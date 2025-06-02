@@ -13,10 +13,10 @@ export default function Home() {
 				{count == 0 ? "Count on me" : count}
 			</p>
 			<div className="flex gap-2">
-				<Button onClick={(prev) => setCount(count + 1)}>+</Button>
-				<Button onClick={(prev) => setCount(count - 1)}>-</Button>
+				<Button onClick={() => setCount(count + 1)}>+</Button>
+				<Button onClick={() => setCount(count - 1)}>-</Button>
 				<Button variant={"outline"} onClick={(prev) => setCount(0)}>
-					reset
+					Reset
 				</Button>
 			</div>
 		</div>
