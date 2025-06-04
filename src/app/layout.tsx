@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,17 +18,20 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" suppressHydrationWarning>
-			<body className={`${inter.className} antialiased`}>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
-					{children}
-				</ThemeProvider>
-			</body>
-		</html>
+		<SidebarProvider>
+			<html lang="en" suppressHydrationWarning>
+				<AppSidebar />
+				<body className={`${inter.className} antialiased`}>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="system"
+						enableSystem
+						disableTransitionOnChange
+					>
+						<SidebarTrigger /> {children}
+					</ThemeProvider>
+				</body>
+			</html>
+		</SidebarProvider>
 	);
 }
