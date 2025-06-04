@@ -1,25 +1,14 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import React from "react";
+import Timer from "@/components/Timer";
+import Kanban from "@/components/Kanban";
 
 export default function Home() {
-	const [count, setCount] = React.useState(0);
-
 	return (
-		<div className="flex flex-col items-center justify-center min-h-screen gap-3 pt-8 pb-12">
-			<section className="flex flex-col gap-4 px-8">
-				<h1 className="text-5xl font-semibold">Hello world</h1>
-				<p className="text-2xl font-medium">
-					{count == 0 ? "Count on me" : count}
-				</p>
-				<div className="flex gap-2">
-					<Button onClick={() => setCount(count + 1)}>+</Button>
-					<Button onClick={() => setCount(count - 1)}>-</Button>
-					<Button variant={"outline"} onClick={(prev) => setCount(0)}>
-						Reset
-					</Button>
-				</div>
+		<div className="flex flex-col items-center justify-center w-full min-h-screen gap-3 pt-8 pb-12">
+			<section className="flex flex-col w-full gap-4 px-8 ">
+				<Timer />
+				<Kanban />
 			</section>
 		</div>
 	);

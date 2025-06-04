@@ -21,7 +21,7 @@ export default function RootLayout({
 		<SidebarProvider>
 			<html lang="en" suppressHydrationWarning>
 				<AppSidebar />
-				<body className={`${inter.className} antialiased`}>
+				<body className={` antialiased`}>
 					<ThemeProvider
 						attribute="class"
 						defaultTheme="system"
