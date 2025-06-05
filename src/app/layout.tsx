@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,14 +22,18 @@ export default function RootLayout({
 		<SidebarProvider>
 			<html lang="en" suppressHydrationWarning>
 				<AppSidebar />
-				<body className={` antialiased`}>
+				<body className="flex antialiased">
 					<ThemeProvider
 						attribute="class"
 						defaultTheme="system"
 						enableSystem
 						disableTransitionOnChange
 					>
-						<SidebarTrigger /> {children}
+						<div className="flex gap-4 p-2 flex-col h-full">
+							<SidebarTrigger />
+							<ThemeToggle />
+						</div>
+						{children}
 					</ThemeProvider>
 				</body>
 			</html>

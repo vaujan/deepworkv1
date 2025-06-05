@@ -8,7 +8,10 @@ export default function Home() {
 		<div className="flex flex-col items-center justify-center w-full min-h-screen gap-3 pt-8 pb-12">
 			<section className="flex flex-col w-full gap-4 px-8 ">
 				<Timer />
-				<Kanban />
+				<div className="flex w-full gap-4 h-fit">
+					<Kanban />
+					<Kanban />
+				</div>
 			</section>
 		</div>
 	);
