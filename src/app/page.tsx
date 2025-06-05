@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import Timer from "@/components/Timer";
 import Kanban from "@/components/Kanban";
+import KanbanPragmatic from "@/components/KanbanPragmatic";
 
 export default function Home() {
 	return (
@@ -10,7 +11,7 @@ export default function Home() {
 				<Timer />
 				<div className="flex w-full gap-4 h-fit">
 					<Kanban />
-					<Kanban />
+					<KanbanPragmatic />
 				</div>
 			</section>
 		</div>

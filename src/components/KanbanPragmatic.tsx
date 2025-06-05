@@ -1,7 +1,12 @@
 "use client";
 
 import React from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import {
+	DragDropContext,
+	Draggable,
+	Droppable,
+} from "@atlaskit/pragmatic-drag-and-drop-react-beautiful-dnd-migration";
 
 const COLUMNS = [
 	{ id: "TODO", title: "To do" },
@@ -30,10 +35,29 @@ const INITIAL_TASKS = [
 		status: "DONE",
 	},
 ];
-export default function Kanban() {
+export default function KanbanPragmatic() {
 	const [tasks, setTasks] = React.useState(INITIAL_TASKS);
 
-	// Handle drag end, based on: https://github.com/hello-pangea/dnd/blob/main/docs/guides/using-the-library.md#ondragend
+	// React.useEffect(() => {
+	// 	return monitorForElements({
+	// 		onDrop({ source, location }) {
+	// 			const destination = location.current.dropTargets[0];
+	// 			if (!destination) return;
+
+	// 			const sourceIndex: any = source.data.index;
+	// 			const destinationIndex: any = destination.data.index;
+
+	// 			if (sourceIndex === destinationIndex) return;
+
+	// 			const newTasks = Array.from(tasks);
+	// 			const [movedTask] = newTasks.splice(sourceIndex, 1);
+	// 			newTasks.splice(destinationIndex, 0, movedTask);
+
+	// 			setTasks(newTasks);
+	// 		},
+	// 	});
+	// }, [tasks]);
+
 	const onDragEnd = (result: any) => {
 		const { source, destination } = result;
 
@@ -54,20 +78,20 @@ export default function Kanban() {
 	return (
 		<DragDropContext onDragEnd={onDragEnd}>
 			<Droppable droppableId="tasks">
-				{(provided, snapshot) => (
+				{(provided: any) => (
 					// The div to contains all the tasks
 					<div
 						{...provided.droppableProps}
 						ref={provided.innerRef}
-						className={`p-4 rounded-sm min-h-[200px] bg-card transition-all ease-out ${snapshot.isDraggingOver ? "" : ""}`}
+						className={`p-4 rounded-sm min-h-[200px] bg-card transition-all ease-out`}
 					>
 						<span className="font-semibold text-card-foreground">
-							Kanban Hello Pangea DnD
+							Kanban Pragmatic DnD
 						</span>
 						{tasks.map((task, index) => (
 							// Per-item
 							<Draggable draggableId={task.id} index={index} key={task.id}>
-								{(provided, snapshot) => (
+								{(provided: any, snapshot: any) => (
 									<div
 										{...provided.draggableProps}
 										{...provided.dragHandleProps}
