@@ -11,7 +11,7 @@ export default function Home() {
 				<Timer />
 				<div className="flex w-full gap-4 h-fit">
 					<Kanban />
-					<KanbanPragmatic />
+					{/* <KanbanPragmatic /> */}
 				</div>
 			</section>
 		</div>

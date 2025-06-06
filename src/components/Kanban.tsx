@@ -1,7 +1,12 @@
 "use client";
 
 import React from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import {
+	DragDropContext,
+	Droppable,
+	Draggable,
+	DropResult,
+} from "@hello-pangea/dnd";
 
 const COLUMNS = [
 	{ id: "TODO", title: "To do" },
@@ -34,7 +39,7 @@ export default function Kanban() {
 	const [tasks, setTasks] = React.useState(INITIAL_TASKS);
 
 	// Handle drag end, based on: https://github.com/hello-pangea/dnd/blob/main/docs/guides/using-the-library.md#ondragend
-	const onDragEnd = (result: any) => {
+	const onDragEnd = (result: DropResult) => {
 		const { source, destination } = result;
 
 		// Dropped outside the list
@@ -44,51 +49,70 @@ export default function Kanban() {
 
 		// Reorder tasks
 		const newTasks = Array.from(tasks);
-		const [reorderedTask] = newTasks.splice(source.index, 1);
-		newTasks.splice(destination.index, 0, reorderedTask);
+		const [movedTask] = newTasks.splice(source.index, 1);
 
+		if (source.droppableId !== destination.droppableId) {
+			movedTask.status = destination.droppableId;
+		}
+
+		newTasks.splice(destination.index, 0, movedTask);
 		setTasks(newTasks);
+
 		console.log("Current tasks:", tasks);
 	};
 
 	return (
 		<DragDropContext onDragEnd={onDragEnd}>
-			<Droppable droppableId="tasks">
-				{(provided, snapshot) => (
-					// The div to contains all the tasks
-					<div
-						{...provided.droppableProps}
-						ref={provided.innerRef}
-						className={`p-4 rounded-sm min-h-[200px] bg-card transition-all ease-out ${snapshot.isDraggingOver ? "" : ""}`}
-					>
-						<span className="font-semibold text-card-foreground">
-							Kanban Hello Pangea DnD
-						</span>
-						{tasks.map((task, index) => (
-							// Per-item
-							<Draggable draggableId={task.id} index={index} key={task.id}>
-								{(provided, snapshot) => (
-									<div
-										{...provided.draggableProps}
-										{...provided.dragHandleProps}
-										ref={provided.innerRef}
-										className={`flex p-4 transition-all ease-out mb-2 rounded-sm shadow-ms ${snapshot.isDragging ? "bg-accent shadow-lg" : "bg-accent"}`}
-									>
-										<div>
-											<p className="font-semibold text-card-foreground ">
-												{task.title}
-											</p>
-											<p className="text-sm text-accent-foreground">
-												{task.description}
-											</p>
-										</div>
-									</div>
-								)}
-							</Draggable>
-						))}
-					</div>
-				)}
-			</Droppable>
+			<div className="w-full">
+				<h1 className="mb-4 text-xl font-semibold">Deep Work Kanban</h1>
+				<div className="flex flex-col gap-6 md:flex-row">
+					{COLUMNS.map((column: any) => (
+						<Droppable key={column.id} droppableId={column.id}>
+							{(provided, snapshot) => (
+								<div
+									{...provided.droppableProps}
+									ref={provided.innerRef}
+									className={`p-4 rounded-sm min-h-[300px] w-full sm:w-1/3 bg-gray-100 transition-all duration-300 ease-in-out ${
+										snapshot.isDraggingOver
+											? "dark:bg-cyan-950 bg-cyan-50 ring-2 ring-cyan-300"
+											: "dark:bg-gray-950 bg-gray-100"
+									}`}
+								>
+									<h2 className="mb-3 font-medium text-muted-foreground">
+										{column.title}
+									</h2>
+									{tasks
+										.filter((task) => task.status === column.id)
+										.map((task, index) => (
+											<Draggable
+												key={task.id}
+												draggableId={task.id}
+												index={index}
+											>
+												{(provided, snapshot) => (
+													<div
+														{...provided.dragHandleProps}
+														{...provided.draggableProps}
+														ref={provided.innerRef}
+														className={`bg-card mb-3 p-3 border-1 border-border rounded-sm `}
+													>
+														<h3 className="text-sm font-semibold">
+															{task.title}
+														</h3>
+														<p className="text-sm text-muted-foreground">
+															{task.description}
+														</p>
+													</div>
+												)}
+											</Draggable>
+										))}
+									{provided.placeholder}
+								</div>
+							)}
+						</Droppable>
+					))}
+				</div>
+			</div>
 		</DragDropContext>
 	);
 }
