@@ -35,7 +35,7 @@ export default function Pomodoro() {
 
 	return (
 		<div className="flex flex-col items-center justify-center max-w-md gap-6 rounded-md h-fit w-fit ">
-			<NavigationMenu className="p-1 rounded-lg border-1 border-border/50 bg-accent/20">
+			<NavigationMenu className="p-1 rounded-lg border-1 border-border/50 bg-secondary/20">
 				<NavigationMenuList>
 					{menu.map((item: any) => (
 						<NavigationMenuItem key={item.id}>

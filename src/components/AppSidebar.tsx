@@ -1,4 +1,4 @@
-import { LogOut, Plus } from "lucide-react";
+import { LogOut, Plus, Settings } from "lucide-react";
 import React from "react";
 
 import {
@@ -13,26 +13,7 @@ import {
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Button } from "./ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-	Card,
-	CardAction,
-	CardContent,
-	CardDescription,
-	CardTitle,
-} from "./ui/card";
+import { Collapsible } from "./ui/collapsible";
 
 // Menu workspaces.
 const workspaces = [
@@ -55,7 +36,7 @@ const workspaces = [
 
 export function AppSidebar() {
 	return (
-		<Sidebar>
+		<Sidebar variant="floating">
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarGroupLabel>Workspaces</SidebarGroupLabel>
@@ -82,9 +63,17 @@ export function AppSidebar() {
 				</SidebarGroup>
 			</SidebarContent>
 			<SidebarFooter>
-				<div className="flex justify-between items-center rounded-lg hover:bg-accent/50 py-3 px-4">
+				<SidebarMenu>
+					<SidebarMenuItem>
+						<SidebarMenuButton>
+							<Settings />
+							Settings
+						</SidebarMenuButton>
+					</SidebarMenuItem>
+				</SidebarMenu>
+				<div className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-accent/50">
 					<div className="flex flex-col">
-						<span className="text-sm text-foreground font-semibold">
+						<span className="text-sm font-semibold text-foreground">
 							Ahmad Fauzan
 						</span>
 						<p className="text-sm text-muted-foreground">ahmadojan@email.com</p>

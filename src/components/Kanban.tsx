@@ -63,8 +63,7 @@ export default function Kanban() {
 
 	return (
 		<DragDropContext onDragEnd={onDragEnd}>
-			<div className="w-full">
-				<h1 className="mb-4 text-xl font-semibold">Deep Work Kanban</h1>
+			<div className="w-full h-fit">
 				<div className="flex flex-col gap-6 md:flex-row">
 					{COLUMNS.map((column: any) => (
 						<Droppable key={column.id} droppableId={column.id}>
@@ -72,10 +71,10 @@ export default function Kanban() {
 								<div
 									{...provided.droppableProps}
 									ref={provided.innerRef}
-									className={`p-4 rounded-sm min-h-[300px] w-full sm:w-1/3 bg-gray-100 transition-all duration-300 ease-in-out ${
+									className={`p-4 rounded-sm min-h-[300px] w-full sm:w-1/3 transition-all duration-300 ease-in-out ${
 										snapshot.isDraggingOver
-											? "dark:bg-cyan-950 bg-cyan-50 ring-2 ring-cyan-300"
-											: "dark:bg-gray-950 bg-gray-100"
+											? "bg-primary/10 ring-2 ring-primary"
+											: "bg-secondary/10"
 									}`}
 								>
 									<h2 className="mb-3 font-medium text-muted-foreground">
@@ -94,7 +93,7 @@ export default function Kanban() {
 														{...provided.dragHandleProps}
 														{...provided.draggableProps}
 														ref={provided.innerRef}
-														className={`bg-card mb-3 p-3 border-1 border-border rounded-sm `}
+														className={`bg-card mb-3 p-3 rounded-sm `}
 													>
 														<h3 className="text-sm font-semibold">
 															{task.title}

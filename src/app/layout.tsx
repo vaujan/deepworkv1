@@ -28,10 +28,8 @@ export default function RootLayout({
 						disableTransitionOnChange
 					>
 						{/* Sidebar Toggle and Theme is off  */}
-						{/* <div className="flex flex-col h-full gap-4 p-2">
-							<SidebarTrigger />
-							<ThemeToggle />
-						</div> */}
+						{/* <ThemeToggle />
+						<SidebarTrigger /> */}
 						{children}
 					</ThemeProvider>
 				</body>
