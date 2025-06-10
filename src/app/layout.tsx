@@ -7,8 +7,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { sansSerif } from "@/lib/fonts";
 
 export const metadata: Metadata = {
-	title: "Supabase and NextJS Grind",
-	description: "Ultralearning Supabase and NextJS",
+	title: "Progtrack",
+	description: "Where your planning ends and actions starts",
 };
 
 export default function RootLayout({
@@ -27,10 +27,11 @@ export default function RootLayout({
 						enableSystem
 						disableTransitionOnChange
 					>
-						<div className="flex flex-col h-full gap-4 p-2">
+						{/* Sidebar Toggle and Theme is off  */}
+						{/* <div className="flex flex-col h-full gap-4 p-2">
 							<SidebarTrigger />
 							<ThemeToggle />
-						</div>
+						</div> */}
 						{children}
 					</ThemeProvider>
 				</body>

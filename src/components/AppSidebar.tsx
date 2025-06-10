@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { LogOut, Plus } from "lucide-react";
 import React from "react";
 
 import {
@@ -13,6 +13,26 @@ import {
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Button } from "./ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+	Card,
+	CardAction,
+	CardContent,
+	CardDescription,
+	CardTitle,
+} from "./ui/card";
 
 // Menu workspaces.
 const workspaces = [
@@ -61,7 +81,19 @@ export function AppSidebar() {
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
-			<SidebarFooter></SidebarFooter>
+			<SidebarFooter>
+				<div className="flex justify-between items-center rounded-lg hover:bg-accent/50 py-3 px-4">
+					<div className="flex flex-col">
+						<span className="text-sm text-foreground font-semibold">
+							Ahmad Fauzan
+						</span>
+						<p className="text-sm text-muted-foreground">ahmadojan@email.com</p>
+					</div>
+					<Button variant={"ghost"} size={"icon"}>
+						<LogOut />
+					</Button>
+				</div>
+			</SidebarFooter>
 		</Sidebar>
 	);
 }
