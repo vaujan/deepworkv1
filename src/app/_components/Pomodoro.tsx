@@ -10,10 +10,9 @@ import {
 	NavigationMenuTrigger,
 	NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
-import { Button } from "./ui/button";
+import { Button } from "../../components/ui/button";
 import { EllipsisVertical, Play } from "lucide-react";
 import { useState } from "react";
-import { Badge } from "./ui/badge";
 
 export default function Pomodoro() {
 	const [selectedId, setSelectedId] = useState(1);

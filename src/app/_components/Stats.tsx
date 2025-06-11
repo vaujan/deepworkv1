@@ -62,7 +62,7 @@ const chartConfig = {
 
 export default function Stats() {
 	return (
-		<ChartContainer config={chartConfig} className="w-full min-h-[128px]">
+		<ChartContainer config={chartConfig} className="w-full min-h-[96px]">
 			<BarChart accessibilityLayer data={data}>
 				<ChartTooltip content={<ChartTooltipContent />} />
 				<ChartLegend content={<ChartLegendContent />} />

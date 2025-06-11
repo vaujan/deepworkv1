@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { AppSidebar } from "@/app/_components/AppSidebar";
 import { sansSerif } from "@/lib/fonts";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
 	title: "Progtrack",

@@ -12,8 +12,8 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Button } from "./ui/button";
-import { Collapsible } from "./ui/collapsible";
+import { Button } from "../../components/ui/button";
+import { Collapsible } from "../../components/ui/collapsible";
 
 // Menu workspaces.
 const workspaces = [
@@ -36,7 +36,7 @@ const workspaces = [
 
 export function AppSidebar() {
 	return (
-		<Sidebar variant="floating">
+		<Sidebar>
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarGroupLabel>Workspaces</SidebarGroupLabel>
