@@ -1,4 +1,5 @@
 "use client";
+
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import {
 	ChartConfig,
@@ -8,6 +9,13 @@ import {
 	ChartLegend,
 	ChartLegendContent,
 } from "@/components/ui/chart";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 
 const data = [
 	{
@@ -62,26 +70,34 @@ const chartConfig = {
 
 export default function Stats() {
 	return (
-		<ChartContainer config={chartConfig} className="w-full min-h-[96px]">
-			<BarChart accessibilityLayer data={data}>
-				<ChartTooltip content={<ChartTooltipContent />} />
-				<ChartLegend content={<ChartLegendContent />} />
-				<CartesianGrid vertical={false} />
-				<XAxis
-					dataKey="month"
-					tickLine={false}
-					tickMargin={10}
-					axisLine={false}
-					tickFormatter={(value) => value.slice(0, 3)}
-				/>
-				<Bar dataKey="Boot.dev Course" fill="var(--chart-1)" radius={4} />
-				<Bar dataKey="UTBK Prep" fill="var(--chart-2)" radius={4} />
-				<Bar
-					dataKey="Learn Backend JavaScript"
-					fill="var(--chart-3)"
-					radius={4}
-				/>
-			</BarChart>
-		</ChartContainer>
+		<Card className="w-full h-full p-0 border-0 shadow-none bg-background">
+			<CardHeader>
+				<CardTitle>Active Minutes</CardTitle>
+				<CardDescription>Total time spent in focus mode</CardDescription>
+			</CardHeader>
+			<CardContent className="flex h-ful">
+				<ChartContainer config={chartConfig} className="w-full">
+					<BarChart accessibilityLayer data={data}>
+						<ChartTooltip content={<ChartTooltipContent />} />
+						<ChartLegend content={<ChartLegendContent />} />
+						<CartesianGrid vertical={false} />
+						<XAxis
+							dataKey="month"
+							tickLine={false}
+							tickMargin={10}
+							axisLine={false}
+							tickFormatter={(value) => value.slice(0, 3)}
+						/>
+						<Bar dataKey="Boot.dev Course" fill="var(--chart-1)" radius={4} />
+						<Bar dataKey="UTBK Prep" fill="var(--chart-2)" radius={4} />
+						<Bar
+							dataKey="Learn Backend JavaScript"
+							fill="var(--chart-3)"
+							radius={4}
+						/>
+					</BarChart>
+				</ChartContainer>
+			</CardContent>
+		</Card>
 	);
 }
