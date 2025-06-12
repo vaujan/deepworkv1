@@ -1,3 +1,7 @@
-import { Instrument_Sans } from "next/font/google";
+import { Geist, Instrument_Serif } from "next/font/google";
 
-export const sansSerif = Instrument_Sans({ subsets: ["latin"] });
+export const sansSerif = Geist({ subsets: ["latin"] });
+export const serif = Instrument_Serif({
+	subsets: ["latin"],
+	weight: "400",
+});

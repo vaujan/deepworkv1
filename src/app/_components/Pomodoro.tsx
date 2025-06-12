@@ -39,6 +39,7 @@ export default function Pomodoro() {
 					{menu.map((item: any) => (
 						<NavigationMenuItem key={item.id}>
 							<Button
+								size={"sm"}
 								variant={"ghost"}
 								className={`${selectedId === item.id ? "bg-accent/50" : ""}`}
 								onClick={() => setSelectedId(item.id)}
@@ -52,7 +53,7 @@ export default function Pomodoro() {
 			<div className="relative flex items-center justify-center w-full">
 				<Button
 					variant={"ghost"}
-					className="absolute top-0 right-0 z-50"
+					className="absolute size-8 top-0 right-0 z-50"
 					size={"icon"}
 				>
 					<EllipsisVertical />
@@ -82,7 +83,7 @@ export default function Pomodoro() {
 					+5:00
 				</Button>
 			</div>
-			<Button className="w-fit">
+			<Button variant={"default"} className="w-fit">
 				<Play /> Start Session
 			</Button>
 		</div>

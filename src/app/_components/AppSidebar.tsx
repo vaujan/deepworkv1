@@ -1,4 +1,12 @@
-import { LogOut, Plus, Settings } from "lucide-react";
+import {
+	Book,
+	CodeIcon,
+	Icon,
+	Laptop,
+	LogOut,
+	Plus,
+	Settings,
+} from "lucide-react";
 import React from "react";
 
 import {
@@ -14,23 +22,24 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "../../components/ui/button";
 import { Collapsible } from "../../components/ui/collapsible";
+import Link from "next/link";
 
 // Menu workspaces.
 const workspaces = [
 	{
 		title: "Learn Backend JavaScript",
 		url: "#",
-		emoji: "💻",
+		icon: Laptop,
 	},
 	{
 		title: "UTBK Prep",
 		url: "#",
-		emoji: "📔",
+		icon: Book,
 	},
 	{
 		title: "Boot.dev Course",
 		url: "#",
-		emoji: "🥾",
+		icon: CodeIcon,
 	},
 ];
 
@@ -46,7 +55,7 @@ export function AppSidebar() {
 								<SidebarMenuItem key={item.title}>
 									<SidebarMenuButton asChild>
 										<a href={item.url}>
-											<span>{item.emoji}</span>
+											<item.icon />
 											<span>{item.title}</span>
 										</a>
 									</SidebarMenuButton>
@@ -79,7 +88,9 @@ export function AppSidebar() {
 						<p className="text-sm text-muted-foreground">ahmadojan@email.com</p>
 					</div>
 					<Button variant={"ghost"} size={"icon"}>
-						<LogOut />
+						<Link href="/">
+							<LogOut />
+						</Link>
 					</Button>
 				</div>
 			</SidebarFooter>
