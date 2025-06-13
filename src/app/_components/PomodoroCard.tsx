@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PomodoroCardFocus from "./PomodoroCardFocus";
 import { EllipsisVertical } from "lucide-react";
@@ -28,7 +22,7 @@ export default function PomodoroCard() {
 	];
 
 	return (
-		<Tabs className="w-full max-w-xs" defaultValue="focus">
+		<Tabs className="w-full md:max-w-xs" defaultValue="focus">
 			<div className="flex w-full justify-between">
 				<TabsList>
 					{tabs.map((tab: any) => (

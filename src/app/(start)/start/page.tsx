@@ -1,6 +1,5 @@
 import Header from "@/app/_components/Header";
 import Kanban from "@/app/_components/Kanban";
-import Pomodoro from "@/app/_components/Pomodoro";
 import PomodoroCard from "@/app/_components/PomodoroCard";
 import Stats from "@/app/_components/Stats";
 import React from "react";
