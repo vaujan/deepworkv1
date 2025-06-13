@@ -1,12 +1,4 @@
-import {
-	Book,
-	CodeIcon,
-	Icon,
-	Laptop,
-	LogOut,
-	Plus,
-	Settings,
-} from "lucide-react";
+import { Book, CodeIcon, Laptop, LogOut, Plus, Settings } from "lucide-react";
 import React from "react";
 
 import {
@@ -21,7 +13,8 @@ import {
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Button } from "../../components/ui/button";
-import { Collapsible } from "../../components/ui/collapsible";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import Link from "next/link";
 
 // Menu workspaces.
@@ -43,9 +36,9 @@ const workspaces = [
 	},
 ];
 
-export function AppSidebar() {
+export function AppSidebar2() {
 	return (
-		<Sidebar>
+		<Sidebar collapsible="icon" variant="floating">
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarGroupLabel>Workspaces</SidebarGroupLabel>
@@ -54,17 +47,16 @@ export function AppSidebar() {
 							{workspaces.map((item) => (
 								<SidebarMenuItem key={item.title}>
 									<SidebarMenuButton asChild>
-										<a href={item.url}>
+										<Link href={item.url}>
 											<item.icon />
 											<span>{item.title}</span>
-										</a>
+										</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>
 							))}
 							<Button
 								variant={"ghost"}
-								className="border-border border-1 hover:border-accent"
-								size={"icon"}
+								className="size-8 w-full border-border border-1 hover:border-accent"
 							>
 								<Plus />
 							</Button>
@@ -75,25 +67,13 @@ export function AppSidebar() {
 			<SidebarFooter>
 				<SidebarMenu>
 					<SidebarMenuItem>
-						<SidebarMenuButton>
-							<Settings />
-							Settings
-						</SidebarMenuButton>
+						<Link href={"/"}>
+							<SidebarMenuButton>
+								<LogOut /> Log Out
+							</SidebarMenuButton>
+						</Link>
 					</SidebarMenuItem>
 				</SidebarMenu>
-				<div className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-accent/50">
-					<div className="flex flex-col">
-						<span className="text-sm font-semibold text-foreground">
-							Ahmad Fauzan
-						</span>
-						<p className="text-sm text-muted-foreground">ahmadojan@email.com</p>
-					</div>
-					<Button variant={"ghost"} size={"icon"}>
-						<Link href="/">
-							<LogOut />
-						</Link>
-					</Button>
-				</div>
 			</SidebarFooter>
 		</Sidebar>
 	);

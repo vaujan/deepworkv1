@@ -200,24 +200,28 @@
 			boxshadow: 0 0 0 8px var(--pulse-color);
 		}
 	}
-  @keyframes pulse {
-  0%, 100% {
-    boxShadow: 0 0 0 0 var(--pulse-color);
+	@keyframes pulse {
+		0%,
+		100% {
+			boxshadow: 0 0 0 0 var(--pulse-color);
 		}
-  50% {
-    boxShadow: 0 0 0 8px var(--pulse-color);
+		50% {
+			boxshadow: 0 0 0 8px var(--pulse-color);
 		}
 	}
-  --animate-shiny-text: shiny-text 8s infinite
-;
-  @keyframes shiny-text {
-  0%, 90%, 100% {
-    background-position: calc(-100% - var(--shiny-width)) 0;
+	--animate-shiny-text: shiny-text 8s infinite;
+	@keyframes shiny-text {
+		0%,
+		90%,
+		100% {
+			background-position: calc(-100% - var(--shiny-width)) 0;
 		}
-  30%, 60% {
-    background-position: calc(100% + var(--shiny-width)) 0;
+		30%,
+		60% {
+			background-position: calc(100% + var(--shiny-width)) 0;
 		}
-	}}
+	}
+}
 
 @layer base {
 	* {

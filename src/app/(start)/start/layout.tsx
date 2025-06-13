@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/app/_components/AppSidebar";
+import { AppSidebar2 } from "@/app/_components/AppSidebar2";
 import { sansSerif } from "@/lib/fonts";
 
 export const metadata: Metadata = {
@@ -16,7 +17,8 @@ export default function RootLayout({
 	return (
 		<SidebarProvider>
 			<html lang="en" suppressHydrationWarning>
-				<AppSidebar />
+				{/* <AppSidebar /> */}
+				<AppSidebar2 />
 				<body className={`${sansSerif.className} flex antialiased`}>
 					{children}
 				</body>

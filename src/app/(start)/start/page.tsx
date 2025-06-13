@@ -10,8 +10,7 @@ export default function Home() {
 		<div className="flex flex-col w-full gap-8 pb-12">
 			<Header>Learn Backend JavaScript</Header>
 			<section className="flex flex-col gap-8 px-8 md:flex-row ">
-				{/* <PomodoroCard /> */}
-				<Pomodoro />
+				<PomodoroCard />
 				<Stats />
 			</section>
 			<section className="flex gap-8 px-8">

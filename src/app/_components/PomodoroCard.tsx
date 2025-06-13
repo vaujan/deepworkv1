@@ -1,77 +1,53 @@
-"use client";
-
+import { Button } from "@/components/ui/button";
 import {
-	NavigationMenu,
-	NavigationMenuItem,
-	NavigationMenuList,
-} from "@/components/ui/navigation-menu";
-import { Button } from "../../components/ui/button";
-import { EllipsisVertical, Play } from "lucide-react";
-import { useState } from "react";
+	Card,
+	CardContent,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PomodoroCardFocus from "./PomodoroCardFocus";
+import { EllipsisVertical } from "lucide-react";
+import PomodoroCardRest from "./PomodoroCardRest";
 
 export default function PomodoroCard() {
-	const [selectedId, setSelectedId] = useState(1);
-
-	const menu = [
+	const tabs = [
 		{
 			title: "Focus",
+			value: "focus",
 			id: 1,
+			component: <PomodoroCardFocus />,
 		},
 		{
 			title: "Rest",
+			value: "rest",
 			id: 2,
+			component: <PomodoroCardRest />,
 		},
 	];
 
 	return (
-		// Card header
-		<div className="flex flex-col items-center justify-center w-full max-w-md h-fit">
-			<div className="flex w-full">
-				{menu.map((item: any) => (
-					<Button
-						className={`rounded-t-md rounded-b-none ${selectedId === item.id ? "bg-card text-card-foreground " : "bg-background text-muted-foreground"}`}
-						onClick={() => setSelectedId(item.id)}
-						variant={"secondary"}
-					>
-						{item.title}
-					</Button>
-				))}
-			</div>
-
-			{/* Card Content */}
-			<div
-				className={`flex z-10 flex-col items-center justify-center w-full gap-4 py-10 rounded-b-lg bg-card ${selectedId == 1 ? "rounded-tr-lg" : "rounded-t-lg"}`}
-			>
-				<div className="relative flex items-center justify-center w-full">
-					<div className="flex items-center justify-center text-xs rounded-lg w-30 border-border border-1 h-30 bg-accent"></div>
-				</div>
-				<div className="flex gap-1.5">
-					<Button
-						className="text-xs border-0 rounded-full "
-						size={"sm"}
-						variant={"outline"}
-					>
-						+0:30
-					</Button>
-					<Button
-						className="text-xs border-0 rounded-full "
-						size={"sm"}
-						variant={"outline"}
-					>
-						+1:00
-					</Button>
-					<Button
-						className="text-xs border-0 rounded-full "
-						size={"sm"}
-						variant={"outline"}
-					>
-						+5:00
-					</Button>
-				</div>
-				<Button variant={"default"} className="w-fit">
-					<Play /> Start Session
+		<Tabs className="w-full max-w-xs" defaultValue="focus">
+			<div className="flex w-full justify-between">
+				<TabsList>
+					{tabs.map((tab: any) => (
+						<TabsTrigger key={tab.id} value={tab.value}>
+							{tab.title}
+						</TabsTrigger>
+					))}
+				</TabsList>
+				<Button variant={"ghost"} className="size-8" size={"icon"}>
+					<EllipsisVertical />
 				</Button>
 			</div>
-		</div>
+			<Card>
+				{tabs.map((tab: any) => (
+					<TabsContent value={tab.value} key={tab.id}>
+						{tab.component}
+					</TabsContent>
+				))}
+			</Card>
+		</Tabs>
 	);
 }
