@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { sansSerif } from "@/lib/fonts";
+import React from "react";
 
 export const metadata: Metadata = {
 	title: "Progtrack",

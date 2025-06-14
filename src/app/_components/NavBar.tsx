@@ -10,7 +10,7 @@ export default function NavBar() {
 				<ThemeToggle />
 
 				<Link href="#">
-					<Button variant="link">Hello world</Button>
+					<Button variant="ghost">Hello world</Button>
 				</Link>
 			</div>
 		</div>

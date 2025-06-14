@@ -1,4 +1,4 @@
-import { Book, CodeIcon, Laptop, LogOut, Plus, Settings } from "lucide-react";
+import { Book, CodeIcon, Laptop, LogOut, Plus } from "lucide-react";
 import React from "react";
 
 import {
@@ -13,8 +13,6 @@ import {
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Button } from "../../components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import Link from "next/link";
 
 // Menu workspaces.
@@ -38,7 +36,7 @@ const workspaces = [
 
 export function AppSidebar2() {
 	return (
-		<Sidebar collapsible="icon" variant="floating">
+		<Sidebar collapsible="icon">
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarGroupLabel>Workspaces</SidebarGroupLabel>

@@ -1,12 +1,4 @@
-import {
-	Book,
-	CodeIcon,
-	Icon,
-	Laptop,
-	LogOut,
-	Plus,
-	Settings,
-} from "lucide-react";
+import { Book, CodeIcon, Laptop, LogOut, Plus, Settings } from "lucide-react";
 import React from "react";
 
 import {
@@ -21,7 +13,6 @@ import {
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Button } from "../../components/ui/button";
-import { Collapsible } from "../../components/ui/collapsible";
 import Link from "next/link";
 
 // Menu workspaces.

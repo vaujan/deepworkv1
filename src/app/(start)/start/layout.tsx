@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/app/_components/AppSidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar2 } from "@/app/_components/AppSidebar2";
-import { sansSerif } from "@/lib/fonts";
+import React from "react";
 
 export const metadata: Metadata = {
 	title: "Progtrack",
@@ -16,13 +15,11 @@ export default function RootLayout({
 }>) {
 	return (
 		<SidebarProvider>
-			<html lang="en" suppressHydrationWarning>
+			<div className="flex w-full ">
 				{/* <AppSidebar /> */}
 				<AppSidebar2 />
-				<body className={`${sansSerif.className} flex antialiased`}>
-					{children}
-				</body>
-			</html>
+				<div className={`flex w-full antialiased`}>{children}</div>
+			</div>
 		</SidebarProvider>
 	);
 }

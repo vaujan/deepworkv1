@@ -7,7 +7,6 @@ import {
 	Draggable,
 	DropResult,
 } from "@hello-pangea/dnd";
-import { GripVertical } from "lucide-react";
 
 const COLUMNS = [
 	{ id: "TODO", title: "To do" },
@@ -72,10 +71,10 @@ export default function Kanban() {
 								<div
 									{...provided.droppableProps}
 									ref={provided.innerRef}
-									className={`p-4 rounded-lg min-h-[300px] w-full sm:w-1/3 transition-all duration-300 ease-in-out ${
+									className={`p-4 rounded-sm min-h-[300px] w-full sm:w-1/3 transition-all duration-300 ease-in-out ${
 										snapshot.isDraggingOver
 											? "bg-primary/10 ring-2 ring-primary"
-											: "bg-secondary/50"
+											: "bg-secondary/10"
 									}`}
 								>
 									<h2 className="mb-3 font-medium text-muted-foreground">
@@ -94,22 +93,14 @@ export default function Kanban() {
 														{...provided.dragHandleProps}
 														{...provided.draggableProps}
 														ref={provided.innerRef}
-														className={`bg-card mb-2 gap-3 flex p-3 rounded-sm ${snapshot.isDragging ? "shadow-xl shadow-blue-500" : "shadow-none"} `}
+														className={`bg-card mb-3 p-3 rounded-sm `}
 													>
-														<div className="pt-1">
-															<GripVertical
-																className="text-muted-foreground/30"
-																size={16}
-															/>
-														</div>
-														<div className="flex flex-col ">
-															<h3 className="text-sm font-semibold">
-																{task.title}
-															</h3>
-															<p className="text-sm text-muted-foreground">
-																{task.description}
-															</p>
-														</div>
+														<h3 className="text-sm font-semibold">
+															{task.title}
+														</h3>
+														<p className="text-sm text-muted-foreground">
+															{task.description}
+														</p>
 													</div>
 												)}
 											</Draggable>

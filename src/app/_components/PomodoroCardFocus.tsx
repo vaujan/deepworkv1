@@ -1,37 +1,50 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { Pause, Play } from "lucide-react";
 import React from "react";
+import { useTimerStore } from "@/lib/store";
+// import {
+// 	Label,
+// 	PolarGrid,
+// 	PolarRadiusAxis,
+// 	RadialBar,
+// 	RadialBarChart,
+// } from "recharts";
+// import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 
 export default function PomodoroCardFocus() {
-	const [seconds, setSeconds] = React.useState(3600);
-	const [isRunning, setisRunning] = React.useState(false);
+	const { focusSeconds, isRunning, setIsRunning, decreaseFocusSeconds } =
+		useTimerStore();
 
 	React.useEffect(() => {
 		let interval: NodeJS.Timeout | undefined;
 		if (isRunning) {
-			interval = setInterval(() => setSeconds((prev) => prev - 1), 1000);
-		} else if (!isRunning && seconds !== 0) {
+			interval = setInterval(() => decreaseFocusSeconds(1), 1000);
+		} else if (!isRunning && focusSeconds !== 0) {
 			clearInterval(interval);
 		}
 		return () => {
 			clearInterval(interval);
 		};
-	}, [isRunning, seconds]);
+	}, [isRunning, focusSeconds]);
 
 	return (
 		<>
 			<CardContent className="flex justify-center items-center">
-				<div className="flex items-center justify-center h-32 transition-all rounded-lg w-54">
-					<h3 className="text-5xl font-semibold">{seconds}</h3>
+				{/* Chart */}
+				<div className="flex flex-col items-center justify-center h-32 transition-all rounded-lg w-54">
+					<h3 className="text-5xl font-semibold">{focusSeconds}</h3>
+					<span className="font-medium text-xs text-muted-foreground mt-2">
+						SECONDS
+					</span>
 				</div>
 			</CardContent>
-			<CardFooter className="flex justify-center items-center">
+			<CardFooter className="shadow-none flex p-0 justify-center items-center">
 				<Button
-					variant={isRunning === true ? "ghost" : "default"}
-					onClick={() => setisRunning(isRunning === true ? false : true)}
+					size={"lg"}
+					className="w-full rounded-t-none"
+					variant={isRunning === true ? "secondary" : "default"}
+					onClick={() => setIsRunning()}
 				>
 					{isRunning === true ? (
 						<>

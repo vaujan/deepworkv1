@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import {
 	ChartConfig,
@@ -72,7 +73,9 @@ export default function Stats() {
 	return (
 		<Card className="w-full h-full p-0 border-0 shadow-none bg-background">
 			<CardHeader>
-				<CardTitle>Active Minutes</CardTitle>
+				<CardTitle>
+					<span className="text-normal">Active Minutes</span>
+				</CardTitle>
 				<CardDescription>Total time spent in focus mode</CardDescription>
 			</CardHeader>
 			<CardContent className="flex h-ful">
