@@ -254,5 +254,5 @@
 }
 
 ::selection {
-	@apply bg-orange-500;
+	@apply bg-sky-500/40;
 }

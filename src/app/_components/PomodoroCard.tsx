@@ -8,11 +8,8 @@ import PomodoroCardFocus from "./PomodoroCardFocus";
 import { EllipsisVertical } from "lucide-react";
 import PomodoroCardRest from "./PomodoroCardRest";
 import { useTimerStore } from "@/lib/store";
-import {
-	Popover,
-	PopoverTrigger,
-	PopoverContent,
-} from "@/components/ui/popover";
+import { Popover, PopoverTrigger } from "@/components/ui/popover";
+import PomodoroCardPopoverSettings from "./PomodoroCardPopoverSettings";
 
 export default function PomodoroCard() {
 	const { isRunning } = useTimerStore();
@@ -33,8 +30,8 @@ export default function PomodoroCard() {
 	];
 
 	return (
-		<Tabs className="w-full md:max-w-xs" defaultValue="focus">
-			<div className="flex w-full justify-between">
+		<Tabs className="w-full" defaultValue="focus">
+			<div className="flex justify-between w-full">
 				<TabsList className="w-full md:w-fit">
 					{tabs.map((tab) => (
 						<TabsTrigger disabled={isRunning} key={tab.id} value={tab.value}>
@@ -43,12 +40,17 @@ export default function PomodoroCard() {
 					))}
 				</TabsList>
 				<Popover>
-					<PopoverTrigger>
-						<Button variant={"ghost"} className="ml-2 md:size-8" size={"icon"}>
+					<PopoverTrigger disabled={isRunning} className="ml-2">
+						<Button
+							disabled={isRunning}
+							variant={"ghost"}
+							className="md:size-8"
+							size={"icon"}
+						>
 							<EllipsisVertical />
 						</Button>
 					</PopoverTrigger>
-					<PopoverContent>Hello world!</PopoverContent>
+					<PomodoroCardPopoverSettings />
 				</Popover>
 			</div>
 			<Card className="p-0">

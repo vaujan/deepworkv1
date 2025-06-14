@@ -30,16 +30,16 @@ export default function PomodoroCardFocus() {
 
 	return (
 		<>
-			<CardContent className="flex justify-center items-center">
+			<CardContent className="flex items-center justify-center">
 				{/* Chart */}
 				<div className="flex flex-col items-center justify-center h-32 transition-all rounded-lg w-54">
 					<h3 className="text-5xl font-semibold">{focusSeconds}</h3>
-					<span className="font-medium text-xs text-muted-foreground mt-2">
+					<span className="mt-2 text-xs font-medium text-muted-foreground">
 						SECONDS
 					</span>
 				</div>
 			</CardContent>
-			<CardFooter className="shadow-none flex p-0 justify-center items-center">
+			<CardFooter className="flex items-center justify-center p-0 shadow-none">
 				<Button
 					size={"lg"}
 					className="w-full rounded-t-none"
