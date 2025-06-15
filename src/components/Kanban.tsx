@@ -88,7 +88,7 @@ export default function Kanban() {
 												draggableId={task.id}
 												index={index}
 											>
-												{(provided, snapshot) => (
+												{(provided) => (
 													<div
 														{...provided.dragHandleProps}
 														{...provided.draggableProps}
