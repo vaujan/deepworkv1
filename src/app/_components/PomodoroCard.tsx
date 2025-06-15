@@ -10,6 +10,7 @@ import PomodoroCardRest from "./PomodoroCardRest";
 import { useTimerStore } from "@/lib/store";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import PomodoroCardPopoverSettings from "./PomodoroCardPopoverSettings";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function PomodoroCard() {
 	const { isRunning } = useTimerStore();
@@ -54,11 +55,20 @@ export default function PomodoroCard() {
 				</Popover>
 			</div>
 			<Card className="p-0">
-				{tabs.map((tab) => (
-					<TabsContent value={tab.value} key={tab.id}>
-						{tab.component}
-					</TabsContent>
-				))}
+				<AnimatePresence mode="wait">
+					{tabs.map((tab) => (
+						<TabsContent value={tab.value} key={tab.id}>
+							<motion.div
+								initial={{ opacity: 0, y: 10 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: -10 }}
+								transition={{ duration: 0.2, ease: "easeInOut" }}
+							>
+								{tab.component}
+							</motion.div>
+						</TabsContent>
+					))}
+				</AnimatePresence>
 			</Card>
 		</Tabs>
 	);
