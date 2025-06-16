@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar2 } from "@/app/_components/AppSidebar2";
+import { AppSidebar } from "@/app/_components/AppSidebar";
 import React from "react";
 
 export const metadata: Metadata = {
@@ -15,10 +15,13 @@ export default function RootLayout({
 }>) {
 	return (
 		<SidebarProvider>
-			<div className="flex w-full ">
-				{/* <AppSidebar /> */}
-				<AppSidebar2 />
-				<div className={`flex w-full antialiased`}>{children}</div>
+			<div className="flex w-full md:py-2 ">
+				<AppSidebar />
+				<div
+					className={`flex w-full antialiased md:border-1 overflow-hidden bg-background md:rounded-2xl`}
+				>
+					{children}
+				</div>
 			</div>
 		</SidebarProvider>
 	);

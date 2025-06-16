@@ -8,11 +8,14 @@ interface TimerState {
 	decreaseFocusSeconds: (by: number) => void;
 	decreaseRestSeconds: (by: number) => void;
 }
+
 export const useTimerStore = create<TimerState>()((set) => ({
-	focusSeconds: 3600,
-	restSeconds: 900,
+	focusSeconds: 3,
+	restSeconds: 3,
 	isRunning: false,
+
 	setIsRunning: () => set((state) => ({ isRunning: !state.isRunning })),
+
 	decreaseFocusSeconds: (by) =>
 		set((state) => ({ focusSeconds: state.focusSeconds - by })),
 	decreaseRestSeconds: (by) =>

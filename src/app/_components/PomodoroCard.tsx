@@ -54,7 +54,7 @@ export default function PomodoroCard() {
 					<PomodoroCardPopoverSettings />
 				</Popover>
 			</div>
-			<Card className="p-0">
+			<Card className="p-0 overflow-hidden">
 				<AnimatePresence mode="wait">
 					{tabs.map((tab) => (
 						<TabsContent value={tab.value} key={tab.id}>

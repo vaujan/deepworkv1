@@ -29,12 +29,12 @@ export default function Home() {
 			/>
 
 			<NavBar />
-			<div className="flex flex-col items-center justify-center max-w-5xl gap-4">
-				<h1 className={cn("mb-2 text-5xl font-medium text-center")}>
+			<div className="flex flex-col items-center justify-center max-w-5xl gap-4 px-8">
+				<h1 className={cn("mb-2 text-3xl md:text-5xl font-medium text-center")}>
 					Get off the algorhytm by <br />
 					<span className="text-">going deep.</span>
 				</h1>
-				<p className="text-lg text-center text-secondary-foreground">
+				<p className="text-base md:text-lg text-center text-secondary-foreground">
 					It is time for you to join the focused few and leave the distraced
 					masses.
 				</p>
