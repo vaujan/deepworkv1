@@ -18,7 +18,7 @@ export default function RootLayout({
 			<div className="flex w-full md:py-2 ">
 				<AppSidebar />
 				<div
-					className={`flex w-full antialiased md:border-1 overflow-hidden bg-background md:rounded-2xl`}
+					className={`flex w-full md:shadow-xs shadow-red-500 antialiased md:border-1 overflow-hidden bg-background md:rounded-2xl`}
 				>
 					{children}
 				</div>

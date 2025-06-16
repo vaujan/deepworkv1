@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { Pause, Play } from "lucide-react";
@@ -9,25 +11,32 @@ export default function PomodoroCardFocus() {
 	const { focusSeconds, isRunning, setIsRunning, decreaseFocusSeconds } =
 		useTimerStore();
 
+	const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
+	const hasCompletedRef = React.useRef(false);
+
 	React.useEffect(() => {
-		let interval: NodeJS.Timeout | undefined;
-		if (isRunning) {
-			interval = setInterval(() => decreaseFocusSeconds(1), 1000);
-		} else if (!isRunning && focusSeconds !== 0) {
-			clearInterval(interval);
-		} else if (isRunning && focusSeconds <= 0) {
+		if (isRunning && focusSeconds > 0) {
+			hasCompletedRef.current = false;
+			intervalRef.current = setInterval(() => {
+				decreaseFocusSeconds(1);
+			}, 1000);
+		} else if (focusSeconds === 0 && !hasCompletedRef.current) {
+			hasCompletedRef.current = true;
+			console.log(`Time's Up!`);
 			setIsRunning();
-			alert(`Time's up!`);
 		}
+
 		return () => {
-			clearInterval(interval);
+			if (intervalRef.current) {
+				clearInterval(intervalRef.current);
+				intervalRef.current = null;
+			}
 		};
-	}, [isRunning, focusSeconds]);
+	}, [isRunning, focusSeconds, setIsRunning, decreaseFocusSeconds]);
 
 	return (
 		<>
 			<CardContent className="flex items-center justify-center">
-				{/* Chart */}
 				<div className="flex flex-col items-center justify-center h-32 transition-all rounded-lg w-54">
 					<h3 className="text-5xl font-semibold">{formatTime(focusSeconds)}</h3>
 					<span className="mt-2 text-xs font-medium text-muted-foreground">

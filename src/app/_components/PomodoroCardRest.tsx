@@ -9,18 +9,28 @@ export default function PomodoroCardRest() {
 	const { restSeconds, isRunning, setIsRunning, decreaseRestSeconds } =
 		useTimerStore();
 
-	React.useEffect(() => {
-		let interval: NodeJS.Timeout | undefined;
+	const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
+	const hasCompletedRef = React.useRef(false);
 
-		if (isRunning && restSeconds < 0) {
-			interval = setInterval(() => decreaseRestSeconds(1), 1000);
-		} else if (!isRunning && restSeconds !== 0) {
-			clearInterval(interval);
+	React.useEffect(() => {
+		if (isRunning && restSeconds > 0) {
+			hasCompletedRef.current = false;
+			intervalRef.current = setInterval(() => {
+				decreaseRestSeconds(1);
+			}, 1000);
+		} else if (restSeconds === 0 && !hasCompletedRef.current) {
+			hasCompletedRef.current = true;
+			console.log(`Rest time's up!`);
+			setIsRunning();
 		}
+
 		return () => {
-			clearInterval(interval);
+			if (intervalRef.current) {
+				clearInterval(intervalRef.current);
+				intervalRef.current = null;
+			}
 		};
-	}, [isRunning, restSeconds]);
+	}, [isRunning, restSeconds, setIsRunning, decreaseRestSeconds]);
 
 	return (
 		<>
