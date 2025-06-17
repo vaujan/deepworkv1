@@ -34,6 +34,47 @@ export default function PomodoroCardFocus() {
 		};
 	}, [isRunning, focusSeconds, setIsRunning, decreaseFocusSeconds]);
 
+	const toggleButton = () => {
+		if (
+			hasCompletedRef.current === false &&
+			focusSeconds > 0 &&
+			isRunning === false
+		) {
+			setIsRunning();
+		}
+	};
+
+	const buttonText = () => {
+		if (
+			hasCompletedRef.current === false &&
+			focusSeconds > 0 &&
+			isRunning === false
+		) {
+			return (
+				<>
+					<Play /> Play
+				</>
+			);
+		} else if (
+			hasCompletedRef.current === false &&
+			focusSeconds > 0 &&
+			isRunning === true
+		) {
+			return (
+				<>
+					<Play /> Resume
+				</>
+			);
+		} else {
+			return (
+				<>
+					<Pause />
+					Paused
+				</>
+			);
+		}
+	};
+
 	return (
 		<>
 			<CardContent className="flex items-center justify-center">
@@ -51,17 +92,7 @@ export default function PomodoroCardFocus() {
 					variant={isRunning === true ? "secondary" : "default"}
 					onClick={() => setIsRunning()}
 				>
-					{isRunning === true ? (
-						<>
-							<Pause />
-							Pause
-						</>
-					) : (
-						<>
-							<Play />
-							Start Session
-						</>
-					)}
+					{buttonText()}
 				</Button>
 			</CardFooter>
 		</>
