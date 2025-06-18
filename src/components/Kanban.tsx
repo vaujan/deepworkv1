@@ -38,6 +38,8 @@ const INITIAL_TASKS = [
 export default function Kanban() {
 	const [tasks, setTasks] = React.useState(INITIAL_TASKS);
 
+	React.useEffect(() => {}, [tasks, setTasks]);
+
 	// Handle drag end, based on: https://github.com/hello-pangea/dnd/blob/main/docs/guides/using-the-library.md#ondragend
 	const onDragEnd = (result: DropResult) => {
 		const { source, destination } = result;

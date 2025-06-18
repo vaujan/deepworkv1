@@ -34,15 +34,15 @@ export default function PomodoroCardRest() {
 
 	return (
 		<>
-			<CardContent className="flex justify-center items-center">
+			<CardContent className="flex items-center justify-center">
 				<div className="flex flex-col items-center justify-center h-32 transition-all rounded-lg w-54">
 					<h3 className="text-5xl font-semibold">{formatTime(restSeconds)}</h3>
-					<span className="font-medium text-xs text-muted-foreground mt-2">
+					<span className="mt-2 text-xs font-medium text-muted-foreground">
 						REMAINING TIME
 					</span>
 				</div>
 			</CardContent>
-			<CardFooter className="flex p-0 justify-center items-center">
+			<CardFooter className="flex items-center justify-center p-0">
 				<div className="w-full">
 					<Button
 						className={`shadow-none w-full rounded-t-none border-x-0 border-b-0 ${isRunning ? "text" : "text-primary"}`}

@@ -8,7 +8,6 @@ export default function NavBar() {
 		<div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full ">
 			<div className="flex items-center w-full max-w-5xl px-8 py-4">
 				<ThemeToggle />
-
 				<Link href="#">
 					<Button variant="ghost">Hello world</Button>
 				</Link>
