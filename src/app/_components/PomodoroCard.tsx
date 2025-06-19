@@ -11,11 +11,19 @@ import { useTimerStore } from "@/lib/store";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import PomodoroCardPopoverSettings from "./PomodoroCardPopoverSettings";
 import { motion, AnimatePresence } from "motion/react";
+import { TimerType } from "@/lib/store";
 
 export default function PomodoroCard() {
-	const { focusMode, restMode, activeTimer } = useTimerStore();
+	const { focusMode, restMode, activeTimer, setActiveTimer } = useTimerStore();
 
-	const tabs = [
+	interface TabState {
+		title: string;
+		value: TimerType;
+		id: number;
+		component: React.ReactNode;
+	}
+
+	const tabs: TabState[] = [
 		{
 			title: "Focus",
 			value: "focus",
@@ -39,6 +47,7 @@ export default function PomodoroCard() {
 							disabled={restMode !== "idle" || focusMode !== "idle"}
 							key={tab.id}
 							value={tab.value}
+							onClick={() => setActiveTimer(tab.value)}
 						>
 							{tab.title}
 						</TabsTrigger>

@@ -8,9 +8,7 @@ import { formatTime } from "@/lib/utils";
 export default function PomodoroCardRest() {
 	const {
 		restTime,
-		setRestTime,
 		restMode,
-		setRestMode,
 		startRestTimer,
 		pauseRestTimer,
 		resumeRestTimer,

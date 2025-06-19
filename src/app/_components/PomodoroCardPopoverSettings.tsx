@@ -6,28 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
 
 export default function PomodoroCardPopoverSettings() {
-	const { focusSeconds, restSeconds, setFocusTime, setRestTime } =
-		useTimerStore();
-	const [focusTime, setFocusTimeLocal] = React.useState(focusSeconds);
-	const [restTime, setRestTimeLocal] = React.useState(restSeconds);
-
-	// Update local state when store values change
-	React.useEffect(() => {
-		setFocusTimeLocal(focusSeconds);
-		setRestTimeLocal(restSeconds);
-	}, [focusSeconds, restSeconds]);
-
-	const handleFocusTimeChange = (increment: number) => {
-		const newTime = Math.max(5 * 60, focusTime + increment); // Minimum 5 minutes
-		setFocusTimeLocal(newTime);
-		setFocusTime(newTime);
-	};
-
-	const handleRestTimeChange = (increment: number) => {
-		const newTime = Math.max(1 * 60, restTime + increment); // Minimum 1 minute
-		setRestTimeLocal(newTime);
-		setRestTime(newTime);
-	};
+	const { focusTime, restTime, setRestTime, setFocusTime } = useTimerStore();
 
 	return (
 		<PopoverContent className="w-56 rounded-xl">
@@ -38,7 +17,7 @@ export default function PomodoroCardPopoverSettings() {
 						<Button
 							className="h-full border-0 rounded-none shadow-none"
 							variant={"outline"}
-							onClick={() => handleFocusTimeChange(-5 * 60)}
+							// onClick={}
 						>
 							<Minus />
 						</Button>
@@ -50,7 +29,6 @@ export default function PomodoroCardPopoverSettings() {
 						<Button
 							className="h-full border-0 rounded-none shadow-none"
 							variant={"outline"}
-							onClick={() => handleFocusTimeChange(5 * 60)}
 						>
 							<Plus />
 						</Button>
@@ -62,7 +40,6 @@ export default function PomodoroCardPopoverSettings() {
 						<Button
 							className="h-full border-0 rounded-none shadow-none"
 							variant={"outline"}
-							onClick={() => handleRestTimeChange(-1 * 60)}
 						>
 							<Minus />
 						</Button>
@@ -74,7 +51,6 @@ export default function PomodoroCardPopoverSettings() {
 						<Button
 							className="h-full border-0 rounded-none shadow-none"
 							variant={"outline"}
-							onClick={() => handleRestTimeChange(1 * 60)}
 						>
 							<Plus />
 						</Button>

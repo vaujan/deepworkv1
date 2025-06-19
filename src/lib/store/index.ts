@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 type TimerMode = "idle" | "running" | "paused" | "finished";
-type TimerType = "focus" | "rest";
+export type TimerType = "focus" | "rest";
 
 // const FOCUS_TIME = 25 * 60;
 // const REST_TIME = 5 * 60;
@@ -82,7 +82,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
 	resetFocusTimer: () => {
 		const { focusMode, focusTime } = get();
 		if (focusMode === "paused" && focusTime > 0) {
-			set({ focusMode: "idle", focusTime: FOCUS_TIME, activeTimer: "rest" });
+			set({ focusMode: "idle", focusTime: FOCUS_TIME, activeTimer: "focus" });
 		}
 	},
 
@@ -128,13 +128,13 @@ export const useTimerStore = create<TimerState>((set, get) => ({
 	resetRestTimer: () => {
 		const { restMode, restTime } = get();
 		if (restMode === "paused" && restTime > 0) {
-			set({ restMode: "idle", restTime: REST_TIME, activeTimer: "focus" });
+			set({ restMode: "idle", restTime: REST_TIME, activeTimer: "rest" });
 		}
 	},
 
 	decrementRestTimer: () => {
 		const { restMode, restTime } = get();
-		if (restTime > 0) {
+		if (restMode === "running" && restTime > 0) {
 			const newTime = restTime - 1;
 			set({ restTime: newTime });
 

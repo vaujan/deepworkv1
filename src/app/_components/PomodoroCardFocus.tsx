@@ -10,9 +10,7 @@ import { useTimerStore } from "@/lib/store";
 export default function PomodoroCardFocus() {
 	const {
 		focusTime,
-		setFocusTime,
 		focusMode,
-		setFocusMode,
 		startFocusTimer,
 		pauseFocusTimer,
 		resumeFocusTimer,
