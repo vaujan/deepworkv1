@@ -9,22 +9,22 @@ import { useTimerStore } from "@/lib/store";
 
 export default function PomodoroCardFocus() {
 	const {
-		time,
-		setTime,
-		currentMode,
-		setCurrentMode,
-		startTimer,
-		pauseTimer,
-		resumeTimer,
-		resetTimer,
-		decrementTimer,
+		focusTime,
+		setFocusTime,
+		focusMode,
+		setFocusMode,
+		startFocusTimer,
+		pauseFocusTimer,
+		resumeFocusTimer,
+		resetFocusTimer,
+		decrementFocusTimer,
 	} = useTimerStore();
 
 	const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
 	React.useEffect(() => {
-		if (currentMode === "running" && time > 0) {
-			intervalRef.current = setInterval(() => decrementTimer(), 1000);
+		if (focusMode === "running" && focusTime > 0) {
+			intervalRef.current = setInterval(() => decrementFocusTimer(), 1000);
 		} else {
 			if (intervalRef.current) {
 				clearInterval(intervalRef.current);
@@ -35,26 +35,26 @@ export default function PomodoroCardFocus() {
 		return () => {
 			if (intervalRef.current) clearInterval(intervalRef.current);
 		};
-	}, [time, currentMode]);
+	}, [focusTime, focusMode]);
 
 	const handleClick = () => {
-		if (currentMode === "idle" && time > 0) {
-			startTimer();
-		} else if (currentMode === "running" && time > 0) {
-			pauseTimer();
-		} else if (currentMode === "paused" && time > 0) {
-			resumeTimer();
+		if (focusMode === "idle" && focusTime) {
+			startFocusTimer();
+		} else if (focusMode === "running" && focusTime > 0) {
+			pauseFocusTimer();
+		} else if (focusMode === "paused" && focusTime > 0) {
+			resumeFocusTimer();
 		}
 	};
 
 	const buttonLabel = () => {
-		if (currentMode === "idle" && time > 0) {
+		if (focusMode === "idle" && focusTime > 0) {
 			return (
 				<>
 					<Play /> Start session
 				</>
 			);
-		} else if (currentMode === "running" && time > 0) {
+		} else if (focusMode === "running" && focusTime > 0) {
 			return (
 				<>
 					<Pause /> Pause
@@ -74,29 +74,29 @@ export default function PomodoroCardFocus() {
 			{" "}
 			<CardContent className="flex items-center justify-center">
 				<div className="flex flex-col items-center justify-center h-32 transition-all rounded-lg w-54">
-					<h3 className="text-5xl font-semibold">{formatTime(time)}</h3>
+					<h3 className="text-5xl font-semibold">{formatTime(focusTime)}</h3>
 					<span className="mt-2 text-xs font-medium text-muted-foreground">
-						{currentMode === "paused" ? "PAUSED" : "REMAINING TIME"}
+						{focusMode === "paused" ? "PAUSED" : "REMAINING TIME"}
 					</span>
 				</div>
 			</CardContent>
 			<CardFooter className="flex items-center justify-center p-0 shadow-none">
 				<Button
-					className={`${currentMode === "paused" ? "" : "hidden"} border-x-0 border-b-0 rounded-none`}
+					className={`${focusMode === "paused" ? "" : "hidden"} border-x-0 border-b-0 rounded-none`}
 					size={"lg"}
 					variant={"outlineDestructive"}
-					onClick={resetTimer}
+					onClick={resetFocusTimer}
 				>
 					<TimerReset /> Reset
 				</Button>
 
 				<Button
 					size={"lg"}
-					className={`rounded-none flex-1 border-r-0 border-b-0 shadow-none ${currentMode === "paused" ? "text-primary" : ""}`}
+					className={`rounded-none flex-1 border-r-0 border-b-0 shadow-none ${focusMode === "paused" ? "text-primary" : ""}`}
 					variant={
-						currentMode === "idle"
+						focusMode === "idle"
 							? "default"
-							: currentMode === "running"
+							: focusMode === "running"
 								? "secondary"
 								: "outline"
 					}

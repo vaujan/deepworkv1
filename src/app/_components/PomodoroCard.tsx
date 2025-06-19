@@ -13,7 +13,7 @@ import PomodoroCardPopoverSettings from "./PomodoroCardPopoverSettings";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function PomodoroCard() {
-	const { currentMode } = useTimerStore();
+	const { focusMode, restMode, activeTimer } = useTimerStore();
 
 	const tabs = [
 		{
@@ -31,12 +31,12 @@ export default function PomodoroCard() {
 	];
 
 	return (
-		<Tabs className="w-full" defaultValue="focus">
+		<Tabs className="w-full" value={activeTimer} defaultValue="focus">
 			<div className="flex justify-between w-full">
 				<TabsList className="w-full md:w-fit">
 					{tabs.map((tab) => (
 						<TabsTrigger
-							disabled={currentMode !== "idle"}
+							disabled={restMode !== "idle" || focusMode !== "idle"}
 							key={tab.id}
 							value={tab.value}
 						>
@@ -45,9 +45,12 @@ export default function PomodoroCard() {
 					))}
 				</TabsList>
 				<Popover>
-					<PopoverTrigger disabled={currentMode !== "idle"} className="ml-2">
+					<PopoverTrigger
+						disabled={restMode !== "idle" || focusMode !== "idle"}
+						className="ml-2"
+					>
 						<Button
-							disabled={currentMode !== "idle"}
+							disabled={restMode !== "idle" || focusMode !== "idle"}
 							variant={"ghost"}
 							className="md:size-8"
 							size={"icon"}
