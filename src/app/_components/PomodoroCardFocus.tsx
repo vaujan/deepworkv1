@@ -5,27 +5,26 @@ import { CardContent, CardFooter } from "@/components/ui/card";
 import { Pause, Play, TimerReset } from "lucide-react";
 import React from "react";
 import { formatTime } from "@/lib/utils";
-
-const INITIAL_TIME = 25 * 60;
-type TimerMode = "idle" | "running" | "paused" | "finished";
+import { useTimerStore } from "@/lib/store";
 
 export default function PomodoroCardFocus() {
-	const [time, setTime] = React.useState<number>(INITIAL_TIME);
-	const [currentMode, setCurrentMode] = React.useState<TimerMode>("idle");
+	const {
+		time,
+		setTime,
+		currentMode,
+		setCurrentMode,
+		startTimer,
+		pauseTimer,
+		resumeTimer,
+		resetTimer,
+		decrementTimer,
+	} = useTimerStore();
 
 	const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
 	React.useEffect(() => {
 		if (currentMode === "running" && time > 0) {
-			intervalRef.current = setInterval(() => {
-				setTime((prev) => {
-					if (prev <= 0) {
-						setCurrentMode("finished");
-						return 0;
-					}
-					return prev - 1;
-				});
-			}, 1000);
+			intervalRef.current = setInterval(() => decrementTimer(), 1000);
 		} else {
 			if (intervalRef.current) {
 				clearInterval(intervalRef.current);
@@ -38,28 +37,13 @@ export default function PomodoroCardFocus() {
 		};
 	}, [time, currentMode]);
 
-	const handleReset = () => {
-		if (currentMode === "paused" && time > 0) {
-			setCurrentMode("idle");
-			setTime(INITIAL_TIME);
-		}
-	};
-
-	const handleStart = () => {
-		if (currentMode == "idle" && time > 0) {
-			setCurrentMode("running");
-		}
-	};
-
-	const handleResume = () => {
-		if (currentMode == "paused" && time > 0) {
-			setCurrentMode("running");
-		}
-	};
-
-	const handlePause = () => {
-		if (currentMode === "running" && time > 0) {
-			setCurrentMode("paused");
+	const handleClick = () => {
+		if (currentMode === "idle" && time > 0) {
+			startTimer();
+		} else if (currentMode === "running" && time > 0) {
+			pauseTimer();
+		} else if (currentMode === "paused" && time > 0) {
+			resumeTimer();
 		}
 	};
 
@@ -101,7 +85,7 @@ export default function PomodoroCardFocus() {
 					className={`${currentMode === "paused" ? "" : "hidden"} border-x-0 border-b-0 rounded-none`}
 					size={"lg"}
 					variant={"outlineDestructive"}
-					onClick={handleReset}
+					onClick={resetTimer}
 				>
 					<TimerReset /> Reset
 				</Button>
@@ -116,13 +100,7 @@ export default function PomodoroCardFocus() {
 								? "secondary"
 								: "outline"
 					}
-					onClick={
-						currentMode === "idle"
-							? handleStart
-							: currentMode === "running"
-								? handlePause
-								: handleResume
-					}
+					onClick={handleClick}
 				>
 					{buttonLabel()}
 				</Button>
