@@ -87,7 +87,7 @@ export default function PomodoroCardRest() {
 					<TimerReset /> Reset
 				</Button>
 				<Button
-					className={`shadow-none flex-1 rounded-t-none border-x-0 border-b-0 ${restMode === "running" ? "text" : "text-primary"}`}
+					className={`shadow-none flex-1 rounded-none border-r-0 border-b-0 ${restMode === "running" ? "text" : "text-primary"}`}
 					size={"lg"}
 					variant={
 						restMode === "idle"
