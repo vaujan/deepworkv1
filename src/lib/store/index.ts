@@ -7,8 +7,8 @@ export type TimerType = "focus" | "rest";
 // const REST_TIME = 5 * 60;
 
 // For testing purpose
-const FOCUS_TIME_TEST = 3;
-const REST_TIME_TEST = 3;
+// const FOCUS_TIME_TEST = 3;
+// const REST_TIME_TEST = 3;
 
 interface TimerState {
 	// Configuration
@@ -126,7 +126,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
 	},
 
 	decrementFocusTimer: () => {
-		const { focusTime, initialFocusTime } = get();
+		const { focusTime } = get();
 		if (focusTime > 0) {
 			const newTime = focusTime - 1;
 			set({ focusTime: newTime });
@@ -173,7 +173,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
 	},
 
 	decrementRestTimer: () => {
-		const { restTime, initialRestTime } = get();
+		const { restTime } = get();
 		if (restTime > 0) {
 			const newTime = restTime - 1;
 			set({ restTime: newTime });
