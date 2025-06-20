@@ -15,43 +15,54 @@ export default function PomodoroCardPopoverSettings() {
 		restMode,
 	} = useTimerStore();
 
-	// const [focusMinutes, setFocusMinutes] = React.useState(initialFocusTime);
-	// const [restMinutes, setRestMinutes] = React.useState(initialRestTime);
+	const [focusMinutes, setFocusMinutes] = React.useState(initialFocusTime / 60);
+	const [restMinutes, setRestMinutes] = React.useState(initialRestTime / 60);
+
+	// Handle conversions from minutes to seconds and prevent < 0 values
+	React.useEffect(() => {
+		if (restMinutes < 0) setFocusMinutes(1);
+		else if (focusMinutes <= 0) setFocusMinutes(1);
+
+		setInitialFocusTime(focusMinutes * 60);
+		setInitialRestTime(restMinutes * 60);
+	}, [focusMinutes, restMinutes]);
 
 	const handleFocusTimeChange = (increment: boolean) => {
-		const currentMinutes = Math.floor(initialFocusTime / 60);
 		const incrementValue = () => {
-			if (currentMinutes <= 1) {
+			if (focusMinutes <= 1) {
 				return 4;
 			}
 			return 5;
 		};
+
 		const newMinutes = increment
-			? currentMinutes + incrementValue()
-			: Math.max(1, currentMinutes - incrementValue());
-		setInitialFocusTime(newMinutes * 60);
+			? focusMinutes + incrementValue()
+			: Math.max(1, focusMinutes - incrementValue()); // Prevent value < 1
+		setFocusMinutes(newMinutes);
 	};
 
 	const handleRestTimeChange = (increment: boolean) => {
-		const currentMinutes = Math.floor(initialRestTime / 60);
-		const incrementvalue = () => {
-			if (currentMinutes <= 1) {
+		const incrementValue = () => {
+			if (restMinutes <= 1) {
 				return 4;
 			}
 			return 5;
 		};
+
 		const newMinutes = increment
-			? currentMinutes + incrementvalue()
-			: Math.max(1, currentMinutes - incrementvalue());
-		setInitialRestTime(newMinutes * 60);
+			? restMinutes + incrementValue()
+			: Math.max(1, restMinutes - incrementValue());
+		setRestMinutes(newMinutes);
 	};
 
 	const restInputOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setInitialRestTime(event.target.value);
+		const value = parseFloat(event.target.value) || 1;
+		setRestMinutes(value);
 	};
 
 	const focusInputOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setInitialFocusTime(event.target.value);
+		const value = parseFloat(event.target.value) || 1;
+		setFocusMinutes(value);
 	};
 
 	return (
@@ -69,9 +80,10 @@ export default function PomodoroCardPopoverSettings() {
 						</Button>
 						<TimeSettingsInput
 							className="h-full text-center border-0 rounded-none border-r-1 border-l-1"
-							// value={`${Math.floor(initialFocusTime / 60)} min`}
 							type="number"
-							value={initialFocusTime}
+							id="focus"
+							value={Math.floor(focusMinutes)}
+							min={1}
 							onChange={focusInputOnChange}
 						/>
 						<Button
@@ -97,7 +109,9 @@ export default function PomodoroCardPopoverSettings() {
 						<TimeSettingsInput
 							className="h-full text-center border-0 rounded-none border-r-1 border-l-1"
 							type="number"
-							value={initialRestTime}
+							id="rest"
+							value={Math.floor(restMinutes)}
+							min={1}
 							onChange={restInputOnChange}
 						/>
 						<Button

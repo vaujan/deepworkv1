@@ -61,7 +61,7 @@ export default function PomodoroCardFocus() {
 		} else {
 			return (
 				<>
-					<Play /> Resume
+					<Play /> Resume session
 				</>
 			);
 		}

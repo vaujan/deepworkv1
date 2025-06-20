@@ -61,7 +61,7 @@ export default function PomodoroCardRest() {
 		} else {
 			return (
 				<>
-					<Play /> Resume
+					<Play /> Resume rest
 				</>
 			);
 		}
