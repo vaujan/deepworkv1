@@ -73,7 +73,7 @@ export default function PomodoroCardRest() {
 				<div className="flex flex-col items-center justify-center h-32 transition-all rounded-lg w-54">
 					<h3 className="text-5xl font-semibold">{formatTime(restTime)}</h3>
 					<span className="mt-2 text-xs font-medium text-muted-foreground">
-						REMAINING TIME
+						{restMode === "paused" ? "PAUSED" : "REMAINING TIME"}
 					</span>
 				</div>
 			</CardContent>

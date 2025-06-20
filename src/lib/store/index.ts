@@ -27,8 +27,8 @@ interface TimerState {
 	activeTimer: TimerType;
 
 	// Configuration Actions
-	setInitialFocusTime: (time: number) => void;
-	setInitialRestTime: (time: number) => void;
+	setInitialFocusTime: (time: number | string) => void;
+	setInitialRestTime: (time: number | string) => void;
 
 	// Focus Timer Actions
 	setFocusTime: (time: number) => void;

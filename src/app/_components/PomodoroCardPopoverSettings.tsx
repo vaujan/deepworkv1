@@ -1,9 +1,9 @@
 import React from "react";
 import { PopoverContent } from "@/components/ui/popover";
 import { useTimerStore } from "@/lib/store";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
+import { TimeSettingsInput } from "@/components/ui/time-settings-input";
 
 export default function PomodoroCardPopoverSettings() {
 	const {
@@ -15,20 +15,43 @@ export default function PomodoroCardPopoverSettings() {
 		restMode,
 	} = useTimerStore();
 
+	// const [focusMinutes, setFocusMinutes] = React.useState(initialFocusTime);
+	// const [restMinutes, setRestMinutes] = React.useState(initialRestTime);
+
 	const handleFocusTimeChange = (increment: boolean) => {
 		const currentMinutes = Math.floor(initialFocusTime / 60);
+		const incrementValue = () => {
+			if (currentMinutes <= 1) {
+				return 4;
+			}
+			return 5;
+		};
 		const newMinutes = increment
-			? currentMinutes + 1
-			: Math.max(1, currentMinutes - 1);
+			? currentMinutes + incrementValue()
+			: Math.max(1, currentMinutes - incrementValue());
 		setInitialFocusTime(newMinutes * 60);
 	};
 
 	const handleRestTimeChange = (increment: boolean) => {
 		const currentMinutes = Math.floor(initialRestTime / 60);
+		const incrementvalue = () => {
+			if (currentMinutes <= 1) {
+				return 4;
+			}
+			return 5;
+		};
 		const newMinutes = increment
-			? currentMinutes + 1
-			: Math.max(1, currentMinutes - 1);
+			? currentMinutes + incrementvalue()
+			: Math.max(1, currentMinutes - incrementvalue());
 		setInitialRestTime(newMinutes * 60);
+	};
+
+	const restInputOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setInitialRestTime(event.target.value);
+	};
+
+	const focusInputOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setInitialFocusTime(event.target.value);
 	};
 
 	return (
@@ -44,10 +67,12 @@ export default function PomodoroCardPopoverSettings() {
 						>
 							<Minus />
 						</Button>
-						<Input
-							readOnly
+						<TimeSettingsInput
 							className="h-full text-center border-0 rounded-none border-r-1 border-l-1"
-							value={`${Math.floor(initialFocusTime / 60)} min`}
+							// value={`${Math.floor(initialFocusTime / 60)} min`}
+							type="number"
+							value={initialFocusTime}
+							onChange={focusInputOnChange}
 						/>
 						<Button
 							className="h-full border-0 rounded-none shadow-none"
@@ -69,10 +94,11 @@ export default function PomodoroCardPopoverSettings() {
 						>
 							<Minus />
 						</Button>
-						<Input
-							readOnly
+						<TimeSettingsInput
 							className="h-full text-center border-0 rounded-none border-r-1 border-l-1"
-							value={`${Math.floor(initialRestTime / 60)} min`}
+							type="number"
+							value={initialRestTime}
+							onChange={restInputOnChange}
 						/>
 						<Button
 							className="h-full border-0 rounded-none shadow-none"
