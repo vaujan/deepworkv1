@@ -73,9 +73,10 @@ export const useTimerStore = create<TimerState>((set, get) => ({
 		const { focusMode } = get();
 		// Only allow changing initial time when timer is idle
 		if (focusMode === "idle") {
+			const numericTime = typeof time === "string" ? parseInt(time, 10) : time;
 			set({
-				initialFocusTime: time,
-				focusTime: time,
+				initialFocusTime: numericTime,
+				focusTime: numericTime,
 			});
 		}
 	},
@@ -84,9 +85,10 @@ export const useTimerStore = create<TimerState>((set, get) => ({
 		const { restMode } = get();
 		// Only allow changing initial time when timer is idle
 		if (restMode === "idle") {
+			const numericTime = typeof time === "string" ? parseInt(time, 10) : time;
 			set({
-				initialRestTime: time,
-				restTime: time,
+				initialRestTime: numericTime,
+				restTime: numericTime,
 			});
 		}
 	},
