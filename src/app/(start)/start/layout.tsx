@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 	description: "Where your planning ends and actions starts",
 };
 
-export default function RootLayout({
+export default function Layout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;

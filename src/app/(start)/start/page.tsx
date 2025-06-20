@@ -1,15 +1,16 @@
+"use client";
+
 import Header from "@/app/_components/Header";
 import Kanban from "@/app/_components/Kanban";
 import PomodoroCard from "@/app/_components/PomodoroCard";
 import Stats from "@/app/_components/Stats";
+import UseDynamicTitle from "@/hooks/use-dynamic-title";
 import React from "react";
-// import {
-// 	ResizableHandle,
-// 	ResizablePanel,
-// 	ResizablePanelGroup,
-// } from "@/components/ui/resizable";
 
 export default function Home() {
+	// Change title
+	UseDynamicTitle();
+
 	return (
 		<div className="flex flex-col w-full gap-8 pb-12">
 			<Header>Learn Backend JavaScript</Header>
