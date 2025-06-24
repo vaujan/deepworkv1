@@ -5,8 +5,11 @@ import { sansSerif } from "@/lib/fonts";
 import React from "react";
 
 export const metadata: Metadata = {
-	title: "Progtrack",
+	title: "deepflow.click",
 	description: "Where your planning ends and actions starts",
+	icons: {
+		icon: "icon.png",
+	},
 };
 
 export default function RootLayout({
