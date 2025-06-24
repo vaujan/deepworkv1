@@ -1,0 +1,43 @@
+# Deep Work SaaS App - Product Requirements Document (PRD)
+
+## Overview
+
+The Deep Work SaaS app helps users, primarily Indonesian students preparing for exams like UTBK and programmers, achieve focused, distraction-free work sessions inspired by Cal Newport's Deep Work. The app provides tools for task management, time tracking, and productivity visualization. The goal is to validate an MVP through local channels (e.g., WhatsApp groups) before scaling.
+
+## Key Features
+
+### Deep Work Timer
+
+- A timer for focus and break sessions (e.g., Pomodoro-style, customizable durations)
+- Visual feedback via a circular progress bar using Tailwind CSS and Shadcn/UI
+- Supports session types (e.g., "Focus", "Break") with start, pause, and reset functionality
+
+### Customizable Workspaces
+
+- Users can create named workspaces (e.g., "Study for UTBK", "Learn Backend JavaScript")
+- Each workspace tracks tasks and time spent, stored in a simple state (e.g., Zustand or React Context)
+
+### Task Management
+
+- Tasks are organized in a kanban-style list, with droppable zones for "To Do", "In Progress", "Done"
+
+### Statistics and Visualization
+
+- Tracks time spent per workspace/project, displayed as a line chart using Recharts
+- Future addition: Heat grid to visualize "time spent deep" across days/weeks
+
+## Cursor-Specific Instructions
+
+- Suggest code in TypeScript (`.tsx`) for Next.js App Router
+- Provide mobile-first CSS with Tailwind utilities (e.g., `sm:`, `md:` breakpoints)
+- If errors occur, provide step-by-step debugging steps with code examples
+- **Always refer to official documentation** for libraries, frameworks, and APIs before suggesting implementations
+- **Always confirm and verify code** before providing it to ensure accuracy and prevent hallucination
+- **Move with first principles thinking** - understand the underlying concepts and build solutions from fundamental truths rather than copying patterns
+- **Provide educational explanations** for why and how the code works, including:
+  - The reasoning behind architectural decisions
+  - How specific functions and components interact
+  - The purpose of each code block and its role in the overall system
+  - Trade-offs and alternatives considered
+- **Ensure code clarity** with meaningful variable names, comments explaining complex logic, and clear separation of concerns
+- **Focus on maintainability** - write code that the programmer can fully understand and modify with confidence
