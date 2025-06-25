@@ -4,7 +4,7 @@ import { AppSidebar } from "@/app/_components/AppSidebar";
 import React from "react";
 
 export const metadata: Metadata = {
-	title: "Progtrack",
+	title: "deepflow.click",
 	description: "Where your planning ends and actions starts",
 };
 

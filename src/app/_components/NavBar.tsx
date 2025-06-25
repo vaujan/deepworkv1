@@ -7,7 +7,7 @@ import Image from "next/image";
 export default function NavBar() {
 	return (
 		<nav className="fixed top-0 left-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-			<div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+			<div className="container flex justify-between items-center px-4 mx-auto h-16 sm:px-6 lg:px-8">
 				{/* Logo and Brand */}
 				<div className="flex items-center space-x-3">
 					<Link href="/" className="flex items-center space-x-2">
@@ -16,7 +16,7 @@ export default function NavBar() {
 							alt="Logo"
 							width={32}
 							height={32}
-							className="h-8 w-8"
+							className="w-8 h-8"
 							priority
 						/>
 						<span className="text-base font-medium">deepflow.click</span>
@@ -24,7 +24,7 @@ export default function NavBar() {
 				</div>
 
 				{/* Navigation Links - Hidden on mobile */}
-				<div className="hidden md:flex items-center space-x-6">
+				<div className="hidden items-center space-x-6 md:flex">
 					<Link href="/features">
 						<Button variant="ghost" className="text-sm">
 							Features
@@ -45,9 +45,13 @@ export default function NavBar() {
 				{/* Right side - Theme toggle and CTA */}
 				<div className="flex items-center space-x-4">
 					<ThemeToggle />
-					<Link href="/start">
-						<Button size="sm" className="hidden sm:inline-flex">
-							Get Started
+					<Link href="/login">
+						<Button
+							size="sm"
+							variant={"secondary"}
+							className="hidden sm:inline-flex"
+						>
+							Sign In
 						</Button>
 					</Link>
 
@@ -59,7 +63,7 @@ export default function NavBar() {
 						aria-label="Toggle menu"
 					>
 						<svg
-							className="h-5 w-5"
+							className="w-5 h-5"
 							fill="none"
 							stroke="currentColor"
 							viewBox="0 0 24 24"
