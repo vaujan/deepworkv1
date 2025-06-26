@@ -1,0 +1,63 @@
+# Deep Work SaaS App - Product Requirements Document (PRD)
+
+## Overview
+
+The Deep Work SaaS app helps users achieve focused, distraction-free work sessions inspired by Cal Newport's Deep Work, enabling them to create meaningful work in an era of constant distractions. Targeting individuals such as students, programmers, and creatives, the app provides tools for task management, time tracking, productivity visualization, and customizable workspaces with dynamic widgets. The goal is to validate an MVP through community channels (e.g., online forums, social media groups) before scaling.
+
+## Key Features
+
+### Deep Work Timer
+
+- A timer for focus and break sessions (e.g., Pomodoro-style, customizable durations)
+- Visual feedback via a circular progress bar using Tailwind CSS and Shadcn/UI
+- Supports session types (e.g., "Focus", "Break") with start, pause, and reset functionality
+
+### Customizable Workspaces
+
+- Users can create named workspaces (e.g., "Study for Exams", "Learn Backend JavaScript", "Write Novel")
+- Each workspace tracks tasks, time spent, and a dynamic set of user-selected widgets
+- Workspaces are stored in a simple state (e.g., Zustand or React Context) with persistence (local storage for MVP, backend later)
+
+### Dynamic Widgets
+
+- Users can add, remove, and drag-and-drop widgets within a workspace to customize layout and functionality
+- Widgets are positioned in a responsive grid (stacked on mobile, multi-column on desktop) using Tailwind CSS
+- Supported widget types:
+  - **Sticky Notes**: For quick thoughts or reminders, editable text fields
+  - **Resources Tab**: List of user-defined hyperlinks (e.g., reference materials, tutorials)
+  - **Kanban**: Task board with "To Do", "In Progress", "Done" columns for tracking progress
+  - **Markdown Notepad**: Text editor supporting Markdown for notes or code snippets
+  - **Media Player**: Ambient noise player for focus (e.g., white noise, rain sounds); Spotify integration as a future stretch goal
+- Example workspaces:
+  - **Study for Exams**: Core features (Timer, Heat Grid Stats) + Sticky Notes (for quick thoughts) + Resources Tab (study links)
+  - **Learn Backend JavaScript**: Core features (Timer, Heat Grid Stats) + Kanban (track learning tasks) + Markdown Notepad (code snippets) + Media Player (ambient noise)
+- Widgets are draggable using a library like `@dnd-kit` for mobile-friendly drag-and-drop
+- Widget configurations (type, position, content) are saved per workspace
+- Future addition: Widget marketplace or templates for pre-configured setups
+
+### Task Management
+
+- Tasks are organized in a kanban-style list, with droppable zones for "To Do", "In Progress", "Done"
+- Kanban can be embedded as a widget within workspaces or accessed as a standalone feature
+
+### Statistics and Visualization
+
+- Tracks time spent per workspace/project, displayed as a line chart using Recharts
+- Heat grid to visualize "time spent deep" across days/weeks, embedded as a core widget in each workspace
+- Future addition: Exportable reports for time tracking
+
+## Cursor-Specific Instructions
+
+- Suggest code in TypeScript (`.tsx`) for Next.js App Router
+- Provide mobile-first CSS with Tailwind utilities (e.g., `sm:`, `md:` breakpoints)
+- If errors occur, provide step-by-step debugging steps with code examples
+- **Always refer to official documentation** for libraries, frameworks, and APIs before suggesting implementations
+- **Always confirm and verify code** before providing it to ensure accuracy and prevent hallucination
+- **Move with first principles thinking** - understand the underlying concepts and build solutions from fundamental truths rather than copying patterns
+- **Provide educational explanations** for why and how the code works, including:
+  - The reasoning behind architectural decisions
+  - How specific functions and components interact
+  - The purpose of each code block and its role in the overall system
+  - Trade-offs and alternatives considered
+- **Ensure code clarity** with meaningful variable names, comments explaining complex logic, and clear separation of concerns
+- **Focus on maintainability** - write code that the programmer can fully understand and modify with confidence
