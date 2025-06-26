@@ -11,14 +11,3 @@ if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey);
-
-// Define the Task type for better type safety
-export interface Task {
-	id: string;
-	title: string;
-	description?: string;
-	is_completed: boolean;
-	created_at?: string;
-	updated_at?: string;
-	// Add more fields as needed based on your table structure
-}
