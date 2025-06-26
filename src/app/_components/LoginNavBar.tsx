@@ -10,15 +10,15 @@ export default function LoginNavBar() {
 				{/* Logo and Brand */}
 				<div className="flex items-center space-x-3">
 					<Link href="/" className="flex items-center space-x-2">
-						<Image
+						{/* <Image
 							src="/logoframe-png.png"
 							alt="Logo"
 							width={32}
 							height={32}
-							className="w-8 h-8"
+							className="size-10"
 							priority
-						/>
-						<span className="text-base font-medium">deepflow.click</span>
+						/> */}
+						<span className="text-base  font-medium">deepflow.click</span>
 					</Link>
 				</div>
 				<div className="flex items-center space-x-4">

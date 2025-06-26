@@ -16,7 +16,7 @@ export default function NavBar() {
 							alt="Logo"
 							width={32}
 							height={32}
-							className="w-8 h-8"
+							className="size-10"
 							priority
 						/>
 						<span className="text-base font-medium">deepflow.click</span>
