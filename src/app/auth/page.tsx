@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import React from "react";
-import LoginNavBar from "../_components/LoginNavBar";
 import { supabase } from "@/lib/supabase";
 import Image from "next/image";
+import LoginNavBar from "../_components/LoginNavBar";
 
 type AuthState = "sign in" | "sign up";
 
