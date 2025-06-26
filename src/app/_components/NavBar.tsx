@@ -45,7 +45,7 @@ export default function NavBar() {
 				{/* Right side - Theme toggle and CTA */}
 				<div className="flex items-center space-x-4">
 					<ThemeToggle />
-					<Link href="/login">
+					<Link href="/auth">
 						<Button
 							size="sm"
 							variant={"secondary"}

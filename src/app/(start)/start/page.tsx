@@ -1,16 +1,16 @@
 "use client";
 
 import Header from "@/app/_components/Header";
-import Kanban from "@/app/_components/Kanban";
+// import Kanban from "@/app/_components/Kanban";
 import PomodoroCard from "@/app/_components/PomodoroCard";
 import Stats from "@/app/_components/Stats";
 import TodoList from "@/app/_components/TodoList";
-import UseDynamicTitle from "@/hooks/use-dynamic-title";
+import useDynamicTitle from "@/hooks/use-dynamic-title";
 import React from "react";
 
 export default function Start() {
 	// Change title
-	UseDynamicTitle();
+	useDynamicTitle();
 
 	return (
 		<div className="flex flex-col gap-8 pb-12 w-full">

@@ -2,7 +2,7 @@ import { useTimerStore } from "@/lib/store";
 import { formatTime } from "@/lib/utils";
 import React from "react";
 
-export default function UseDynamicTitle() {
+export default function useDynamicTitle() {
 	const { focusMode, focusTime, restMode, restTime, activeTimer } =
 		useTimerStore();
 

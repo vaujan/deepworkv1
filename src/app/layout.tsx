@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeProvider } from "@/providers/ThemeProvider";
-import { sansSerif } from "@/lib/fonts";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import React from "react";
+import { sansSerif } from "@/lib/fonts";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 export const metadata: Metadata = {
-	title: "deepflow.click",
-	description: "Where your planning ends and actions starts",
-	icons: {
-		icon: "icon.png",
-	},
+	title: "DeepWork",
+	description: "Focus on what matters",
 };
 
 export default function RootLayout({
@@ -26,7 +24,7 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					{children}
+					<SidebarProvider>{children}</SidebarProvider>
 				</ThemeProvider>
 			</body>
 		</html>

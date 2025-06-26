@@ -1,24 +1,48 @@
-import type { Metadata } from "next";
+"use client";
+
+// import type { Metadata } from "next";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/app/_components/AppSidebar";
 import React from "react";
-
-export const metadata: Metadata = {
-	title: "deepflow.click",
-	description: "Where your planning ends and actions starts",
-};
+import useUser from "@/hooks/use-user";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Layout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const { user, loading } = useUser();
+
+	if (!user || loading) {
+		return (
+			<div className="flex flex-col justify-center items-center w-full min-h-screen">
+				<div className="flex flex-col gap-4 justify-center items-center px-8 w-full md:max-w-5xl">
+					<div className="text-center">
+						<h3 className="font-medium">
+							{loading ? "Loading" : "Please sign in to continue"}
+						</h3>
+					</div>
+
+					{!loading && !user && (
+						<Link href="/auth">
+							<Button type="button" className="w-full">
+								Sign in
+							</Button>
+						</Link>
+					)}
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<SidebarProvider>
-			<div className="flex w-full md:py-2 ">
+			<div className="flex w-full md:py-2">
 				<AppSidebar />
 				<div
-					className={`flex w-full md:shadow-xs antialiased md:border-1 overflow-hidden bg-background md:rounded-2xl`}
+					className={`flex overflow-hidden w-full antialiased md:shadow-xs md:border-1 bg-background md:rounded-2xl`}
 				>
 					{children}
 				</div>

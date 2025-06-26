@@ -1,5 +1,6 @@
 import { Book, CodeIcon, Laptop, LogOut, Plus } from "lucide-react";
 import React from "react";
+import { useRouter } from "next/navigation";
 
 import {
 	Sidebar,
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "../../components/ui/button";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
 // Menu workspaces.
 const workspaces = [
@@ -35,6 +37,20 @@ const workspaces = [
 ];
 
 export function AppSidebar() {
+	const route = useRouter();
+
+	const handleLogOut = async () => {
+		const { error } = await supabase.auth.signOut();
+
+		if (error) {
+			console.error("An error has occur during sign out:", error.message);
+			return;
+		} else {
+			console.log("logging out");
+			route.push("/");
+		}
+	};
+
 	return (
 		<Sidebar collapsible="icon" variant="inset">
 			<SidebarContent>
@@ -54,7 +70,7 @@ export function AppSidebar() {
 							))}
 							<Button
 								variant={"ghost"}
-								className="size-8 w-full border-border border-1 hover:border-accent"
+								className="w-full size-8 border-border border-1 hover:border-accent"
 							>
 								<Plus />
 							</Button>
@@ -65,11 +81,9 @@ export function AppSidebar() {
 			<SidebarFooter>
 				<SidebarMenu>
 					<SidebarMenuItem>
-						<Link href={"/"}>
-							<SidebarMenuButton>
-								<LogOut /> Log Out
-							</SidebarMenuButton>
-						</Link>
+						<SidebarMenuButton onClick={handleLogOut}>
+							<LogOut /> Log Out
+						</SidebarMenuButton>
 					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarFooter>
