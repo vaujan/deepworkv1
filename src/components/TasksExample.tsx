@@ -1,6 +1,7 @@
 "use client";
 
 import { useTasks } from "@/hooks/use-tasks";
+import React from "react";
 
 export function TasksExample() {
 	const { tasks, loading, error, fetchTasks, toggleTaskCompletion } =

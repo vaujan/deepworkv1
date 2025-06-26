@@ -1,10 +1,10 @@
 import { supabase } from "@/lib/supabase";
-import { Session } from "@supabase/supabase-js";
+import { User } from "@supabase/supabase-js";
 import React from "react";
 import { useRouter } from "next/navigation";
 
 export default function useUser() {
-	const [user, setUser] = React.useState<Session | null>(null);
+	const [user, setUser] = React.useState<User | null>(null);
 	const [loading, setLoading] = React.useState(true);
 	const router = useRouter();
 
