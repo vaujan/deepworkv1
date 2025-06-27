@@ -1,4 +1,12 @@
-import { Book, CodeIcon, Laptop, LogOut, Plus } from "lucide-react";
+import {
+	Book,
+	ChevronsUpDown,
+	CodeIcon,
+	Laptop,
+	LogOut,
+	Plus,
+	Settings,
+} from "lucide-react";
 import React from "react";
 import { useRouter } from "next/navigation";
 
@@ -17,6 +25,13 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import useUser from "@/hooks/use-user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+	DropdownMenu,
+	DropdownMenuTrigger,
+	DropdownMenuContent,
+	DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
 
 // Menu workspaces.
 const workspaces = [
@@ -103,7 +118,6 @@ export function AppSidebar() {
 									</SidebarMenuButton>
 								</SidebarMenuItem>
 							))}
-							<SidebarMenu></SidebarMenu>
 							<SidebarMenuItem>
 								<SidebarMenuButton className="w-full border-1 hover:border-accent flex justify-center items-center">
 									<Plus />
@@ -114,35 +128,49 @@ export function AppSidebar() {
 				</SidebarGroup>
 			</SidebarContent>
 			<SidebarFooter>
-				<SidebarMenu>
-					<div className="flex items-center py-4 border-b gap-3">
-						<Avatar className="size-8 border-1">
-							<AvatarImage
-								src={getUserAvatar() || undefined}
-								alt={getUserDisplayName()}
-							/>
-							<AvatarFallback className="text-sm font-medium">
-								{getUserInitials()}
-							</AvatarFallback>
-						</Avatar>
-						<div className="flex flex-col min-w-0">
-							<p className="text-sm font-medium truncate">
-								{getUserDisplayName()}
-							</p>
-							<p className="text-xs text-muted-foreground truncate">
-								{user?.email}
-							</p>
-						</div>
-					</div>
-				</SidebarMenu>
+				{/* User profile & avatar */}
 
-				<SidebarMenu>
-					<SidebarMenuItem>
-						<SidebarMenuButton onClick={handleLogOut}>
-							<LogOut /> Log Out
-						</SidebarMenuButton>
-					</SidebarMenuItem>
-				</SidebarMenu>
+				<DropdownMenu>
+					<DropdownMenuTrigger>
+						<SidebarMenu>
+							<Separator className="mb-1" />
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									className={`relative hover:bg-card active:bg-card active: hover:text-card-foreground`}
+									size={"lg"}
+								>
+									<Avatar className="rounded-lg">
+										<AvatarImage src={getUserAvatar()} />
+										<AvatarFallback>{getUserInitials()}</AvatarFallback>
+									</Avatar>
+									<div className="flex flex-col">
+										<span className="text-sm">{getUserDisplayName()}</span>
+										<p className="text-xs text-muted-foreground">
+											{user && user?.email}
+										</p>
+									</div>
+									<ChevronsUpDown className="absolute right-3" />
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+						</SidebarMenu>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent
+						className="w-56"
+						side="right"
+						align="end"
+						sideOffset={24}
+					>
+						<DropdownMenuItem>
+							<Settings />
+							Settings
+						</DropdownMenuItem>
+						<Separator className="my-1" />
+						<DropdownMenuItem variant="destructive" onClick={handleLogOut}>
+							<LogOut />
+							Log Out
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
 			</SidebarFooter>
 		</Sidebar>
 	);

@@ -1,4 +1,4 @@
-import { ThemeToggle } from "@/components/ThemeToggle";
+// import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
@@ -14,9 +14,9 @@ export default function NavBar() {
 						<Image
 							src="/logoframe-png.png"
 							alt="Logo"
-							width={32}
-							height={32}
-							className="size-10"
+							width={1080}
+							height={1080}
+							className="size-12"
 							priority
 						/>
 						<span className="text-base font-medium">deepflow.click</span>
@@ -44,7 +44,7 @@ export default function NavBar() {
 
 				{/* Right side - Theme toggle and CTA */}
 				<div className="flex items-center space-x-4">
-					<ThemeToggle />
+					{/* <ThemeToggle /> */}
 					<Link href="/auth">
 						<Button
 							size="sm"

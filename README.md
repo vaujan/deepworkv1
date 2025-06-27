@@ -1,7 +1,8 @@
-# Deep Work SaaS
-![Uploading image.png…]()
+# deepflow.click
 
-A Deep Work SaaS app inspired by Cal Newport's philosophy, helping users achieve focused, distraction-free work sessions with customizable workspaces and productivity tracking.
+![deepflow.click logo box](./public/logo-box.png)
+
+A Deep Work app inspired by Cal Newport's philosophy, helping users achieve focused, distraction-free work sessions with customizable workspaces and productivity tracking.
 
 ## 🚀 Getting Started
 

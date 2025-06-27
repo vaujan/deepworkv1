@@ -6,7 +6,7 @@ import { sansSerif } from "@/lib/fonts";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
 export const metadata: Metadata = {
-	title: "DeepWork",
+	title: "deepflow.click",
 	description: "Focus on what matters",
 };
 
@@ -20,7 +20,7 @@ export default function RootLayout({
 			<body className={`${sansSerif.className} flex antialiased`}>
 				<ThemeProvider
 					attribute="class"
-					defaultTheme="system"
+					defaultTheme="dark"
 					enableSystem
 					disableTransitionOnChange
 				>

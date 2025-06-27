@@ -7,6 +7,7 @@ import React from "react";
 import useUser from "@/hooks/use-user";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 
 export default function Layout({
 	children,
@@ -14,6 +15,11 @@ export default function Layout({
 	children: React.ReactNode;
 }>) {
 	const { user, loading } = useUser();
+	const { theme, setTheme } = useTheme();
+
+	React.useEffect(() => {
+		if (theme) setTheme("dark");
+	}, []);
 
 	if (!user || loading) {
 		return (
@@ -42,7 +48,7 @@ export default function Layout({
 			<div className="flex w-full md:py-2">
 				<AppSidebar />
 				<div
-					className={`flex overflow-hidden w-full antialiased md:shadow-xs md:border-1 bg-background md:rounded-2xl`}
+					className={`flex overflow-hidden w-full antialiased md:shadow-xs bg-background md:rounded-2xl`}
 				>
 					{children}
 				</div>

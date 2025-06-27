@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import React from "react";
 import { supabase } from "@/lib/supabase";
-import Image from "next/image";
 import LoginNavBar from "../_components/LoginNavBar";
 
 type AuthState = "sign in" | "sign up";
@@ -73,14 +72,14 @@ export default function Login() {
 			<LoginNavBar />
 
 			<div className="flex flex-col gap-4 w-full justify-center items-center px-8 md:max-w-5xl">
-				<Image
-					src="/Logo Frame.png"
+				{/* <Image
+					src="/logoframe-png.png"
 					alt="Logo"
-					width={32}
-					height={32}
+					width={1080}
+					height={1080}
 					className="size-32"
 					priority
-				/>
+				/> */}
 				<div className="text-center">
 					<h3 className="font-medium">
 						{authMethod === "sign in" ? "Sign in" : "Sign up"}
