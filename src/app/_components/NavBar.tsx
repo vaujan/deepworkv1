@@ -12,8 +12,8 @@ export default function NavBar() {
 				<div className="flex items-center space-x-3">
 					<Link href="/" className="flex items-center space-x-2">
 						<Image
-							src="/logoframe-png.png"
-							alt="Logo"
+							src="/logo-frame-transparent.png"
+							alt="deepflow.click logo"
 							width={1080}
 							height={1080}
 							className="size-12"
