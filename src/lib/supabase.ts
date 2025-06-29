@@ -9,5 +9,6 @@ if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
 	throw new Error("Missing Supabase environment variables");
 }
 
+// export const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey);

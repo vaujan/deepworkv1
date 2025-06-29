@@ -32,6 +32,8 @@ import {
 	DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
+import { DatabaseService } from "@/lib/database";
+import { Input } from "@/components/ui/input";
 
 // Menu workspaces.
 const workspaces = [
@@ -55,6 +57,25 @@ const workspaces = [
 export function AppSidebar() {
 	const route = useRouter();
 	const { user } = useUser();
+
+	const [newWorkspace, setNewWorkspace] = React.useState("");
+
+	const handleAddWorkspace = async () => {
+		const workspace = await DatabaseService.createWorkspace({
+			name: newWorkspace,
+		});
+
+		console.log("New workspace created✅:", workspace);
+
+		const getWorkspaces = await DatabaseService.getWorkspaces();
+		console.log("Getting workspacess:", getWorkspaces);
+	};
+
+	const handleWorkspaceOnChange = (
+		event: React.ChangeEvent<HTMLInputElement>
+	) => {
+		setNewWorkspace(event.target.value);
+	};
 
 	const handleLogOut = async () => {
 		const { error } = await supabase.auth.signOut();
@@ -119,7 +140,13 @@ export function AppSidebar() {
 								</SidebarMenuItem>
 							))}
 							<SidebarMenuItem>
-								<SidebarMenuButton className="w-full border-1 hover:border-accent flex justify-center items-center">
+								<Input onChange={handleWorkspaceOnChange} />
+							</SidebarMenuItem>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									onClick={handleAddWorkspace}
+									className="w-full border-1 hover:border-accent flex justify-center items-center"
+								>
 									<Plus />
 								</SidebarMenuButton>
 							</SidebarMenuItem>

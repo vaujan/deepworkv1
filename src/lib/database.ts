@@ -14,7 +14,7 @@ export class DatabaseService {
 	): Promise<DeepWorkSession | null> {
 		const { data: session, error } = await supabase
 			.from("deep_work_sessions")
-			.insert([data])
+			.insert({ ...data, user_id: "test-user-id" })
 			.select()
 			.single();
 
