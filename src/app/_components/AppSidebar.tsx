@@ -1,12 +1,4 @@
-import {
-	Book,
-	ChevronsUpDown,
-	CodeIcon,
-	Laptop,
-	LogOut,
-	Plus,
-	Settings,
-} from "lucide-react";
+import { ChevronsUpDown, Laptop, LogOut, Plus, Settings } from "lucide-react";
 import React from "react";
 import { useRouter } from "next/navigation";
 
@@ -34,47 +26,87 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { DatabaseService } from "@/lib/database";
 import { Input } from "@/components/ui/input";
+import useAvatar from "@/hooks/use-avatar";
+import { Workspace } from "@/lib/types";
+import { LucideIcon } from "lucide-react";
 
-// Menu workspaces.
-const workspaces = [
-	{
-		title: "Learn Backend JavaScript",
-		url: "#",
-		icon: Laptop,
-	},
-	{
-		title: "UTBK Prep",
-		url: "#",
-		icon: Book,
-	},
-	{
-		title: "Boot.dev Course",
-		url: "#",
-		icon: CodeIcon,
-	},
-];
+// Interface for transformed workspace data used in the UI
+interface WorkspaceItem {
+	id: string;
+	title: string;
+	url: string;
+	icon: LucideIcon;
+}
 
 export function AppSidebar() {
 	const route = useRouter();
 	const { user } = useUser();
+	const { getUserAvatar, getUserDisplayName, getUserInitials } = useAvatar();
 
 	const [newWorkspace, setNewWorkspace] = React.useState("");
+	const [workspaces, setWorkspaces] = React.useState<WorkspaceItem[]>([]);
+	const [isLoading, setIsLoading] = React.useState(false);
+
+	// Fetch workspaces on component mount
+	React.useEffect(() => {
+		fetchWorkspaces();
+	}, []);
+
+	const fetchWorkspaces = async () => {
+		try {
+			setIsLoading(true);
+			const workspacesData = await DatabaseService.getWorkspaces();
+			if (workspacesData && workspacesData.length > 0) {
+				// Transform the data to match the expected format
+				const transformedWorkspaces = workspacesData.map(
+					(workspace: Workspace) => ({
+						id: workspace.id,
+						title: workspace.name,
+						url: `/workspace/${workspace.id}`,
+						icon: Laptop, // Default icon for now
+					})
+				);
+				setWorkspaces(transformedWorkspaces);
+			}
+		} catch (error) {
+			console.error("Error fetching workspaces:", error);
+			// Fallback to default workspaces
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	const handleAddWorkspace = async () => {
-		const workspace = await DatabaseService.createWorkspace({
-			name: newWorkspace,
-		});
+		if (!newWorkspace.trim()) return;
 
-		console.log("New workspace created✅:", workspace);
+		try {
+			setIsLoading(true);
+			// Pass the workspace name as a string
+			const workspace = await DatabaseService.createWorkspace(newWorkspace);
+			console.log("New workspace created✅:", workspace);
 
-		const getWorkspaces = await DatabaseService.getWorkspaces();
-		console.log("Getting workspacess:", getWorkspaces);
+			// Refresh the workspaces list
+			await fetchWorkspaces();
+
+			// Clear the input
+			setNewWorkspace("");
+		} catch (error) {
+			console.error("Error creating workspace:", error);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const handleWorkspaceOnChange = (
 		event: React.ChangeEvent<HTMLInputElement>
 	) => {
 		setNewWorkspace(event.target.value);
+	};
+
+	const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		if (event.key === "Enter") {
+			handleAddWorkspace();
+		}
 	};
 
 	const handleLogOut = async () => {
@@ -89,39 +121,6 @@ export function AppSidebar() {
 		}
 	};
 
-	const getUserDisplayName = () => {
-		if (!user) return "User";
-
-		// for Google based Auth, use email
-		if (user.user_metadata?.full_name) return user.user_metadata.full_name;
-
-		if (user.email) {
-			return user.email.split("@")[0];
-		}
-
-		return "Use";
-	};
-
-	const getUserAvatar = () => {
-		if (!user) return null;
-
-		if (user.user_metadata?.avatar_url) {
-			return user.user_metadata.avatar_url;
-		}
-
-		return null;
-	};
-
-	const getUserInitials = () => {
-		const name = getUserDisplayName();
-		return name
-			.split(" ")
-			.map((n: string) => n[0])
-			.join("")
-			.toUpperCase()
-			.slice(0, 2);
-	};
-
 	return (
 		<Sidebar collapsible="icon" variant="inset">
 			<SidebarContent>
@@ -130,7 +129,7 @@ export function AppSidebar() {
 					<SidebarGroupContent>
 						<SidebarMenu>
 							{workspaces.map((item) => (
-								<SidebarMenuItem key={item.title}>
+								<SidebarMenuItem key={item.id || item.title}>
 									<SidebarMenuButton asChild>
 										<Link href={item.url}>
 											<item.icon />
@@ -140,12 +139,19 @@ export function AppSidebar() {
 								</SidebarMenuItem>
 							))}
 							<SidebarMenuItem>
-								<Input onChange={handleWorkspaceOnChange} />
+								<Input
+									placeholder="e.g Learning HTML/CSS"
+									value={newWorkspace}
+									onChange={handleWorkspaceOnChange}
+									onKeyPress={handleKeyPress}
+									disabled={isLoading}
+								/>
 							</SidebarMenuItem>
 							<SidebarMenuItem>
 								<SidebarMenuButton
 									onClick={handleAddWorkspace}
 									className="w-full border-1 hover:border-accent flex justify-center items-center"
+									disabled={isLoading || !newWorkspace.trim()}
 								>
 									<Plus />
 								</SidebarMenuButton>

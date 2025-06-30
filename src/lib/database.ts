@@ -12,9 +12,18 @@ export class DatabaseService {
 	static async createSession(
 		data: CreateSessionData
 	): Promise<DeepWorkSession | null> {
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			console.error("No authenticated user found");
+			return null;
+		}
+
 		const { data: session, error } = await supabase
 			.from("deep_work_sessions")
-			.insert({ ...data, user_id: "test-user-id" })
+			.insert({ ...data, user_id: user.id })
 			.select()
 			.single();
 
@@ -49,9 +58,19 @@ export class DatabaseService {
 		startDate: string,
 		endDate: string
 	): Promise<DeepWorkSession[]> {
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			console.error("No authenticated user found");
+			return [];
+		}
+
 		const { data: sessions, error } = await supabase
 			.from("deep_work_sessions")
 			.select("*")
+			.eq("user_id", user.id)
 			.gte("start_time", startDate)
 			.lte("start_time", endDate)
 			.order("start_time", { ascending: false });
@@ -69,9 +88,25 @@ export class DatabaseService {
 		name: string,
 		description?: string
 	): Promise<Workspace | null> {
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			console.error("No authenticated user found");
+			return null;
+		}
+
 		const { data: workspace, error } = await supabase
 			.from("workspaces")
-			.insert([{ name, description }])
+			.insert([
+				{
+					name,
+					description,
+					user_id: user.id,
+					is_active: true,
+				},
+			])
 			.select()
 			.single();
 
@@ -84,9 +119,19 @@ export class DatabaseService {
 	}
 
 	static async getWorkspaces(): Promise<Workspace[]> {
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			console.error("No authenticated user found");
+			return [];
+		}
+
 		const { data: workspaces, error } = await supabase
 			.from("workspaces")
 			.select("*")
+			.eq("user_id", user.id)
 			.eq("is_active", true)
 			.order("created_at", { ascending: false });
 
@@ -103,9 +148,19 @@ export class DatabaseService {
 		startDate: string,
 		endDate: string
 	): Promise<DailyDeepWorkStats[]> {
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			console.error("No authenticated user found");
+			return [];
+		}
+
 		const { data: stats, error } = await supabase
 			.from("daily_deep_work_stats")
 			.select("*")
+			.eq("user_id", user.id)
 			.gte("date", startDate)
 			.lte("date", endDate)
 			.order("date", { ascending: true });
@@ -121,9 +176,20 @@ export class DatabaseService {
 	static async upsertDailyStats(
 		stats: Partial<DailyDeepWorkStats>
 	): Promise<DailyDeepWorkStats | null> {
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			console.error("No authenticated user found");
+			return null;
+		}
+
 		const { data: result, error } = await supabase
 			.from("daily_deep_work_stats")
-			.upsert([stats], { onConflict: "user_id,workspace_id,date" })
+			.upsert([{ ...stats, user_id: user.id }], {
+				onConflict: "user_id,workspace_id,date",
+			})
 			.select()
 			.single();
 

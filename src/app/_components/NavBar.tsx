@@ -3,8 +3,14 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
 import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import useAvatar from "@/hooks/use-avatar";
+import useUser from "@/hooks/use-user";
 
 export default function NavBar() {
+	const { user } = useUser();
+	const { getUserAvatar, getUserDisplayName, getUserInitials } = useAvatar();
+
 	return (
 		<nav className="fixed top-0 left-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 			<div className="container flex justify-between items-center px-4 mx-auto h-16 sm:px-6 lg:px-8">
@@ -45,15 +51,36 @@ export default function NavBar() {
 				{/* Right side - Theme toggle and CTA */}
 				<div className="flex items-center space-x-4">
 					{/* <ThemeToggle /> */}
-					<Link href="/auth">
-						<Button
-							size="sm"
-							variant={"secondary"}
-							className="hidden sm:inline-flex"
-						>
-							Sign In
-						</Button>
-					</Link>
+					{user ? (
+						<Link href={"/start"}>
+							<Button
+								className="inline-flex  pl-0 py-5 px-2"
+								variant={"ghost"}
+								size={"sm"}
+							>
+								<Avatar className="rounded-lg">
+									<AvatarImage src={getUserAvatar()} />
+									<AvatarFallback>{getUserInitials()}</AvatarFallback>
+								</Avatar>
+								<div className="flex justify-start text-left flex-col">
+									<span className="text-sm">{getUserDisplayName()}</span>
+									<p className="text-xs text-muted-foreground">
+										{user && user?.email}
+									</p>
+								</div>
+							</Button>
+						</Link>
+					) : (
+						<Link href="/auth">
+							<Button
+								size="sm"
+								variant={"secondary"}
+								className="hidden sm:inline-flex"
+							>
+								Sign In
+							</Button>
+						</Link>
+					)}
 
 					{/* Mobile menu button - you can expand this later */}
 					<Button
