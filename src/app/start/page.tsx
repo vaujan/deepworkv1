@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import useDynamicTitle from "@/hooks/use-dynamic-title";
 import { testDatabaseConnection } from "@/lib/test-database";
 import React from "react";
+import HeatGrid from "../_components/HeatGrid";
 
 export default function Start() {
 	// Change title
@@ -42,7 +43,7 @@ export default function Start() {
 			</div>
 			<section className="flex flex-col gap-8 px-8 md:flex-row">
 				<PomodoroCard />
-				{/* <Stats /> */}
+				<HeatGrid />
 			</section>
 
 			<section className="flex gap-8 px-8">
