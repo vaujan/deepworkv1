@@ -12,7 +12,7 @@ export default function NavBar() {
 	const { getUserAvatar, getUserDisplayName, getUserInitials } = useAvatar();
 
 	return (
-		<nav className="fixed top-0 left-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+		<nav className="fixed top-0 left-0 z-50 w-full backdrop-blur supports-[backdrop-filter]:bg-background/60">
 			<div className="container flex justify-between items-center px-4 mx-auto h-16 sm:px-6 lg:px-8">
 				{/* Logo and Brand */}
 				<div className="flex items-center space-x-3">
