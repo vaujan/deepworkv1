@@ -54,7 +54,7 @@ export default function NavBar() {
 					{user ? (
 						<Link href={"/start"}>
 							<Button
-								className="inline-flex  pl-0 py-5 px-2"
+								className="inline-flex py-5 px-2 pl-0 "
 								variant={"ghost"}
 								size={"sm"}
 							>
@@ -62,7 +62,7 @@ export default function NavBar() {
 									<AvatarImage src={getUserAvatar()} />
 									<AvatarFallback>{getUserInitials()}</AvatarFallback>
 								</Avatar>
-								<div className="flex justify-start text-left flex-col">
+								<div className="flex flex-col justify-start text-left">
 									<span className="text-sm">{getUserDisplayName()}</span>
 									<p className="text-xs text-muted-foreground">
 										{user && user?.email}

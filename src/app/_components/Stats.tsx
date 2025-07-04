@@ -71,7 +71,7 @@ const chartConfig = {
 
 export default function Stats() {
 	return (
-		<Card className="w-full h-full p-0 border-0 shadow-none bg-background">
+		<Card className="p-0 w-full h-full border-0 shadow-none bg-background">
 			<CardHeader>
 				<CardTitle>
 					<span className="text-normal">Active Minutes</span>

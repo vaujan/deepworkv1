@@ -150,7 +150,7 @@ export function AppSidebar() {
 							<SidebarMenuItem>
 								<SidebarMenuButton
 									onClick={handleAddWorkspace}
-									className="w-full border-1 hover:border-accent flex justify-center items-center"
+									className="flex justify-center items-center w-full border-1 hover:border-accent"
 									disabled={isLoading || !newWorkspace.trim()}
 								>
 									<Plus />

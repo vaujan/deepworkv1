@@ -1,15 +1,14 @@
 "use client";
 
 import Header from "@/app/_components/Header";
-// import Kanban from "@/app/_components/Kanban";
 import PomodoroCard from "@/app/_components/PomodoroCard";
-// import Stats from "@/app/_components/Stats";
 import TodoList from "@/app/_components/TodoList";
 import { Button } from "@/components/ui/button";
 import useDynamicTitle from "@/hooks/use-dynamic-title";
 import { testDatabaseConnection } from "@/lib/test-database";
 import React from "react";
 import HeatGrid from "../_components/HeatGrid";
+import Kanban from "../_components/Kanban";
 
 export default function Start() {
 	// Change title
@@ -43,11 +42,14 @@ export default function Start() {
 			</div>
 			<section className="flex flex-col gap-8 px-8 md:flex-row">
 				<PomodoroCard />
-				<HeatGrid />
+				{/* <HeatGrid /> */}
 			</section>
 
 			<section className="flex gap-8 px-8">
-				{/* <Kanban /> */}
+				<Kanban />
+			</section>
+
+			<section className="flex gap-8 px-8">
 				<TodoList />
 			</section>
 		</div>
