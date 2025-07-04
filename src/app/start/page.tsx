@@ -9,10 +9,26 @@ import { testDatabaseConnection } from "@/lib/test-database";
 import React from "react";
 import HeatGrid from "../_components/HeatGrid";
 import Kanban from "../_components/Kanban";
+import { createSwapy, SwapEvent, Swapy } from "swapy";
 
 export default function Start() {
 	// Change title
 	useDynamicTitle();
+
+	const container = React.useRef(null);
+	const swapy = React.useRef<Swapy>(null);
+
+	React.useEffect(() => {
+		if (container.current) {
+			swapy.current = createSwapy(container.current, {
+				animation: "dynamic",
+			});
+
+			swapy.current.onSwap((event: SwapEvent) => {
+				console.log("Swapping widgets!:", event);
+			});
+		}
+	}, []);
 
 	const handleTestDatabse = async () => {
 		console.log("Running database test...");
@@ -28,7 +44,7 @@ export default function Start() {
 
 	return (
 		<div className="flex flex-col gap-8 pb-12 w-full">
-			<div className="flex justify-between items-center ">
+			<div className="flex justify-between items-center">
 				<Header>Learn Backend JavaScript</Header>
 
 				<Button
@@ -41,8 +57,12 @@ export default function Start() {
 				</Button>
 			</div>
 			<section className="flex flex-col gap-8 px-8 md:flex-row">
-				<PomodoroCard />
-				{/* <HeatGrid /> */}
+				<div>
+					<PomodoroCard />
+				</div>
+				<div>
+					<HeatGrid />
+				</div>
 			</section>
 
 			<section className="flex gap-8 px-8">

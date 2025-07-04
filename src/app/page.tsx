@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { FlickeringGrid } from "@/components/magicui/flickering-grid";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { serif } from "@/lib/fonts";
 
 export default function Home() {
 	const { resolvedTheme } = useTheme();
@@ -29,17 +30,19 @@ export default function Home() {
 
 			<NavBar />
 			<div className="flex flex-col gap-4 justify-center items-center px-8 max-w-5xl">
-				<h1 className="mb-2 text-3xl font-medium text-center md:text-5xl">
+				<h1 className={`mb-2 text-3xl font-medium text-center md:text-5xl`}>
 					Get off the algorhytm by <br />
 					<span className="text-">going deep.</span>
 				</h1>
-				<p className="text-base text-center md:text-lg text-secondary-foreground">
+				<p
+					className={`text-base text-center md:text-lg text-secondary-foreground`}
+				>
 					It is time for you to join the focused few and leave the distraced
 					masses.
 				</p>
 				<Link href="/start">
 					<Button size={"lg"}>
-						Get Started <ArrowRight />
+						Get Started <ArrowRight className="" />
 					</Button>
 				</Link>
 			</div>

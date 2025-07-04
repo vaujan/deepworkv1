@@ -40,10 +40,8 @@ export default function HeatGrid() {
 	];
 
 	return (
-		<div className="grid gap-1 p-2 w-full rounded-xl border grid-rows-7 border-border">
-			{dummyData.map((deep, index) => (
-				<DotComponent key={index} date={deep.date} timeSpent={deep.timeSpent} />
-			))}
+		<div className="flex flex-col flex-wrap gap-1 p-2 w-full rounded-xl border border-border">
+			{/* Import deep work session dots here */}
 		</div>
 	);
 }
@@ -58,7 +56,7 @@ function DotComponent({
 	return (
 		<Tooltip>
 			<TooltipTrigger
-				className={`w-4 h-4 rounded-sm ${className} bg-foreground`}
+				className={`w-4 h-4 rounded-sm bg-foreground`}
 			></TooltipTrigger>
 			<TooltipContent>
 				<p>{date}</p>
