@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import React from "react";
-import { Plus } from "lucide-react";
+import { Lock, LockOpen, Plus } from "lucide-react";
 
 export default function Header({ children }: { children: React.ReactNode }) {
-	const [editMode, setEditMode] = React.useState(false);
+	const [isEditMode, setIsEditMode] = React.useState(false);
 
 	const handleToggleEditMode = () => {
-		setEditMode(!editMode);
+		setIsEditMode(!isEditMode);
 	};
 
 	return (
@@ -20,25 +20,22 @@ export default function Header({ children }: { children: React.ReactNode }) {
 				<Separator orientation="vertical" />
 				<h3 className="ml-4 text-base font-semibold">{children}</h3>
 			</div>
-			<div className="flex">
-				<div className="flex justify-center items-center p-1 rounded-lg">
-					<Button
-						className={`${editMode === true ? "" : "hidden"} rounded-r-none border-r-0 `}
-						size={"sm"}
-						variant={"outline"}
-					>
+			<div className="flex gap-3">
+				{isEditMode && (
+					<Button variant={"outline"} size={"sm"}>
 						<Plus />
 						Add Widget
 					</Button>
-					<Button
-						size={"sm"}
-						onClick={handleToggleEditMode}
-						variant={editMode === true ? "outline" : "secondary"}
-						className={`${editMode === true ? "rounded-l-none" : ""}`}
-					>
-						Edit
-					</Button>
-				</div>
+				)}
+				<Button
+					onClick={handleToggleEditMode}
+					size="sm"
+					className={`${isEditMode === true ? "bg-accent" : "hover:bg-transparent"}`}
+					variant={"ghost"}
+				>
+					Layout Mode
+					{isEditMode === true ? <LockOpen /> : <Lock />}
+				</Button>
 			</div>
 		</div>
 	);
