@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { GripVertical, Plus } from "lucide-react";
-import { title } from "process";
 import React from "react";
 import { createSwapy, SwapEvent, Swapy } from "swapy";
 
@@ -60,7 +59,7 @@ const KANBAN_CARDS: KanbanCardState[] = [
 	},
 ];
 
-export default function Kanban() {
+export default function KanbanSwapy() {
 	const swapy = React.useRef<Swapy>(null);
 	const container = React.useRef(null);
 
