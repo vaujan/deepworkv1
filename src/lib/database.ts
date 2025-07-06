@@ -200,4 +200,26 @@ export class DatabaseService {
 
 		return result;
 	}
+
+	static async joinWaitList(email: string) {
+		if (!email || !email.includes("@")) {
+			throw new Error("Invalid email address");
+		}
+
+		const { data: userEmail, error } = await supabase
+			.from("waitlist")
+			.upsert([
+				{
+					email: email.toLowerCase().trim(),
+				},
+			])
+			.select()
+			.single();
+
+		if (error) {
+			console.error("Error adding to waitlist:", error);
+			return null;
+		}
+		return userEmail;
+	}
 }

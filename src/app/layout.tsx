@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import React from "react";
 import { sansSerif } from "@/lib/fonts";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
 	title: "deepflow.click",
@@ -25,6 +26,7 @@ export default function RootLayout({
 					disableTransitionOnChange
 				>
 					<SidebarProvider>{children}</SidebarProvider>
+					<Toaster />
 				</ThemeProvider>
 			</body>
 		</html>

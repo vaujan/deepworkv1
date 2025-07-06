@@ -1,53 +1,13 @@
 import React from "react";
 
-const COLUMNS: Column[] = [
-	{ id: "TODO", title: "To Do" },
-	{ id: "IN_PROGRESS", title: "In Progress" },
-	{ id: "DONE", title: "Done" },
-];
+export default function KanbanDnDKit() {
+	return (
+		<div className="p-3 flex flex-col w-full h-16 rounded-lg bg-card">
+			<span className="p-1 text-sm font-medium text-cyan-900 bg-cyan-200 rounded-lg dark:bg-cyan-950 dark:text-cyan-200">
+				Kanban @dnd-kit
+			</span>
 
-const INITIAL_TASKS: Task[] = [
-	{
-		id: "1",
-		title: "Research Project",
-		description: "Gather requirements and create initial documentation",
-		status: "TODO",
-	},
-	{
-		id: "2",
-		title: "Design System",
-		description: "Create component library and design tokens",
-		status: "TODO",
-	},
-	{
-		id: "3",
-		title: "API Integration",
-		description: "Implement REST API endpoints",
-		status: "IN_PROGRESS",
-	},
-	{
-		id: "4",
-		title: "Testing",
-		description: "Write unit tests for core functionality",
-		status: "DONE",
-	},
-];
-
-export default function KanbanKit() {
-	const [tasks, setTasks] = React.useState(INITIAL_TASKS);
-
-	return <div className="p-3 w-full rounded-lg bg-card">Kanban</div>;
-}
-type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
-
-interface Task {
-	id: string;
-	status: TaskStatus;
-	title: string;
-	description: string;
-}
-
-interface Column {
-	id: TaskStatus;
-	title: string;
+			<div>Columns</div>
+		</div>
+	);
 }

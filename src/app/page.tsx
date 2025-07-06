@@ -1,26 +1,71 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import NavBar from "./_components/NavBar";
 import { useTheme } from "next-themes";
 import { FlickeringGrid } from "@/components/magicui/flickering-grid";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 import { serif } from "@/lib/fonts";
+import { DatabaseService } from "@/lib/database";
+import { toast } from "sonner";
+import { CheckCircle, Loader2 } from "lucide-react";
 
 export default function Home() {
 	const { resolvedTheme } = useTheme();
 	const [color, setColor] = React.useState("#ffffff");
+	const [email, setEmail] = React.useState("");
+	const [isSubmitting, setIsSubmitting] = React.useState(false);
 
 	React.useEffect(() => {
 		setColor(resolvedTheme === "dark" ? "#ffffff" : "#000000");
 	}, [resolvedTheme]);
 
+	const handleJoinWaitlist = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+
+		// Basic email validation
+		if (!email || !email.includes("@")) {
+			toast.error("Invalid email", {
+				description: "Please enter a valid email address.",
+			});
+			return;
+		}
+
+		setIsSubmitting(true);
+
+		try {
+			const result = await DatabaseService.joinWaitList(email);
+
+			if (result) {
+				toast.success("Successfully joined!", {
+					description:
+						"You're now on the waitlist. We'll notify you when we launch!",
+				});
+				setEmail(""); // Clear the form
+			} else {
+				toast.error("Something went wrong", {
+					description: "Please try again later.",
+				});
+			}
+		} catch (error) {
+			console.error("Error joining waitlist:", error);
+			toast.error("Error", {
+				description: "Failed to join waitlist. Please try again.",
+			});
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
+	const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setEmail(event.target.value);
+	};
+
 	return (
-		<div className="flex flex-col justify-center items-center w-full min-h-screen">
+		<div className="flex  flex-col justify-center items-center w-full min-h-screen overflow-y-auto">
 			<FlickeringGrid
-				className="absolute inset-0 -z-50 size-full [mask-image:radial-gradient(450px_circle_at_center,white,transparent)]"
+				className="fixed inset-0 -z-50 size-full [mask-image:radial-gradient(450px_circle_at_center,white,transparent)]"
 				squareSize={9}
 				gridGap={6}
 				color={color}
@@ -30,21 +75,70 @@ export default function Home() {
 
 			<NavBar />
 			<div className="flex flex-col gap-4 justify-center items-center px-8 max-w-5xl">
-				<h1 className={`mb-2 text-3xl font-medium text-center md:text-5xl`}>
-					Get off the algorhytm by <br />
-					<span className="text-">going deep.</span>
+				<span
+					className={`text-sm mb-4 bg-card rounded-full px-2 text-muted-foreground py-1 border-border/50 border ${serif.className} italic `}
+				>
+					Protecting your deep work time isn&apos;t expensive. Losing it is.
+				</span>
+				<h1
+					className={`${serif.className} text-4xl font-medium italic text-center md:text-5xl`}
+				>
+					Stop Organizing Your Work. <br /> Start Doing It.
 				</h1>
 				<p
-					className={`text-base text-center md:text-lg text-secondary-foreground`}
+					className={`text-base max-w-2xl text-center text-secondary-foreground`}
 				>
-					It is time for you to join the focused few and leave the distraced
-					masses.
+					The customizable workspace that helps you focus on what matters:
+					making actual progress, not perfect productivity systems.
 				</p>
-				<Link href="/start">
-					<Button size={"lg"}>
-						Get Started <ArrowRight className="" />
+
+				{/* Mockup Image Placeholder */}
+				{/* <div className="mt-8 mb-8 w-full max-w-4xl">
+					<div className="relative w-full h-64 md:h-96 bg-gradient-to-br from-muted/50 to-muted/30 rounded-lg border border-border/50 flex items-center justify-center">
+						<div className="text-center">
+							<p className="text-sm text-muted-foreground">Product Mockup</p>
+							<p className="text-xs text-muted-foreground/70 mt-1">
+								Coming soon
+							</p>
+						</div>
+					</div>
+				</div> */}
+
+				<form
+					className="flex mt-8 w-full md:w-fit flex-col md:flex-row gap-2 md:gap-0 border-r-0"
+					onSubmit={handleJoinWaitlist}
+				>
+					<Input
+						type="email"
+						placeholder="johndoe@email.com"
+						value={email}
+						onChange={handleEmailChange}
+						className="md:border-r-0 md:rounded-r-none"
+						disabled={isSubmitting}
+						required
+					/>
+					<Button
+						className="md:rounded-l-none"
+						disabled={isSubmitting}
+						type="submit"
+					>
+						{isSubmitting ? (
+							<>
+								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+								Joining...
+							</>
+						) : (
+							<>
+								<CheckCircle className="mr-2 h-4 w-4" />
+								Join the waitlist
+							</>
+						)}
 					</Button>
-				</Link>
+				</form>
+				<span className="text-xs max-w-lg text-muted-foreground text-center">
+					Get early access when we launch in Q3 2025 + 50% off your first 6
+					months. No spam, unsubscribe anytime.
+				</span>
 			</div>
 		</div>
 	);

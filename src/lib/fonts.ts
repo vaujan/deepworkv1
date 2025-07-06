@@ -1,11 +1,11 @@
-import { Inter, EB_Garamond } from "next/font/google";
+import { Inter, Crimson_Pro } from "next/font/google";
 
 export const sansSerif = Inter({
 	subsets: ["latin"],
 	variable: "--font-sans",
 });
-export const serif = EB_Garamond({
+export const serif = Crimson_Pro({
 	subsets: ["latin"],
-	weight: "400",
 	variable: "--font-serif",
+	style: ["italic", "normal"],
 });
