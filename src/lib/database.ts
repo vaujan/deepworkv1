@@ -208,11 +208,16 @@ export class DatabaseService {
 
 		const { data: userEmail, error } = await supabase
 			.from("waitlist")
-			.upsert([
+			.upsert(
+				[
+					{
+						email: email.toLowerCase().trim(),
+					},
+				],
 				{
-					email: email.toLowerCase().trim(),
-				},
-			])
+					onConflict: "email",
+				}
+			)
 			.select()
 			.single();
 
