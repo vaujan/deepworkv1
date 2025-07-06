@@ -1,16 +1,35 @@
 // import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import useAvatar from "@/hooks/use-avatar";
+import useUser from "@/hooks/use-user";
 
 export default function NavBar() {
+	const { user } = useUser();
+	const { getUserAvatar, getUserDisplayName, getUserInitials } = useAvatar();
+	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+	// const toggleMobileMenu = () => {
+	// 	setIsMobileMenuOpen(!isMobileMenuOpen);
+	// };
+
+	const closeMobileMenu = () => {
+		setIsMobileMenuOpen(false);
+	};
+
 	return (
-		<nav className="fixed top-0 left-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+		<nav className="fixed top-0 left-0 z-50 w-full backdrop-blur supports-[backdrop-filter]:bg-background/60">
 			<div className="container flex justify-between items-center px-4 mx-auto h-16 sm:px-6 lg:px-8">
 				{/* Logo and Brand */}
 				<div className="flex items-center space-x-3">
-					<Link href="/" className="flex items-center space-x-2">
+					<Link
+						href="/"
+						className="flex items-center space-x-2"
+						onClick={closeMobileMenu}
+					>
 						<Image
 							src="/logo-frame-transparent.png"
 							alt="deepflow.click logo"
@@ -25,7 +44,7 @@ export default function NavBar() {
 
 				{/* Navigation Links - Hidden on mobile */}
 				<div className="hidden items-center space-x-6 md:flex">
-					<Link href="/features">
+					{/* <Link href="/features">
 						<Button variant="ghost" className="text-sm">
 							Features
 						</Button>
@@ -39,28 +58,49 @@ export default function NavBar() {
 						<Button variant="ghost" className="text-sm">
 							About
 						</Button>
-					</Link>
+					</Link> */}
 				</div>
 
 				{/* Right side - Theme toggle and CTA */}
 				<div className="flex items-center space-x-4">
 					{/* <ThemeToggle /> */}
-					<Link href="/auth">
+					{user ? (
+						<Link href={"/start"}>
+							<Button
+								className="inline-flex py-5 px-2 pl-0 "
+								variant={"ghost"}
+								size={"sm"}
+							>
+								<Avatar className="rounded-lg">
+									<AvatarImage src={getUserAvatar()} />
+									<AvatarFallback>{getUserInitials()}</AvatarFallback>
+								</Avatar>
+								<div className="flex flex-col justify-start text-left">
+									<span className="text-sm">{getUserDisplayName()}</span>
+									<p className="text-xs text-muted-foreground">
+										{user && user?.email}
+									</p>
+								</div>
+							</Button>
+						</Link>
+					) : (
 						<Button
 							size="sm"
 							variant={"secondary"}
 							className="hidden sm:inline-flex"
+							disabled
 						>
 							Sign In
 						</Button>
-					</Link>
+					)}
 
-					{/* Mobile menu button - you can expand this later */}
-					<Button
+					{/* Mobile menu button */}
+					{/* 					<Button
 						variant="ghost"
 						size="sm"
 						className="md:hidden"
 						aria-label="Toggle menu"
+						onClick={toggleMobileMenu}
 					>
 						<svg
 							className="w-5 h-5"
@@ -75,9 +115,42 @@ export default function NavBar() {
 								d="M4 6h16M4 12h16M4 18h16"
 							/>
 						</svg>
-					</Button>
+					</Button> */}
 				</div>
 			</div>
+
+			{/* Mobile Menu */}
+			{isMobileMenuOpen && (
+				<div className="md:hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
+					<div className="container px-4 py-4 space-y-3">
+						{/* <Link href="/features" onClick={closeMobileMenu}>
+							<Button variant="ghost" className="w-full justify-start text-sm">
+								Features
+							</Button>
+						</Link>
+						<Link href="/pricing" onClick={closeMobileMenu}>
+							<Button variant="ghost" className="w-full justify-start text-sm">
+								Pricing
+							</Button>
+						</Link>
+						<Link href="/about" onClick={closeMobileMenu}>
+							<Button variant="ghost" className="w-full justify-start text-sm">
+								About
+							</Button>
+						</Link> */}{" "}
+						{/* {!user && (
+							<Link href="/auth" onClick={closeMobileMenu}>
+								<Button
+									variant="secondary"
+									className="w-full justify-start text-sm"
+								>
+									Sign In
+								</Button>
+							</Link>
+						)} */}
+					</div>
+				</div>
+			)}
 		</nav>
 	);
 }

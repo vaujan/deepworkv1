@@ -9,7 +9,7 @@ export default function TodoList() {
 	const [isDone, setIsDone] = React.useState(false);
 
 	return (
-		<Card className="gap-2 pt-4 w-full max-w-md shadow-none dark:border-0">
+		<Card className="gap-2 pt-4 w-full shadow-none dark:border-0">
 			<CardHeader className="">
 				<div className="flex justify-between items-center">
 					<CardTitle>Hello</CardTitle>

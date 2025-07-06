@@ -70,18 +70,20 @@ export default function PomodoroCardPopoverSettings() {
 	return (
 		<PopoverContent className="w-56 rounded-xl">
 			<div className="grid gap-8">
-				<div className="grid w-full gap-3">
-					<span className="text-center text-muted-foreground">Focus Time</span>
-					<div className="flex items-center justify-center h-16 overflow-hidden rounded-lg border-1 border-border">
+				<div className="grid gap-3 w-full">
+					<span className="text-center text-muted-foreground">
+						Focus minutes
+					</span>
+					<div className="flex overflow-hidden justify-between items-center h-16 rounded-lg transition-all ease-out hover:bg-input/10 border-1 border-border">
 						<Button
-							className="h-full border-0 rounded-none shadow-none"
-							variant={"outline"}
+							className="h-full rounded-none border-0 shadow-none"
+							variant={"secondary"}
 							onClick={() => handleFocusTimeChange(false)}
 						>
 							<Minus />
 						</Button>
 						<TimeSettingsInput
-							className="h-full text-center border-0 rounded-none border-r-1 border-l-1"
+							className="flex h-full text-center rounded-lg border-0 w-15"
 							type="number"
 							id="focus"
 							value={Math.floor(focusMinutes)}
@@ -89,27 +91,29 @@ export default function PomodoroCardPopoverSettings() {
 							onChange={focusInputOnChange}
 						/>
 						<Button
-							className="h-full border-0 rounded-none shadow-none"
-							variant={"outline"}
+							className="h-full rounded-none border-0 shadow-none"
+							variant={"secondary"}
 							onClick={() => handleFocusTimeChange(true)}
 						>
 							<Plus />
 						</Button>
 					</div>
 				</div>
-				<div className="grid w-full gap-3">
-					<span className="text-center text-muted-foreground">Rest Time</span>
-					<div className="flex items-center justify-center h-16 overflow-hidden rounded-lg border-1 border-border">
+				<div className="grid gap-3 w-full">
+					<span className="text-center text-muted-foreground">
+						Rest minutes
+					</span>
+					<div className="flex overflow-hidden justify-between items-center h-16 rounded-lg transition-all ease-out hover:bg-input/10 border-1 border-border">
 						<Button
-							className="h-full border-0 rounded-none shadow-none"
-							variant={"outline"}
+							className="h-full rounded-none border-0 shadow-none"
+							variant={"secondary"}
 							onClick={() => handleRestTimeChange(false)}
 							disabled={focusMode !== "idle" || restMode !== "idle"}
 						>
 							<Minus />
 						</Button>
 						<TimeSettingsInput
-							className="h-full text-center border-0 rounded-none border-r-1 border-l-1"
+							className="flex h-full text-center rounded-lg border-0 w-15"
 							type="number"
 							id="rest"
 							value={Math.floor(restMinutes)}
@@ -117,8 +121,8 @@ export default function PomodoroCardPopoverSettings() {
 							onChange={restInputOnChange}
 						/>
 						<Button
-							className="h-full border-0 rounded-none shadow-none"
-							variant={"outline"}
+							className="h-full rounded-none border-0 shadow-none"
+							variant={"secondary"}
 							onClick={() => handleRestTimeChange(true)}
 							disabled={focusMode !== "idle" || restMode !== "idle"}
 						>

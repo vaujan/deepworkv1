@@ -69,10 +69,10 @@ export default function Login() {
 	};
 
 	return (
-		<div className="flex flex-col pb-32 justify-center items-center w-full min-h-screen">
+		<div className="flex flex-col justify-center items-center pb-32 w-full min-h-screen">
 			<LoginNavBar />
 
-			<div className="flex flex-col gap-4 w-full justify-center items-center px-8 md:max-w-5xl">
+			<div className="flex flex-col gap-4 justify-center items-center px-8 w-full md:max-w-5xl">
 				<Image
 					src="/logo-frame-transparent.png"
 					alt="Logo"
@@ -122,7 +122,7 @@ export default function Login() {
 					</Button>
 				</form>
 
-				<span className="text-secondary-foreground text-sm">
+				<span className="text-sm text-secondary-foreground">
 					{authMethod === "sign in" ? (
 						<>
 							New to our platform?{" "}

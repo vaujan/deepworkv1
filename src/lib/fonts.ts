@@ -1,11 +1,11 @@
-import { Instrument_Sans, Instrument_Serif } from "next/font/google";
+import { Inter, Crimson_Pro } from "next/font/google";
 
-export const sansSerif = Instrument_Sans({
+export const sansSerif = Inter({
 	subsets: ["latin"],
 	variable: "--font-sans",
 });
-export const serif = Instrument_Serif({
+export const serif = Crimson_Pro({
 	subsets: ["latin"],
-	weight: "400",
 	variable: "--font-serif",
+	style: ["italic", "normal"],
 });
