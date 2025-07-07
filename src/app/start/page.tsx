@@ -6,7 +6,7 @@ import TodoList from "@/app/_components/TodoList";
 import useDynamicTitle from "@/hooks/use-dynamic-title";
 import React from "react";
 // import KanbanSwapy from "../_components/KanbanSwapy";
-import KanbanDnDKit from "../_components/KanbanDnDKit";
+import KanbanDnDKit from "../_components/kanban/KanbanDnDKit";
 
 export default function Start() {
 	// Change title
