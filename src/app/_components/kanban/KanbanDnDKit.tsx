@@ -4,9 +4,18 @@ import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Column } from "@/lib/types";
 import ColumnContainer from "./ColumnContainer";
+import { DndContext, DragOverlay, DragStartEvent } from "@dnd-kit/core";
+import { SortableContext } from "@dnd-kit/sortable";
+import { createPortal } from "react-dom";
 
 export default function KanbanDnDKit() {
 	const [columns, setColumns] = React.useState<Column[]>([]);
+	const [activeColumn, setActiveColumn] = React.useState<Column | null>(null);
+
+	const columnsId = React.useMemo(
+		() => columns.map((col) => col.id),
+		[columns]
+	);
 
 	const logColumns = () => {
 		console.log("columns:", columns);
@@ -29,6 +38,13 @@ export default function KanbanDnDKit() {
 		setColumns(filteredColumns);
 	};
 
+	const onDragStart = (event: DragStartEvent) => {
+		if (event.active.data.current?.type === "Column") {
+			setActiveColumn(event.active.data.current.column);
+			return;
+		}
+	};
+
 	return (
 		<div className="flex flex-col gap-3 w-full rounded-lg h-fit">
 			<div className="flex justify-between">
@@ -47,14 +63,31 @@ export default function KanbanDnDKit() {
 			</div>
 
 			<div className="flex gap-3">
-				{columns.map((column) => (
-					<ColumnContainer
-						key={column.id}
-						column={column}
-						onDeleteColumn={handleDeleteColumn}
-					/>
-				))}
+				<DndContext onDragStart={onDragStart}>
+					<SortableContext items={columnsId}>
+						{columns.map((column) => (
+							<ColumnContainer
+								key={column.id}
+								column={column}
+								onDeleteColumn={handleDeleteColumn}
+							/>
+						))}
+					</SortableContext>
+
+					{createPortal(
+						<DragOverlay>
+							{activeColumn && (
+								<ColumnContainer
+									column={activeColumn}
+									onDeleteColumn={handleDeleteColumn}
+								/>
+							)}
+						</DragOverlay>,
+						document.body
+					)}
+				</DndContext>
 			</div>
+
 			<Button className="w-fit" variant={"outline"} onClick={handleAddColumn}>
 				<Plus />
 				Add Column

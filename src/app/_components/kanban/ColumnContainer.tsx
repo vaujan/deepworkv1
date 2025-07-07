@@ -8,19 +8,56 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export default function ColumnContainer(columns: ColumnProps) {
 	const { column, onDeleteColumn } = columns;
 
+	const {
+		setNodeRef,
+		attributes,
+		listeners,
+		transform,
+		transition,
+		isDragging,
+	} = useSortable({
+		id: column.id,
+		data: {
+			type: "Column",
+			column,
+		},
+	});
+
+	if (isDragging) {
+		return (
+			<div
+				ref={setNodeRef}
+				className="flex flex-col gap-3 px-4 pt-3 pb-4 w-full rounded-xl border opacity-15 animate-pulse min-h-64 min-w-64 group bg-[repeating-linear-gradient(45deg,var(--muted),transparent_50%)] bg-[length:1rem_1rem]"
+			></div>
+		);
+	}
+
+	const style = { transition, transform: CSS.Transform.toString(transform) };
+
 	return (
-		<div className="flex flex-col gap-3 px-4 pt-3 pb-4 w-full rounded-xl border min-h-64 min-w-64 group ">
+		<div
+			ref={setNodeRef}
+			style={style}
+			className="flex flex-col gap-3 px-4 pt-3 pb-4 w-full rounded-xl border min-h-64 min-w-64 group"
+		>
 			{/* Header of the column */}
-			<div className="flex justify-between items-center">
+			<div
+				{...attributes}
+				{...listeners}
+				className="flex justify-between items-center cursor-grab active:cursor-grabbing"
+			>
 				<span className="font-medium text-muted-foreground">
 					{column.title}
 				</span>
 				<Popover>
 					<PopoverTrigger>
+						{" "}
 						<Button
 							size={"icon"}
 							className="bg-transparent size-8"
@@ -30,7 +67,7 @@ export default function ColumnContainer(columns: ColumnProps) {
 						</Button>
 					</PopoverTrigger>
 
-					<PopoverContent className="w-fit p-2">
+					<PopoverContent className="p-2 w-fit">
 						<Button
 							variant={"destructive"}
 							onClick={() => onDeleteColumn(column.id)}
