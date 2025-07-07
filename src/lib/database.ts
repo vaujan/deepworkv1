@@ -206,25 +206,42 @@ export class DatabaseService {
 			throw new Error("Invalid email address");
 		}
 
-		const { data: userEmail, error } = await supabase
+		const normalizedEmail = email.toLowerCase().trim();
+
+		// First, check if the email already exists
+		const { data: existingEmail, error: checkError } = await supabase
 			.from("waitlist")
-			.upsert(
-				[
-					{
-						email: email.toLowerCase().trim(),
-					},
-				],
+			.select("email")
+			.eq("email", normalizedEmail)
+			.single();
+
+		if (checkError && checkError.code !== "PGRST116") {
+			// PGRST116 is "not found" error
+			console.error("Error checking existing email:", checkError);
+			throw new Error("Failed to check email status");
+		}
+
+		// If email already exists, return the existing record
+		if (existingEmail) {
+			return { ...existingEmail, isExisting: true };
+		}
+
+		// If email doesn't exist, insert it
+		const { data: newEmail, error: insertError } = await supabase
+			.from("waitlist")
+			.insert([
 				{
-					onConflict: "email",
-				}
-			)
+					email: normalizedEmail,
+				},
+			])
 			.select()
 			.single();
 
-		if (error) {
-			console.error("Error adding to waitlist:", error);
-			return null;
+		if (insertError) {
+			console.error("Error adding to waitlist:", insertError);
+			throw new Error("Failed to join waitlist");
 		}
-		return userEmail;
+
+		return { ...newEmail, isExisting: false };
 	}
 }
