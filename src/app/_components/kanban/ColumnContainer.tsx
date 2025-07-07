@@ -1,7 +1,12 @@
 import React from "react";
 import { ColumnProps } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { EllipsisVertical, Plus, Trash } from "lucide-react";
+import {
+	EllipsisVertical,
+	Plus,
+	SquareDashedMousePointer,
+	Trash,
+} from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
 	Popover,
@@ -33,8 +38,10 @@ export default function ColumnContainer(columns: ColumnProps) {
 		return (
 			<div
 				ref={setNodeRef}
-				className="flex flex-col gap-3 px-4 pt-3 pb-4 w-full rounded-xl border opacity-15 animate-pulse min-h-64 min-w-64 group bg-[repeating-linear-gradient(45deg,var(--muted),transparent_50%)] bg-[length:1rem_1rem]"
-			></div>
+				className="flex flex-col gap-3 justify-center items-center px-4 pt-3 pb-4 w-full rounded-xl border-4 border-dashed animate-pulse opacity-15 min-h-64 min-w-64 group"
+			>
+				<SquareDashedMousePointer className="animate-pulse" />
+			</div>
 		);
 	}
 
@@ -44,15 +51,15 @@ export default function ColumnContainer(columns: ColumnProps) {
 		<div
 			ref={setNodeRef}
 			style={style}
-			className="flex flex-col gap-3 px-4 pt-3 pb-4 w-full rounded-xl border min-h-64 min-w-64 group"
+			className="flex flex-col gap-3 p-1 w-full rounded-xl border-0 border-pink-500/50 bg-pink-700/30 min-h-64 min-w-64 group"
 		>
 			{/* Header of the column */}
-			<div
-				{...attributes}
-				{...listeners}
-				className="flex justify-between items-center cursor-grab active:cursor-grabbing"
-			>
-				<span className="font-medium text-muted-foreground">
+			<div className="flex justify-between items-center p-2 rounded-lg bg-pink-500/10">
+				<span
+					{...attributes}
+					{...listeners}
+					className="inline-flex items-center w-full h-full font-medium text-muted-foreground cursor-grab active:cursor-grabbing"
+				>
 					{column.title}
 				</span>
 				<Popover>
@@ -80,11 +87,11 @@ export default function ColumnContainer(columns: ColumnProps) {
 
 			{/* Task list for each column */}
 			<ScrollArea className="h-fit max-h-[350px] rounded-md">
-				<div className="flex flex-col p-2 mb-2 text-sm rounded-lg border bg-pink-500/25 border-pink-200/20 h-fit">
+				<div className="flex flex-col p-2 mb-2 text-sm rounded-lg border bg-secondary border-pink-200/20 h-fit">
 					<span>Task title</span>
 					<p>Task description</p>
 				</div>
-				<div className="flex flex-col p-2 mb-2 text-sm rounded-lg border bg-pink-500/25 border-pink-200/20 h-fit">
+				<div className="flex flex-col p-2 mb-2 text-sm rounded-lg border bg-secondary border-pink-200/20 h-fit">
 					<span>Task title</span>
 					<p>Task description</p>
 				</div>
