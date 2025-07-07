@@ -38,10 +38,17 @@ export default function Home() {
 			const result = await DatabaseService.joinWaitList(email);
 
 			if (result) {
-				toast.success("Successfully joined!", {
-					description:
-						"You're now on the waitlist. We'll notify you when we launch!",
-				});
+				if (result.isExisting) {
+					toast.info("Already on the waitlist!", {
+						description:
+							"You're already signed up. We'll notify you when we launch!",
+					});
+				} else {
+					toast.success("Successfully joined!", {
+						description:
+							"You're now on the waitlist. We'll notify you when we launch!",
+					});
+				}
 				setEmail(""); // Clear the form
 			} else {
 				toast.error("Something went wrong", {
@@ -76,7 +83,7 @@ export default function Home() {
 			<NavBar />
 			<div className="flex flex-col gap-4 justify-center items-center px-8 max-w-5xl">
 				<span
-					className={`text-sm mb-4 bg-card rounded-full px-2 text-muted-foreground py-1 border-border/50 border ${serif.className} italic `}
+					className={`text-sm mb-4 bg-card rounded-full px-2 text-muted-foreground py-1 border-border/50 border ${serif.className} `}
 				>
 					Protecting your deep work time isn&apos;t expensive. Losing it is.
 				</span>
@@ -109,7 +116,7 @@ export default function Home() {
 					onSubmit={handleJoinWaitlist}
 				>
 					<Input
-						type="email"
+						type="text"
 						placeholder="johndoe@email.com"
 						value={email}
 						onChange={handleEmailChange}
@@ -137,7 +144,7 @@ export default function Home() {
 				</form>
 				<span className="text-xs max-w-lg text-muted-foreground text-center">
 					Get early access when we launch in Q3 2025 + 50% off your first 6
-					months. No spam, unsubscribe anytime.
+					months. <br /> No spam, unsubscribe anytime.
 				</span>
 			</div>
 		</div>
