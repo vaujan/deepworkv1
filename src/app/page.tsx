@@ -70,7 +70,7 @@ export default function Home() {
 	};
 
 	return (
-		<div className="flex  flex-col justify-center items-center w-full min-h-screen overflow-y-auto">
+		<div className="flex overflow-y-auto flex-col justify-center items-center w-full min-h-screen">
 			<FlickeringGrid
 				className="fixed inset-0 -z-50 size-full [mask-image:radial-gradient(450px_circle_at_center,white,transparent)]"
 				squareSize={9}
@@ -93,7 +93,7 @@ export default function Home() {
 					Stop Organizing Your Work. <br /> Start Doing It.
 				</h1>
 				<p
-					className={`text-base max-w-2xl text-center text-secondary-foreground`}
+					className={`max-w-2xl text-base text-center text-secondary-foreground`}
 				>
 					The customizable workspace that helps you focus on what matters:
 					making actual progress, not perfect productivity systems.
@@ -101,10 +101,10 @@ export default function Home() {
 
 				{/* Mockup Image Placeholder */}
 				{/* <div className="mt-8 mb-8 w-full max-w-4xl">
-					<div className="relative w-full h-64 md:h-96 bg-gradient-to-br from-muted/50 to-muted/30 rounded-lg border border-border/50 flex items-center justify-center">
+					<div className="flex relative justify-center items-center w-full h-64 bg-gradient-to-br rounded-lg border md:h-96 from-muted/50 to-muted/30 border-border/50">
 						<div className="text-center">
 							<p className="text-sm text-muted-foreground">Product Mockup</p>
-							<p className="text-xs text-muted-foreground/70 mt-1">
+							<p className="mt-1 text-xs text-muted-foreground/70">
 								Coming soon
 							</p>
 						</div>
@@ -112,7 +112,7 @@ export default function Home() {
 				</div> */}
 
 				<form
-					className="flex mt-8 w-full md:w-fit flex-col md:flex-row gap-2 md:gap-0 border-r-0"
+					className="flex flex-col gap-2 mt-8 w-full border-r-0 md:w-fit md:flex-row md:gap-0"
 					onSubmit={handleJoinWaitlist}
 				>
 					<Input
@@ -131,18 +131,18 @@ export default function Home() {
 					>
 						{isSubmitting ? (
 							<>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+								<Loader2 className="mr-2 w-4 h-4 animate-spin" />
 								Joining...
 							</>
 						) : (
 							<>
-								<CheckCircle className="mr-2 h-4 w-4" />
+								<CheckCircle className="mr-2 w-4 h-4" />
 								Join the waitlist
 							</>
 						)}
 					</Button>
 				</form>
-				<span className="text-xs max-w-lg text-muted-foreground text-center">
+				<span className="max-w-lg text-xs text-center text-muted-foreground">
 					Get early access when we launch in Q3 2025 + 50% off your first 6
 					months. <br /> No spam, unsubscribe anytime.
 				</span>
