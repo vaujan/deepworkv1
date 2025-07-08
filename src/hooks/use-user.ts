@@ -16,7 +16,7 @@ export default function useUser() {
 				} = await supabase.auth.getSession();
 				setUser(session?.user ?? null);
 
-				console.log("Initial session:", session);
+				// console.log("Initial session:", session);
 			} catch (error) {
 				console.error("Error getting initial session", error);
 			} finally {
@@ -28,7 +28,7 @@ export default function useUser() {
 
 		const { data: authListener } = supabase.auth.onAuthStateChange(
 			(event, session) => {
-				console.log("Auth state changed:", event, session);
+				// console.log("Auth state changed:", event, session);
 				setUser(session?.user ?? null);
 
 				if (event === "SIGNED_OUT") {
