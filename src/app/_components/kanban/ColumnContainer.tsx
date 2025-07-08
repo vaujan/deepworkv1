@@ -1,5 +1,5 @@
 import React from "react";
-import { ColumnProps, Row } from "./types";
+import { ColumnProps } from "./types";
 import { Button } from "@/components/ui/button";
 import {
 	EllipsisVertical,
@@ -15,44 +15,21 @@ import {
 } from "@/components/ui/popover";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { v4 as uuidv4 } from "uuid";
 import RowContainer from "./RowContainer";
+import { Row } from "./types";
 
 export default function ColumnContainer(columns: ColumnProps) {
-	const { column, onDeleteColumn, onUpdateColumn } = columns;
+	const {
+		rows,
+		column,
+		onDeleteColumn,
+		onUpdateColumn,
+		onAddRow,
+		onDeleteRow,
+		onUpdateRowDescription,
+		onUpdateRowTitle,
+	} = columns;
 	const [editMode, setEditMode] = React.useState(false);
-
-	const [rows, setRows] = React.useState<Row[] | null>();
-	// const [activeRow, setActiveRow] = React.useState<Row | null>([]);
-
-	// const rowId = React.useMemo(() => rows?.map((row) => row.id), [rows]);
-
-	const handleAddRow = (columnId: string) => {
-		if (!rows) {
-			const firstRow: Row = {
-				id: uuidv4(),
-				columnId: columnId,
-				title: "Task #1",
-				description: "Current task description",
-			};
-
-			setRows([firstRow]);
-		}
-
-		const newRow: Row = {
-			id: uuidv4(),
-			columnId: columnId,
-			title: `Task #${(rows?.length ?? 0) + 1}`,
-			description: "Current task description",
-		};
-
-		setRows(rows ? [...rows, newRow] : [newRow]);
-	};
-
-	const handleDeleteRow = (id: string) => {
-		const filteredRows = rows?.filter((row) => row.id !== id);
-		setRows(filteredRows);
-	};
 
 	const {
 		setNodeRef,
@@ -143,9 +120,17 @@ export default function ColumnContainer(columns: ColumnProps) {
 			{/* Content */}
 			{/* Task list for each column */}
 			<ScrollArea className="h-full max-h-[350px] transition-all ease-out rounded-md [&[data-state=scrolling]]:shadow-inner">
-				{rows?.map((row) => (
-					<RowContainer key={row.id} row={row} onDeleteRow={handleDeleteRow} />
-				))}
+				{rows
+					?.filter((row: Row) => row.columnId === column.id)
+					.map((row: Row) => (
+						<RowContainer
+							key={row.id}
+							row={row}
+							onDeleteRow={() => onDeleteRow(row.id)}
+							onUpdateRowDescription={onUpdateRowDescription}
+							onUpdateRowTitle={onUpdateRowTitle}
+						/>
+					))}
 			</ScrollArea>
 
 			{/* Footer */}
@@ -154,7 +139,7 @@ export default function ColumnContainer(columns: ColumnProps) {
 					size={"sm"}
 					className="w-full shadow-none text-xs bg-transparent border-0 opacity-0 border-foreground/15 hover:border-1 hover:bg-foreground/5 text-foreground hover:opacity-100 group-hover:opacity-50"
 					variant={"default"}
-					onClick={() => handleAddRow(column.id)}
+					onClick={() => onAddRow(column.id)}
 				>
 					<Plus />
 					Add Task

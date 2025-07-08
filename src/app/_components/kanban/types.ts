@@ -4,10 +4,14 @@ export interface Column {
 }
 
 export interface ColumnProps {
+	rows: Row[];
 	column: Column;
 	onDeleteColumn: (id: string) => void;
 	onUpdateColumn: (id: string, title: string) => void;
-	// onAddRow: (id: string) => void;
+	onAddRow: (columnId: string) => void;
+	onDeleteRow: (id: string) => void;
+	onUpdateRowTitle: (id: string, title: string) => void;
+	onUpdateRowDescription: (id: string, description: string) => void;
 }
 
 export interface Row {
@@ -20,4 +24,6 @@ export interface Row {
 export interface RowProps {
 	row: Row;
 	onDeleteRow: (id: string) => void;
+	onUpdateRowTitle: (id: string, title: string) => void;
+	onUpdateRowDescription: (id: string, description: string) => void;
 }

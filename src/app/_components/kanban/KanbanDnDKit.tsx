@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash } from "lucide-react";
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Column } from "./types";
+import { Column, Row } from "./types";
 import ColumnContainer from "./ColumnContainer";
 import {
 	DndContext,
@@ -19,6 +19,47 @@ import { createPortal } from "react-dom";
 export default function KanbanDnDKit() {
 	const [columns, setColumns] = React.useState<Column[]>([]);
 	const [activeColumn, setActiveColumn] = React.useState<Column | null>(null);
+	const [rows, setRows] = React.useState<Row[] | null>();
+
+	const handleAddRow = (columnId: string) => {
+		const currentRows = rows || [];
+		const columnRows = currentRows.filter((row) => row.columnId === columnId);
+
+		const newRow: Row = {
+			id: uuidv4(),
+			columnId: columnId,
+			title: `Task #${columnRows.length + 1}`,
+			description: "Current task description",
+		};
+
+		setRows([...currentRows, newRow]);
+	};
+
+	const handleDeleteRow = (id: string) => {
+		if (!rows) return;
+		const filteredRows = rows.filter((row) => row.id !== id);
+		setRows(filteredRows);
+	};
+
+	const handleUpdateRowTitle = (id: string, title: string) => {
+		const newRows = rows?.map((row) => {
+			if (row.id !== id) return row;
+
+			return { ...row, title };
+		});
+
+		setRows(newRows as Row[]);
+	};
+
+	const handleUpdateRowDescription = (id: string, description: string) => {
+		const newRows = rows?.map((row) => {
+			if (row.id !== id) return row;
+
+			return { ...row, description };
+		});
+
+		setRows(newRows as Row[]);
+	};
 
 	const columnsId = React.useMemo(
 		() => columns.map((col) => col.id),
@@ -120,8 +161,13 @@ export default function KanbanDnDKit() {
 							<ColumnContainer
 								key={column.id}
 								column={column}
+								rows={rows || []}
 								onDeleteColumn={handleDeleteColumn}
 								onUpdateColumn={handleUpdateColumn}
+								onAddRow={handleAddRow}
+								onDeleteRow={handleDeleteRow}
+								onUpdateRowTitle={handleUpdateRowTitle}
+								onUpdateRowDescription={handleUpdateRowDescription}
 							/>
 						))}
 					</div>
@@ -132,8 +178,13 @@ export default function KanbanDnDKit() {
 						{activeColumn && (
 							<ColumnContainer
 								column={activeColumn}
+								rows={rows || []}
 								onDeleteColumn={handleDeleteColumn}
 								onUpdateColumn={handleUpdateColumn}
+								onAddRow={handleAddRow}
+								onDeleteRow={handleDeleteRow}
+								onUpdateRowTitle={handleUpdateRowTitle}
+								onUpdateRowDescription={handleUpdateRowDescription}
 							/>
 						)}
 					</DragOverlay>,
