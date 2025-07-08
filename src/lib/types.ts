@@ -51,6 +51,7 @@ export interface UpdateSessionData {
 // Task interface for Kanban board items
 export interface Task {
 	id: string;
+	columnId: string;
 	title: string;
 	description?: string;
 	status: "todo" | "inprogress" | "done";
