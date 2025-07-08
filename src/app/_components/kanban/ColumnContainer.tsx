@@ -1,5 +1,5 @@
 import React from "react";
-import { ColumnProps } from "@/lib/types";
+import { ColumnProps, Row } from "./types";
 import { Button } from "@/components/ui/button";
 import {
 	EllipsisVertical,
@@ -15,9 +15,44 @@ import {
 } from "@/components/ui/popover";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { v4 as uuidv4 } from "uuid";
+import RowContainer from "./RowContainer";
 
 export default function ColumnContainer(columns: ColumnProps) {
-	const { column, onDeleteColumn } = columns;
+	const { column, onDeleteColumn, onUpdateColumn } = columns;
+	const [editMode, setEditMode] = React.useState(false);
+
+	const [rows, setRows] = React.useState<Row[] | null>();
+	// const [activeRow, setActiveRow] = React.useState<Row | null>([]);
+
+	// const rowId = React.useMemo(() => rows?.map((row) => row.id), [rows]);
+
+	const handleAddRow = (columnId: string) => {
+		if (!rows) {
+			const firstRow: Row = {
+				id: uuidv4(),
+				columnId: columnId,
+				title: "Task #1",
+				description: "Current task description",
+			};
+
+			setRows([firstRow]);
+		}
+
+		const newRow: Row = {
+			id: uuidv4(),
+			columnId: columnId,
+			title: `Task #${(rows?.length ?? 0) + 1}`,
+			description: "Current task description",
+		};
+
+		setRows(rows ? [...rows, newRow] : [newRow]);
+	};
+
+	const handleDeleteRow = (id: string) => {
+		const filteredRows = rows?.filter((row) => row.id !== id);
+		setRows(filteredRows);
+	};
 
 	const {
 		setNodeRef,
@@ -32,6 +67,7 @@ export default function ColumnContainer(columns: ColumnProps) {
 			type: "Column",
 			column,
 		},
+		disabled: editMode,
 	});
 
 	if (isDragging) {
@@ -44,30 +80,49 @@ export default function ColumnContainer(columns: ColumnProps) {
 			</div>
 		);
 	}
-
 	const style = { transition, transform: CSS.Transform.toString(transform) };
 
 	return (
 		<div
 			ref={setNodeRef}
 			style={style}
-			className="flex flex-col gap-3 p-1 w-full rounded-xl border-0 border-pink-500/50 bg-pink-700/30 min-h-64 min-w-64 group"
+			className="flex flex-col gap-3 justify-between p-1 w-full rounded-xl border-0 border-pink-500/50 bg-pink-700/30 min-h-64 min-w-64 group "
 		>
 			{/* Header of the column */}
-			<div className="flex justify-between items-center p-2 rounded-lg bg-pink-500/10">
+			<div
+				{...attributes}
+				{...listeners}
+				className="flex justify-between items-center p-2 rounded-lg bg-pink-500/10 cursor-grab active:cursor-grabbing"
+			>
 				<span
-					{...attributes}
-					{...listeners}
-					className="inline-flex items-center w-full h-full font-medium text-muted-foreground cursor-grab active:cursor-grabbing"
+					onClick={() => setEditMode(true)}
+					className="inline-flex items-center w-full h-full font-medium text-secondary-foreground"
 				>
-					{column.title}
+					{editMode === true ? (
+						<input
+							className="w-full border-foreground/50 selection:bg-transparent focus:outline-0 text-foreground focus:border-b-1"
+							onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+								onUpdateColumn(column.id, event?.target.value)
+							}
+							value={column.title}
+							autoFocus
+							onBlur={() => {
+								setEditMode(false);
+							}}
+							onKeyDown={(e) => {
+								if (e.key !== "Enter") return;
+								setEditMode(false);
+							}}
+						/>
+					) : (
+						<span className="cursor-text">{column.title}</span>
+					)}
 				</span>
 				<Popover>
 					<PopoverTrigger>
-						{" "}
 						<Button
 							size={"icon"}
-							className="bg-transparent size-8"
+							className="bg-transparent shadow-none hover:bg-foreground/10 size-8"
 							variant={"secondary"}
 						>
 							<EllipsisVertical />
@@ -76,7 +131,7 @@ export default function ColumnContainer(columns: ColumnProps) {
 
 					<PopoverContent className="p-2 w-fit">
 						<Button
-							variant={"destructive"}
+							variant={"ghostDestructive"}
 							onClick={() => onDeleteColumn(column.id)}
 						>
 							<Trash /> Delete
@@ -85,24 +140,26 @@ export default function ColumnContainer(columns: ColumnProps) {
 				</Popover>
 			</div>
 
+			{/* Content */}
 			{/* Task list for each column */}
-			<ScrollArea className="h-fit max-h-[350px] rounded-md">
-				<div className="flex flex-col p-2 mb-2 text-sm rounded-lg border bg-secondary border-pink-200/20 h-fit">
-					<span>Task title</span>
-					<p>Task description</p>
-				</div>
-				<div className="flex flex-col p-2 mb-2 text-sm rounded-lg border bg-secondary border-pink-200/20 h-fit">
-					<span>Task title</span>
-					<p>Task description</p>
-				</div>
+			<ScrollArea className="h-full max-h-[350px] transition-all ease-out rounded-md [&[data-state=scrolling]]:shadow-inner">
+				{rows?.map((row) => (
+					<RowContainer key={row.id} row={row} onDeleteRow={handleDeleteRow} />
+				))}
 			</ScrollArea>
-			<Button
-				size={"sm"}
-				className="text-xs bg-transparent border-0 opacity-0 hover:opacity-100 group-hover:opacity-50"
-				variant={"outline"}
-			>
-				<Plus />
-			</Button>
+
+			{/* Footer */}
+			<div className="p-2">
+				<Button
+					size={"sm"}
+					className="w-full shadow-none text-xs bg-transparent border-0 opacity-0 border-foreground/15 hover:border-1 hover:bg-foreground/5 text-foreground hover:opacity-100 group-hover:opacity-50"
+					variant={"default"}
+					onClick={() => handleAddRow(column.id)}
+				>
+					<Plus />
+					Add Task
+				</Button>
+			</div>
 		</div>
 	);
 }

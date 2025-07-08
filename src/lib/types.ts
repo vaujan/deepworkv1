@@ -51,6 +51,7 @@ export interface UpdateSessionData {
 // Task interface for Kanban board items
 export interface Task {
 	id: string;
+	columnId: string;
 	title: string;
 	description?: string;
 	status: "todo" | "inprogress" | "done";
@@ -115,14 +116,4 @@ export interface Resource {
 export interface HeatmapDataPoint {
 	date: string;
 	value: number;
-}
-
-export interface Column {
-	id: string;
-	title: string;
-}
-
-export interface ColumnProps {
-	column: Column;
-	onDeleteColumn: (id: string) => void;
 }
