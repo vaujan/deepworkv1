@@ -83,17 +83,17 @@ export default function Home() {
 			<NavBar />
 			<div className="flex flex-col gap-4 justify-center items-center px-8 max-w-5xl">
 				<span
-					className={`text-sm mb-4 bg-card rounded-full px-2 text-muted-foreground py-1 border-border/50 border ${serif.className} `}
+					className={`text-md mb-4 bg-card rounded-full px-2 text-muted-foreground py-1 border-border/50 border ${serif.className} `}
 				>
 					Protecting your deep work time isn&apos;t expensive. Losing it is.
 				</span>
 				<h1
-					className={`${serif.className} text-4xl font-medium italic text-center md:text-5xl`}
+					className={`${serif.className} text-6xl font-medium italic text-center md:text-7xl`}
 				>
 					Stop Organizing Your Work. <br /> Start Doing It.
 				</h1>
 				<p
-					className={`max-w-2xl text-base text-center text-secondary-foreground`}
+					className={`max-w-2xl text-lg text-center text-secondary-foreground`}
 				>
 					The customizable workspace that helps you focus on what matters:
 					making actual progress, not perfect productivity systems.
@@ -142,7 +142,7 @@ export default function Home() {
 						)}
 					</Button>
 				</form>
-				<span className="max-w-lg text-xs text-center text-muted-foreground">
+				<span className="max-w-lg text-xs md:text-sm text-center text-muted-foreground">
 					Get early access when we launch in Q3 2025 + 50% off your first 6
 					months. <br /> No spam, unsubscribe anytime.
 				</span>
