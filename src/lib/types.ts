@@ -116,13 +116,3 @@ export interface HeatmapDataPoint {
 	date: string;
 	value: number;
 }
-
-export interface Column {
-	id: string;
-	title: string;
-}
-
-export interface ColumnProps {
-	column: Column;
-	onDeleteColumn: (id: string) => void;
-}
