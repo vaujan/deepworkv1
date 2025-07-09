@@ -7,5 +7,5 @@ export const sansSerif = Inter({
 export const serif = Crimson_Pro({
 	subsets: ["latin"],
 	variable: "--font-serif",
-	style: ["normal"],
+	style: ["italic", "normal"],
 });
