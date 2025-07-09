@@ -12,14 +12,6 @@ export default function RowContainer(rows: RowProps) {
 	const [editMode, setEditMode] = React.useState(false);
 	const [editValue, setEditValue] = React.useState(row.title);
 
-	// const toggleEditMode = () => {
-	// 	setEditMode(!editMode);
-	// 	if (!editMode) {
-	// 		// When entering edit mode, set the current title as the edit value
-	// 		setEditValue(row.title);
-	// 	}
-	// };
-
 	const handleEditComplete = () => {
 		setEditMode(false);
 		// If the edit value is empty, delete the row
@@ -68,11 +60,11 @@ export default function RowContainer(rows: RowProps) {
 			<div
 				ref={setNodeRef}
 				style={style}
-				className="flex gap-3 justify-between p-2 mb-2 rounded-lg border-2 bg-secondary/50 border-accent opacity-50"
+				className="flex min-h-15 gap-3 justify-between opacity-50 p-2 mb-2 rounded-lg bg-accent/25 border-2 border-accent/80 border-dashed"
 			>
-				<div className="flex flex-col gap-2">
-					<span className="font-medium">{row.title}</span>
-					<p className="text-muted-foreground">{row.description}</p>
+				<div className="flex opacity-0 flex-col gap-2">
+					<span className="font-medium text-foreground">{row.title}</span>
+					{/* <p className="text-muted-foreground text-sm">{row.description}</p> */}
 				</div>
 			</div>
 		);
@@ -86,8 +78,10 @@ export default function RowContainer(rows: RowProps) {
 			{...listeners}
 			onMouseEnter={() => setMouseIsOver(true)}
 			onMouseLeave={() => setMouseIsOver(false)}
-			className={`flex gap-3 justify-between p-2 my-2 rounded-lg min-h-15 cursor-grab active:cursor-grabbing bg-secondary border transition-all duration-200 ${
-				isOver ? "border-accent border-2 bg-accent/10" : "border-border"
+			className={`flex gap-3 justify-between p-2 my-2 rounded-lg min-h-15 cursor-grab active:cursor-grabbing bg-secondary border transition-all duration-200${
+				isOver
+					? "border-accent border-2 bg-accent/10 shadow-lg scale-[1.02]"
+					: "border-border hover:border-accent/50"
 			}`}
 			aria-label={`Task: ${row.title}. Drag to reorder or move to different column.`}
 		>
@@ -122,7 +116,7 @@ export default function RowContainer(rows: RowProps) {
 
 			{/* Drop indicator when hovering over this row */}
 			{isOver && (
-				<div className="absolute inset-0 border-2 border-dashed border-accent bg-accent/10 rounded-lg pointer-events-none" />
+				<div className="absolute inset-0 border-2 border-dashed border-accent bg-accent/5 rounded-lg pointer-events-none animate-pulse" />
 			)}
 
 			{mouseIsOver && (

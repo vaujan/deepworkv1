@@ -89,7 +89,7 @@ const ColumnContainer = React.memo(function ColumnContainer(
 		return (
 			<div
 				ref={setNodeRef}
-				className="flex flex-col gap-3 justify-center items-center px-4 pt-3 pb-4 w-full rounded-xl border-4 border-dashed animate-pulse opacity-15 min-h-64 min-w-64 group"
+				className="flex flex-col gap-3 justify-center items-center px-4 pt-3 pb-4 w-[350px] h-full rounded-xl border-4 border-dashed animate-pulse opacity-15 min-h-64 min-w-64 group"
 			>
 				<SquareDashedMousePointer className="animate-pulse" />
 			</div>
@@ -156,8 +156,7 @@ const ColumnContainer = React.memo(function ColumnContainer(
 			{/* Task list for each column */}
 			<ScrollArea
 				ref={setDroppableRef}
-				className={`h-full p-2 max-h-[350px] transition-all ease-out rounded-md [&[data-state=scrolling]]:shadow-inner ${
-					isOver ? "bg-accent/20 border-2 border-dashed border-accent" : ""
+				className={`h-full p-2 transition-all ease-out rounded-md [&[data-state=scrolling]]:shadow-inner
 				}`}
 			>
 				<SortableContext items={rowsIds}>

@@ -21,7 +21,6 @@ import {
 	sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
-import RowContainer from "./RowContainer";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export default function KanbanDnDKit() {
@@ -299,11 +298,20 @@ export default function KanbanDnDKit() {
 							/>
 						)}
 						{activeRow && (
-							<RowContainer
-								row={activeRow}
-								onDeleteRow={handleDeleteRow}
-								onUpdateRowTitle={handleUpdateRowTitle}
-							/>
+							<div className="flex gap-3 justify-between p-2 mb-2 rounded-lg border-2 bg-card/80 border-accent/50 opacity-80 shadow-2xl shadow-accent/20 backdrop-blur-sm transform rotate-2 scale-105 transition-all duration-200">
+								<div className="flex flex-col gap-2">
+									<span className="font-medium text-foreground">
+										{activeRow.title}
+									</span>
+									<p className="text-muted-foreground text-sm">
+										{activeRow.description}
+									</p>
+								</div>
+								{/* Show a subtle drag indicator */}
+								<div className="flex items-center justify-center w-6 h-6 rounded-full bg-accent/20">
+									<div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+								</div>
+							</div>
 						)}
 					</DragOverlay>,
 					document.body
