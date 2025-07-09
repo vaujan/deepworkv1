@@ -13,7 +13,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { useSortable } from "@dnd-kit/sortable";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import RowContainer from "./RowContainer";
 import { Row } from "./types";
@@ -29,7 +29,13 @@ export default function ColumnContainer(columns: ColumnProps) {
 		onUpdateRowDescription,
 		onUpdateRowTitle,
 	} = columns;
+
 	const [editMode, setEditMode] = React.useState(false);
+
+	const rowsIds = React.useMemo(
+		() => rows.filter((row) => row.columnId === column.id).map((row) => row.id),
+		[rows, column.id]
+	);
 
 	const {
 		setNodeRef,
@@ -63,13 +69,13 @@ export default function ColumnContainer(columns: ColumnProps) {
 		<div
 			ref={setNodeRef}
 			style={style}
-			className="flex flex-col gap-3 justify-between p-1 w-full rounded-xl border-0 border-pink-500/50 bg-pink-700/30 min-h-64 min-w-64 group "
+			className="flex flex-col gap-3 justify-between p-1 w-full rounded-xl border-0 border-border/50 bg-card/60 min-h-64 min-w-64 group"
 		>
 			{/* Header of the column */}
 			<div
 				{...attributes}
 				{...listeners}
-				className="flex justify-between items-center p-2 rounded-lg bg-pink-500/10 cursor-grab active:cursor-grabbing"
+				className="flex justify-between items-center p-2 rounded-lg bg-card cursor-grab active:cursor-grabbing"
 			>
 				<span
 					onClick={() => setEditMode(true)}
@@ -120,24 +126,26 @@ export default function ColumnContainer(columns: ColumnProps) {
 			{/* Content */}
 			{/* Task list for each column */}
 			<ScrollArea className="h-full max-h-[350px] transition-all ease-out rounded-md [&[data-state=scrolling]]:shadow-inner">
-				{rows
-					?.filter((row: Row) => row.columnId === column.id)
-					.map((row: Row) => (
-						<RowContainer
-							key={row.id}
-							row={row}
-							onDeleteRow={() => onDeleteRow(row.id)}
-							onUpdateRowDescription={onUpdateRowDescription}
-							onUpdateRowTitle={onUpdateRowTitle}
-						/>
-					))}
+				<SortableContext items={rowsIds}>
+					{rows
+						?.filter((row: Row) => row.columnId === column.id)
+						.map((row: Row) => (
+							<RowContainer
+								key={row.id}
+								row={row}
+								onDeleteRow={() => onDeleteRow(row.id)}
+								onUpdateRowDescription={onUpdateRowDescription}
+								onUpdateRowTitle={onUpdateRowTitle}
+							/>
+						))}
+				</SortableContext>
 			</ScrollArea>
 
 			{/* Footer */}
 			<div className="p-2">
 				<Button
 					size={"sm"}
-					className="w-full shadow-none text-xs bg-transparent border-0 opacity-0 border-foreground/15 hover:border-1 hover:bg-foreground/5 text-foreground hover:opacity-100 group-hover:opacity-50"
+					className="w-full text-xs bg-transparent border-0 shadow-none opacity-0 border-foreground/15 hover:border-1 hover:bg-foreground/5 text-foreground hover:opacity-100 group-hover:opacity-50"
 					variant={"default"}
 					onClick={() => onAddRow(column.id)}
 				>

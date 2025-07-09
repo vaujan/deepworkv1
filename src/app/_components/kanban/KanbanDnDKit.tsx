@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Plus, Trash } from "lucide-react";
 import React from "react";
-import { v4 as uuidv4 } from "uuid";
 import { Column, Row } from "./types";
 import ColumnContainer from "./ColumnContainer";
 import {
 	DndContext,
 	DragEndEvent,
+	DragOverEvent,
 	DragOverlay,
 	DragStartEvent,
 	PointerSensor,
@@ -15,24 +15,26 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
+import RowContainer from "./RowContainer";
 
 export default function KanbanDnDKit() {
 	const [columns, setColumns] = React.useState<Column[]>([]);
 	const [activeColumn, setActiveColumn] = React.useState<Column | null>(null);
-	const [rows, setRows] = React.useState<Row[] | null>();
+
+	const [rows, setRows] = React.useState<Row[]>([]);
+	const [activeRow, setActiveRow] = React.useState<Row | null>(null);
 
 	const handleAddRow = (columnId: string) => {
-		const currentRows = rows || [];
-		const columnRows = currentRows.filter((row) => row.columnId === columnId);
+		const columnRows = rows.filter((row) => row.columnId === columnId);
 
 		const newRow: Row = {
-			id: uuidv4(),
+			id: crypto.randomUUID(),
 			columnId: columnId,
 			title: `Task #${columnRows.length + 1}`,
 			description: "Current task description",
 		};
 
-		setRows([...currentRows, newRow]);
+		setRows([...rows, newRow]);
 	};
 
 	const handleDeleteRow = (id: string) => {
@@ -61,14 +63,14 @@ export default function KanbanDnDKit() {
 		setRows(newRows as Row[]);
 	};
 
-	const columnsId = React.useMemo(
+	const columnsIds = React.useMemo(
 		() => columns.map((col) => col.id),
 		[columns]
 	);
 
 	const handleAddColumn = () => {
 		const newColumn = {
-			id: uuidv4(),
+			id: crypto.randomUUID(),
 			title: `Column #${columns.length + 1}`,
 		};
 
@@ -89,15 +91,23 @@ export default function KanbanDnDKit() {
 
 		setColumns(newColumns);
 	};
+
 	// Handles when a drag operation starts
 	const onDragStart = (event: DragStartEvent) => {
 		const { active } = event;
+
 		const draggedColumn = columns.find((col) => col.id === active.id);
+		const draggedRow = rows.find((row) => row.id === active.id);
+
 		setActiveColumn(draggedColumn || null);
+		setActiveRow(draggedRow || null);
 	};
 
 	// Handles when a drag operation ends
 	const onDragEnd = (event: DragEndEvent) => {
+		setActiveColumn(null);
+		setActiveRow(null);
+
 		// Extract the dragged column and the drop target from the event
 		const { active, over } = event;
 
@@ -130,6 +140,48 @@ export default function KanbanDnDKit() {
 		setActiveColumn(null);
 	};
 
+	const onDragOver = (event: DragOverEvent) => {
+		const { active, over } = event;
+
+		if (!over) return;
+
+		const activeRowId = active.id;
+		const overRowId = over.id;
+
+		if (activeRowId === overRowId) return;
+
+		const isActiveARow = active.data.current?.type === "Row";
+		const isOverARow = over.data.current?.type === "Row";
+
+		if (!isActiveARow) return;
+
+		// Dropping a task over another task
+		if (isActiveARow && isOverARow) {
+			setRows((rows) => {
+				const activeRowIndex = rows?.findIndex((row) => row.id === activeRowId);
+				const overRowIndex = rows?.findIndex((row) => row.id === overRowId);
+
+				rows[activeRowIndex].columnId = rows[overRowIndex].columnId;
+
+				return arrayMove(rows, activeRowIndex, overRowIndex);
+			});
+		}
+
+		// Dropping a task over another column
+		const isOverColumn = over.data.current?.type === "Column";
+
+		if (isActiveARow && isOverColumn) {
+			setRows((rows) => {
+				const activeRowIndex = rows.findIndex((row) => row.id === activeRowId);
+
+				rows[activeRowIndex].columnId = overRowId.toString();
+
+				return arrayMove(rows, activeRowIndex, activeRowIndex);
+			});
+		}
+		setActiveRow(null);
+	};
+
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
 			activationConstraint: {
@@ -154,14 +206,15 @@ export default function KanbanDnDKit() {
 				sensors={sensors}
 				onDragEnd={onDragEnd}
 				onDragStart={onDragStart}
+				onDragOver={onDragOver}
 			>
-				<SortableContext items={columnsId}>
+				<SortableContext items={columnsIds}>
 					<div className="flex gap-4">
 						{columns.map((column) => (
 							<ColumnContainer
 								key={column.id}
 								column={column}
-								rows={rows || []}
+								rows={rows}
 								onDeleteColumn={handleDeleteColumn}
 								onUpdateColumn={handleUpdateColumn}
 								onAddRow={handleAddRow}
@@ -182,6 +235,14 @@ export default function KanbanDnDKit() {
 								onDeleteColumn={handleDeleteColumn}
 								onUpdateColumn={handleUpdateColumn}
 								onAddRow={handleAddRow}
+								onDeleteRow={handleDeleteRow}
+								onUpdateRowTitle={handleUpdateRowTitle}
+								onUpdateRowDescription={handleUpdateRowDescription}
+							/>
+						)}
+						{activeRow && (
+							<RowContainer
+								row={activeRow}
 								onDeleteRow={handleDeleteRow}
 								onUpdateRowTitle={handleUpdateRowTitle}
 								onUpdateRowDescription={handleUpdateRowDescription}

@@ -32,6 +32,67 @@ export default function RowContainer(rows: RowProps) {
 
 	const style = { transition, transform: CSS.Transform.toString(transform) };
 
+	if (isDragging) {
+		return (
+			<div
+				ref={setNodeRef}
+				style={style}
+				className="flex gap-3 justify-between p-2 mb-2 rounded-lg border-2 bg-secondary/50 border-accent"
+			>
+				<div
+					className="flex flex-col gap-2"
+					onKeyDown={(e) => {
+						if (e.key !== "Enter") return;
+						setEditMode(false);
+					}}
+				>
+					{editMode === true ? (
+						<input
+							type="text"
+							className="w-full border-foreground/50 selection:bg-transparent focus:outline-0 text-foreground focus:border-b-1"
+							onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+								onUpdateRowTitle(row.id, event.target.value)
+							}
+							onBlur={() => setEditMode(false)}
+							value={row.title}
+							onKeyDown={(e) => {
+								if (e.key !== "Enter" && e.key !== "Escape") return;
+								setEditMode(false);
+							}}
+							placeholder="Add title"
+						/>
+					) : (
+						<span onClick={() => setEditMode(true)} className="font-medium">
+							{row.title}
+						</span>
+					)}
+					{editMode === true ? (
+						<input
+							type="text"
+							className="w-full border-foreground/50 selection:bg-transparent focus:outline-0 text-foreground focus:border-b-1"
+							onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+								onUpdateRowDescription(row.id, event.target.value)
+							}
+							value={row.description}
+							onKeyDown={(e) => {
+								if (e.key !== "Enter" && e.key !== "Escape") return;
+								setEditMode(false);
+							}}
+							placeholder="Add description"
+						/>
+					) : (
+						<p
+							onClick={() => setEditMode(true)}
+							className="text-muted-foreground"
+						>
+							{row.description}
+						</p>
+					)}
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div
 			ref={setNodeRef}
@@ -40,7 +101,7 @@ export default function RowContainer(rows: RowProps) {
 			{...listeners}
 			onMouseEnter={() => setMouseIsOver(true)}
 			onMouseLeave={() => setMouseIsOver(false)}
-			className="flex gap-3 justify-between p-2 mb-2 rounded-lg border bg-secondary"
+			className="flex gap-3 justify-between p-2 mb-2 rounded-lg border cursor-grab active:cursor-grabbing bg-secondary"
 		>
 			<div
 				className="flex flex-col gap-2"
@@ -56,7 +117,7 @@ export default function RowContainer(rows: RowProps) {
 						onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
 							onUpdateRowTitle(row.id, event.target.value)
 						}
-						onBlur={() => toggleEditMode}
+						onBlur={() => setEditMode(false)}
 						value={row.title}
 						onKeyDown={(e) => {
 							if (e.key !== "Enter" && e.key !== "Escape") return;
@@ -98,7 +159,7 @@ export default function RowContainer(rows: RowProps) {
 						<Button
 							onClick={() => toggleEditMode()}
 							size="sm"
-							className="size-8 shadow-none opacity-60 hover:opacity-100"
+							className="shadow-none opacity-60 size-8 hover:opacity-100"
 							variant={"ghost"}
 						>
 							<Pencil />
@@ -107,7 +168,7 @@ export default function RowContainer(rows: RowProps) {
 						<Button
 							onClick={() => toggleEditMode()}
 							size="sm"
-							className="size-8 shadow-none opacity-60 hover:opacity-100"
+							className="shadow-none opacity-60 size-8 hover:opacity-100"
 							variant={"default"}
 						>
 							<Check />
@@ -116,7 +177,7 @@ export default function RowContainer(rows: RowProps) {
 					<Button
 						onClick={() => onDeleteRow(row.id)}
 						size="sm"
-						className="size-8 shadow-none opacity-60 hover:opacity-100"
+						className="shadow-none opacity-60 size-8 hover:opacity-100"
 						variant={"ghostDestructive"}
 					>
 						<Trash />

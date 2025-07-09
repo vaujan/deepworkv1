@@ -16,7 +16,7 @@ export default function Header({ children }: { children: React.ReactNode }) {
 		<div className="flex gap-2 justify-between px-8 pt-4 pb-2 w-full">
 			{/* <ThemeToggle /> */}
 			<div className="flex items-center">
-				<SidebarTrigger className="size-8" />
+				<SidebarTrigger className="size-8 mr-2" />
 				<Separator orientation="vertical" />
 				<h3 className="ml-4 text-base font-semibold">{children}</h3>
 			</div>
