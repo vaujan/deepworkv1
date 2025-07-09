@@ -303,6 +303,7 @@ export default function KanbanDnDKit() {
 						)}
 						{activeRow && (
 							<div className="flex gap-3 justify-between p-2 mb-2 rounded-lg border-2 bg-card/80 border-accent/50 opacity-80 shadow-2xl shadow-accent/20 transition-all duration-200">
+								=======
 								<div className="flex flex-col gap-2">
 									<span className="font-medium text-foreground">
 										{activeRow.title}
