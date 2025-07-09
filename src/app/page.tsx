@@ -88,7 +88,7 @@ export default function Home() {
 					Protecting your deep work time isn&apos;t expensive. Losing it is.
 				</span>
 				<h1
-					className={`${serif.className} text-6xl font-medium italic text-center md:text-7xl`}
+					className={`${serif.className} text-6xl tracking-tight font-medium italic text-center md:text-7xl`}
 				>
 					Stop Organizing Your Work. <br /> Start Doing It.
 				</h1>
@@ -142,7 +142,7 @@ export default function Home() {
 						)}
 					</Button>
 				</form>
-				<span className="max-w-lg text-xs md:text-sm text-center text-muted-foreground">
+				<span className="max-w-lg text-xs text-center md:text-sm text-muted-foreground">
 					Get early access when we launch in Q3 2025 + 50% off your first 6
 					months. <br /> No spam, unsubscribe anytime.
 				</span>
