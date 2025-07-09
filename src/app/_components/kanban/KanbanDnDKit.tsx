@@ -21,7 +21,6 @@ import {
 	sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
-import RowContainer from "./RowContainer";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export default function KanbanDnDKit() {
@@ -288,22 +287,36 @@ export default function KanbanDnDKit() {
 				{createPortal(
 					<DragOverlay>
 						{activeColumn && (
-							<ColumnContainer
-								column={activeColumn}
-								rows={rows}
-								onDeleteColumn={handleDeleteColumn}
-								onUpdateColumn={handleUpdateColumn}
-								onAddRow={handleAddRow}
-								onDeleteRow={handleDeleteRow}
-								onUpdateRowTitle={handleUpdateRowTitle}
-							/>
+							<div className="flex flex-col gap-3 justify-center items-center px-4 pt-3 pb-4 w-[350px] h-full rounded-xl border-2 border-dashed border-accent/50 bg-card/20 backdrop-blur-sm opacity-90 shadow-2xl shadow-accent/20 transition-all duration-300 min-h-64 min-w-64">
+								<div className="flex flex-col items-center gap-2">
+									<div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent/20">
+										<div className="w-3 h-3 rounded-full bg-accent animate-pulse" />
+									</div>
+									<span className="text-sm text-muted-foreground font-medium">
+										{activeColumn.title}
+									</span>
+									<span className="text-xs text-muted-foreground/70">
+										Moving column...
+									</span>
+								</div>
+							</div>
 						)}
 						{activeRow && (
-							<RowContainer
-								row={activeRow}
-								onDeleteRow={handleDeleteRow}
-								onUpdateRowTitle={handleUpdateRowTitle}
-							/>
+							<div className="flex gap-3 justify-between p-2 mb-2 rounded-lg border-2 bg-card/80 border-accent/50 opacity-80 shadow-2xl shadow-accent/20 transition-all duration-200">
+								=======
+								<div className="flex flex-col gap-2">
+									<span className="font-medium text-foreground">
+										{activeRow.title}
+									</span>
+									<p className="text-muted-foreground text-sm">
+										{activeRow.description}
+									</p>
+								</div>
+								{/* Show a subtle drag indicator */}
+								<div className="flex items-center justify-center w-6 h-6 rounded-full bg-accent/20">
+									<div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+								</div>
+							</div>
 						)}
 					</DragOverlay>,
 					document.body

@@ -1,12 +1,7 @@
 import React from "react";
 import { ColumnProps } from "./types";
 import { Button } from "@/components/ui/button";
-import {
-	EllipsisVertical,
-	Plus,
-	SquareDashedMousePointer,
-	Trash,
-} from "lucide-react";
+import { EllipsisVertical, Plus, Trash } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
 	Popover,
@@ -89,9 +84,16 @@ const ColumnContainer = React.memo(function ColumnContainer(
 		return (
 			<div
 				ref={setNodeRef}
-				className="flex flex-col gap-3 justify-center items-center px-4 pt-3 pb-4 w-full rounded-xl border-4 border-dashed animate-pulse opacity-15 min-h-64 min-w-64 group"
+				className="flex flex-col gap-3 justify-center items-center px-4 pt-3 pb-4 w-[350px] h-full rounded-xl border-2 border-dashed border-accent/50 bg-card/20 backdrop-blur-sm opacity-90 shadow-2xl shadow-accent/20 transition-all duration-300 min-h-64 min-w-64 group"
 			>
-				<SquareDashedMousePointer className="animate-pulse" />
+				<div className="flex flex-col items-center gap-2">
+					<div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent/20">
+						<div className="w-3 h-3 rounded-full bg-accent animate-pulse" />
+					</div>
+					<span className="text-sm text-muted-foreground font-medium">
+						Moving column...
+					</span>
+				</div>
 			</div>
 		);
 	}
@@ -156,8 +158,7 @@ const ColumnContainer = React.memo(function ColumnContainer(
 			{/* Task list for each column */}
 			<ScrollArea
 				ref={setDroppableRef}
-				className={`h-full p-2 max-h-[350px] transition-all ease-out rounded-md [&[data-state=scrolling]]:shadow-inner ${
-					isOver ? "bg-accent/20 border-2 border-dashed border-accent" : ""
+				className={`h-full p-2 transition-all ease-out rounded-md [&[data-state=scrolling]]:shadow-inner
 				}`}
 			>
 				<SortableContext items={rowsIds}>
