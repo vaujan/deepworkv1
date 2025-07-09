@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Plus, Trash } from "lucide-react";
+import { Plus } from "lucide-react";
 import React from "react";
 import { Column, Row } from "./types";
 import ColumnContainer from "./ColumnContainer";
@@ -10,12 +10,19 @@ import {
 	DragOverlay,
 	DragStartEvent,
 	PointerSensor,
+	KeyboardSensor,
 	useSensor,
 	useSensors,
+	closestCenter,
 } from "@dnd-kit/core";
-import { arrayMove, SortableContext } from "@dnd-kit/sortable";
+import {
+	arrayMove,
+	SortableContext,
+	sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 import RowContainer from "./RowContainer";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export default function KanbanDnDKit() {
 	const [columns, setColumns] = React.useState<Column[]>([]);
@@ -25,6 +32,12 @@ export default function KanbanDnDKit() {
 	const [activeRow, setActiveRow] = React.useState<Row | null>(null);
 
 	const handleAddRow = (columnId: string) => {
+		// Validate column exists
+		if (!columns.find((col) => col.id === columnId)) {
+			console.error("Column not found:", columnId);
+			return;
+		}
+
 		const columnRows = rows.filter((row) => row.columnId === columnId);
 
 		const newRow: Row = {
@@ -39,6 +52,13 @@ export default function KanbanDnDKit() {
 
 	const handleDeleteRow = (id: string) => {
 		if (!rows) return;
+
+		// Validate row exists
+		if (!rows.find((row) => row.id === id)) {
+			console.error("Row not found:", id);
+			return;
+		}
+
 		const filteredRows = rows.filter((row) => row.id !== id);
 		setRows(filteredRows);
 	};
@@ -47,17 +67,7 @@ export default function KanbanDnDKit() {
 		const newRows = rows?.map((row) => {
 			if (row.id !== id) return row;
 
-			return { ...row, title };
-		});
-
-		setRows(newRows as Row[]);
-	};
-
-	const handleUpdateRowDescription = (id: string, description: string) => {
-		const newRows = rows?.map((row) => {
-			if (row.id !== id) return row;
-
-			return { ...row, description };
+			return { ...row, title: title };
 		});
 
 		setRows(newRows as Row[]);
@@ -78,15 +88,31 @@ export default function KanbanDnDKit() {
 	};
 
 	const handleDeleteColumn = (id: string) => {
+		// Validate column exists
+		if (!columns.find((col) => col.id === id)) {
+			console.error("Column not found:", id);
+			return;
+		}
+
+		// Delete all rows in this column
+		const rowsToKeep = rows.filter((row) => row.columnId !== id);
+		setRows(rowsToKeep);
+
 		const filteredColumns = columns.filter((col) => col.id !== id);
 		setColumns(filteredColumns);
 	};
 
 	const handleUpdateColumn = (id: string, title: string) => {
+		// Validate column exists
+		if (!columns.find((col) => col.id === id)) {
+			console.error("Column not found:", id);
+			return;
+		}
+
 		const newColumns = columns.map((col) => {
 			if (col.id !== id) return col;
 
-			return { ...col, title };
+			return { ...col, title: title };
 		});
 
 		setColumns(newColumns);
@@ -146,12 +172,13 @@ export default function KanbanDnDKit() {
 		if (!over) return;
 
 		const activeRowId = active.id;
-		const overRowId = over.id;
+		const overId = over.id;
 
-		if (activeRowId === overRowId) return;
+		if (activeRowId === overId) return;
 
 		const isActiveARow = active.data.current?.type === "Row";
 		const isOverARow = over.data.current?.type === "Row";
+		const isOverColumn = over.data.current?.type === "Column";
 
 		if (!isActiveARow) return;
 
@@ -159,27 +186,50 @@ export default function KanbanDnDKit() {
 		if (isActiveARow && isOverARow) {
 			setRows((rows) => {
 				const activeRowIndex = rows?.findIndex((row) => row.id === activeRowId);
-				const overRowIndex = rows?.findIndex((row) => row.id === overRowId);
+				const overRowIndex = rows?.findIndex((row) => row.id === overId);
 
+				if (activeRowIndex === -1 || overRowIndex === -1) return rows;
+
+				// Update the column ID to match the target row's column
 				rows[activeRowIndex].columnId = rows[overRowIndex].columnId;
 
 				return arrayMove(rows, activeRowIndex, overRowIndex);
 			});
 		}
 
-		// Dropping a task over another column
-		const isOverColumn = over.data.current?.type === "Column";
-
+		// Dropping a task over a column
 		if (isActiveARow && isOverColumn) {
 			setRows((rows) => {
 				const activeRowIndex = rows.findIndex((row) => row.id === activeRowId);
 
-				rows[activeRowIndex].columnId = overRowId.toString();
+				if (activeRowIndex === -1) return rows;
 
-				return arrayMove(rows, activeRowIndex, activeRowIndex);
+				// Update the column ID to the target column
+				rows[activeRowIndex].columnId = overId.toString();
+
+				// Move the row to the end of the target column
+				const updatedRows = [...rows];
+				const movedRow = updatedRows.splice(activeRowIndex, 1)[0];
+
+				// Find the last row in the target column
+				const targetColumnRows = updatedRows.filter(
+					(row) => row.columnId === overId.toString()
+				);
+				const insertIndex = updatedRows.findIndex(
+					(row) => row.id === targetColumnRows[targetColumnRows.length - 1]?.id
+				);
+
+				if (insertIndex === -1) {
+					// If no rows in target column, insert at beginning
+					updatedRows.unshift(movedRow);
+				} else {
+					// Insert after the last row in target column
+					updatedRows.splice(insertIndex + 1, 0, movedRow);
+				}
+
+				return updatedRows;
 			});
 		}
-		setActiveRow(null);
 	};
 
 	const sensors = useSensors(
@@ -187,43 +237,52 @@ export default function KanbanDnDKit() {
 			activationConstraint: {
 				distance: 3, // 3px
 			},
+		}),
+		useSensor(KeyboardSensor, {
+			coordinateGetter: sortableKeyboardCoordinates,
 		})
 	);
 
 	return (
 		<div className="flex flex-col gap-4 w-full h-full">
-			<div className="flex justify-between">
-				<span className="p-1 text-sm font-medium text-cyan-900 bg-cyan-200 rounded-lg h-fit w-fit dark:bg-cyan-950 dark:text-cyan-200">
-					Kanban @dnd-kit
-				</span>
-
-				<Button variant={"outline"} size={"icon"}>
-					<Trash />
-				</Button>
-			</div>
-
 			<DndContext
 				sensors={sensors}
+				collisionDetection={closestCenter}
 				onDragEnd={onDragEnd}
 				onDragStart={onDragStart}
 				onDragOver={onDragOver}
 			>
 				<SortableContext items={columnsIds}>
-					<div className="flex gap-4">
-						{columns.map((column) => (
-							<ColumnContainer
-								key={column.id}
-								column={column}
-								rows={rows}
-								onDeleteColumn={handleDeleteColumn}
-								onUpdateColumn={handleUpdateColumn}
-								onAddRow={handleAddRow}
-								onDeleteRow={handleDeleteRow}
-								onUpdateRowTitle={handleUpdateRowTitle}
-								onUpdateRowDescription={handleUpdateRowDescription}
-							/>
-						))}
-					</div>
+					<ScrollArea className="w-full">
+						<div
+							className="flex gap-4 overflow-x-auto h-[560px] p-3 bg-card/10 rounded-lg"
+							role="region"
+							aria-label="Kanban board columns"
+						>
+							{columns.map((column) => (
+								<ColumnContainer
+									key={column.id}
+									column={column}
+									rows={rows}
+									onDeleteColumn={handleDeleteColumn}
+									onUpdateColumn={handleUpdateColumn}
+									onAddRow={handleAddRow}
+									onDeleteRow={handleDeleteRow}
+									onUpdateRowTitle={handleUpdateRowTitle}
+								/>
+							))}
+
+							<Button
+								className="w-[350px]"
+								variant={"outline"}
+								onClick={handleAddColumn}
+							>
+								<Plus />
+								Add Column
+							</Button>
+						</div>
+						<ScrollBar orientation="horizontal" />
+					</ScrollArea>
 				</SortableContext>
 
 				{createPortal(
@@ -231,13 +290,12 @@ export default function KanbanDnDKit() {
 						{activeColumn && (
 							<ColumnContainer
 								column={activeColumn}
-								rows={rows || []}
+								rows={rows}
 								onDeleteColumn={handleDeleteColumn}
 								onUpdateColumn={handleUpdateColumn}
 								onAddRow={handleAddRow}
 								onDeleteRow={handleDeleteRow}
 								onUpdateRowTitle={handleUpdateRowTitle}
-								onUpdateRowDescription={handleUpdateRowDescription}
 							/>
 						)}
 						{activeRow && (
@@ -245,18 +303,12 @@ export default function KanbanDnDKit() {
 								row={activeRow}
 								onDeleteRow={handleDeleteRow}
 								onUpdateRowTitle={handleUpdateRowTitle}
-								onUpdateRowDescription={handleUpdateRowDescription}
 							/>
 						)}
 					</DragOverlay>,
 					document.body
 				)}
 			</DndContext>
-
-			<Button className="w-fit" variant={"outline"} onClick={handleAddColumn}>
-				<Plus />
-				Add Column
-			</Button>
 		</div>
 	);
 }

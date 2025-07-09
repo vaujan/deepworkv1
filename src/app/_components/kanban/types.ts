@@ -11,7 +11,6 @@ export interface ColumnProps {
 	onAddRow: (columnId: string) => void;
 	onDeleteRow: (id: string) => void;
 	onUpdateRowTitle: (id: string, title: string) => void;
-	onUpdateRowDescription: (id: string, description: string) => void;
 }
 
 export interface Row {
@@ -25,5 +24,4 @@ export interface RowProps {
 	row: Row;
 	onDeleteRow: (id: string) => void;
 	onUpdateRowTitle: (id: string, title: string) => void;
-	onUpdateRowDescription: (id: string, description: string) => void;
 }
