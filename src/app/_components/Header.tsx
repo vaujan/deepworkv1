@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import React from "react";
 import { Lock, LockOpen, Plus } from "lucide-react";
+import SyncIndicator from "./SyncIndicator";
 
 export default function Header({ children }: { children: React.ReactNode }) {
 	const [isEditMode, setIsEditMode] = React.useState(false);
@@ -19,6 +20,9 @@ export default function Header({ children }: { children: React.ReactNode }) {
 				<SidebarTrigger className="size-8 mr-2" />
 				<Separator orientation="vertical" />
 				<h3 className="ml-4 text-base font-semibold">{children}</h3>
+				<div className="ml-4">
+					<SyncIndicator />
+				</div>
 			</div>
 			<div className="flex gap-3">
 				{isEditMode && (

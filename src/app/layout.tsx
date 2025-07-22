@@ -5,6 +5,7 @@ import React from "react";
 import { sansSerif } from "@/lib/fonts";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
+import { SyncStatusProvider } from "@/hooks/use-sync-status";
 
 export const metadata: Metadata = {
 	title: "deepflow.click",
@@ -25,8 +26,10 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<SidebarProvider>{children}</SidebarProvider>
-					<Toaster />
+					<SyncStatusProvider>
+						<SidebarProvider>{children}</SidebarProvider>
+						<Toaster />
+					</SyncStatusProvider>
 				</ThemeProvider>
 			</body>
 		</html>

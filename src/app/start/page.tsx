@@ -5,8 +5,7 @@ import PomodoroCard from "@/app/_components/PomodoroCard";
 import TodoList from "@/app/_components/TodoList";
 import useDynamicTitle from "@/hooks/use-dynamic-title";
 import React from "react";
-// import KanbanSwapy from "../_components/KanbanSwapy";
-import KanbanDnDKit from "../_components/kanban/KanbanDnDKit";
+import KanbanBoard from "../_components/kanban/Board";
 
 export default function Start() {
 	// Change title
@@ -37,7 +36,7 @@ export default function Start() {
 				</div>
 
 				<div className="w-full">
-					<KanbanDnDKit />
+					<KanbanBoard boardId="default-board" />
 				</div>
 
 				<div className="w-full">{/* <KanbanSwapy /> */}</div>
