@@ -5,7 +5,23 @@ import { CardContent, CardFooter } from "@/components/ui/card";
 import React from "react";
 import { useTimerStore } from "@/lib/store";
 import { Pause, Play, TimerReset } from "lucide-react";
-import { formatTime } from "@/lib/utils";
+import {
+	ChartContainer,
+	ChartTooltip,
+	ChartTooltipContent,
+	type ChartConfig,
+} from "@/components/ui/chart";
+import { PolarGrid, RadialBar, RadialBarChart } from "recharts";
+
+const chartConfig = {
+	minutes: {
+		label: "Minutes",
+	},
+	rest: {
+		label: "Rest",
+		color: "hsl(var(--chart-2))",
+	},
+} satisfies ChartConfig;
 
 export default function PomodoroCardRest() {
 	const {
@@ -16,6 +32,7 @@ export default function PomodoroCardRest() {
 		resumeRestTimer,
 		resetRestTimer,
 		decrementRestTimer,
+		initialRestTime,
 	} = useTimerStore();
 
 	const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -35,7 +52,7 @@ export default function PomodoroCardRest() {
 		return () => {
 			if (intervalRef.current) clearInterval(intervalRef.current);
 		};
-	}, [restTime, restMode]);
+	}, [restTime, restMode, decrementRestTimer]);
 
 	const handleClick = () => {
 		if (restMode === "idle" && restTime > 0) {
@@ -69,15 +86,38 @@ export default function PomodoroCardRest() {
 		}
 	};
 
+	const chartData = [
+		{ month: "rest", minutes: restTime, fill: "var(--color-rest)" },
+	];
+
 	return (
 		<>
-			<CardContent className="flex justify-center items-center">
-				<div className="flex flex-col justify-center items-center h-32 rounded-lg transition-all w-54">
-					<h3 className="text-5xl font-semibold">{formatTime(restTime)}</h3>
-					<span className="mt-2 text-xs font-medium text-muted-foreground">
-						{restMode === "paused" ? "PAUSED" : "REMAINING TIME"}
-					</span>
-				</div>
+			<CardContent className="flex justify-center items-center py-8">
+				<ChartContainer
+					config={chartConfig}
+					className="mx-auto aspect-square w-full max-w-[250px]"
+				>
+					<RadialBarChart
+						data={chartData}
+						startAngle={90}
+						endAngle={-270}
+						innerRadius="70%"
+						outerRadius="100%"
+						barSize={20}
+					>
+						<PolarGrid
+							gridType="circle"
+							radialLines={false}
+							stroke="none"
+							className="first:fill-muted last:fill-background"
+						/>
+						<RadialBar dataKey="minutes" background cornerRadius={10} />
+						<ChartTooltip
+							cursor={false}
+							content={<ChartTooltipContent hideLabel />}
+						/>
+					</RadialBarChart>
+				</ChartContainer>
 			</CardContent>
 			<CardFooter className="flex justify-center items-center p-0">
 				<Button

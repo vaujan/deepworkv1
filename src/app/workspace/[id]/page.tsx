@@ -3,6 +3,7 @@
 import Header from "@/app/_components/Header";
 import PomodoroCard from "@/app/_components/PomodoroCard";
 import TodoList from "@/app/_components/TodoList";
+import AnalyticsWidget from "@/app/_components/AnalyticsWidget";
 import useDynamicTitle from "@/hooks/use-dynamic-title";
 import React from "react";
 import KanbanBoard from "../../_components/kanban/Board";
@@ -89,16 +90,14 @@ export default function WorkspacePage() {
 			</div>
 
 			<section className="flex flex-col gap-8 px-8">
-				<div className="flex flex-col gap-8 w-full md:flex-row">
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
 					<PomodoroCard />
-					<TodoList />
+					<AnalyticsWidget />
 				</div>
 
 				<div className="w-full">
 					<KanbanBoard workspaceId={workspaceId} />
 				</div>
-
-				<div className="w-full">{/* Future widgets will go here */}</div>
 			</section>
 
 			<section className="flex gap-8 items-end px-8 h-full">
