@@ -2,12 +2,12 @@ import { useTimerStore } from "@/lib/store";
 import { formatTime } from "@/lib/utils";
 import React from "react";
 
-export default function useDynamicTitle() {
+export default function useDynamicTitle(workspaceName?: string) {
 	const { focusMode, focusTime, restMode, restTime, activeTimer } =
 		useTimerStore();
 
 	React.useEffect(() => {
-		const baseTitle = "Learning Backend JavaScript"; // Hardcode Project Name
+		const baseTitle = workspaceName || "deepflow.click";
 
 		// Focus mode is running
 		if (focusMode === "running" && focusTime > 0) {
@@ -32,5 +32,5 @@ export default function useDynamicTitle() {
 		} else {
 			document.title = baseTitle;
 		}
-	}, [focusTime, focusMode, restMode, restTime, activeTimer]);
+	}, [focusTime, focusMode, restMode, restTime, activeTimer, workspaceName]);
 }

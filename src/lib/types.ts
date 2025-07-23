@@ -97,7 +97,7 @@ export interface KanbanCard {
 export interface CreateKanbanBoardData {
 	name: string;
 	description?: string;
-	workspace_id?: string;
+	workspace_id: string; // Required: All boards must belong to a workspace
 }
 
 export interface UpdateKanbanBoardData {

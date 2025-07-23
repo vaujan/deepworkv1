@@ -17,6 +17,13 @@ import {
 	UpdateKanbanCardData,
 } from "./types";
 
+// Simple in-memory cache for development performance
+const boardCache = new Map<
+	string,
+	{ data: KanbanBoardWithData; timestamp: number }
+>();
+const CACHE_TTL = 30000; // 30 seconds cache
+
 export class DatabaseService {
 	// Session methods
 	static async createSession(
@@ -151,6 +158,60 @@ export class DatabaseService {
 		}
 
 		return workspaces || [];
+	}
+
+	static async updateWorkspace(
+		workspaceId: string,
+		data: { name?: string; description?: string }
+	): Promise<Workspace | null> {
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			console.error("No authenticated user found");
+			return null;
+		}
+
+		const { data: workspace, error } = await supabase
+			.from("workspaces")
+			.update({ ...data, updated_at: new Date().toISOString() })
+			.eq("id", workspaceId)
+			.eq("user_id", user.id) // Ensure user can only update their own workspaces
+			.select()
+			.single();
+
+		if (error) {
+			console.error("Error updating workspace:", error);
+			return null;
+		}
+
+		return workspace;
+	}
+
+	static async deleteWorkspace(workspaceId: string): Promise<boolean> {
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			console.error("No authenticated user found");
+			return false;
+		}
+
+		// Soft delete by setting is_active to false
+		const { error } = await supabase
+			.from("workspaces")
+			.update({ is_active: false, updated_at: new Date().toISOString() })
+			.eq("id", workspaceId)
+			.eq("user_id", user.id); // Ensure user can only delete their own workspaces
+
+		if (error) {
+			console.error("Error deleting workspace:", error);
+			return false;
+		}
+
+		return true;
 	}
 
 	// Daily stats methods
@@ -311,7 +372,76 @@ export class DatabaseService {
 		return boards || [];
 	}
 
-	static async getKanbanBoardWithData(
+	// Optimized: Get workspace-specific board with single query + caching
+	static async getOrCreateWorkspaceBoard(
+		workspaceId: string
+	): Promise<KanbanBoardWithData | null> {
+		// Check cache first
+		const cacheKey = `workspace-${workspaceId}`;
+		const cached = boardCache.get(cacheKey);
+		if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+			console.log("📦 Using cached board data for workspace:", workspaceId);
+			return cached.data;
+		}
+
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			console.error("No authenticated user found");
+			return null;
+		}
+
+		console.log("🔄 Loading fresh board data for workspace:", workspaceId);
+
+		// Try to get workspace's existing board
+		let { data: board, error } = await supabase
+			.from("kanban_boards")
+			.select("*")
+			.eq("user_id", user.id)
+			.eq("workspace_id", workspaceId)
+			.eq("is_active", true)
+			.order("created_at", { ascending: true })
+			.limit(1)
+			.single();
+
+		// If no board exists, create one
+		if (error?.code === "PGRST116") {
+			// No rows returned
+			console.log(
+				"📝 No board found, creating new board for workspace:",
+				workspaceId
+			);
+			const newBoard = await this.createKanbanBoard({
+				name: "Kanban Board",
+				workspace_id: workspaceId,
+			});
+			if (!newBoard) {
+				console.error("❌ Failed to create new board");
+				return null;
+			}
+			console.log("✅ Created new board:", newBoard.id);
+			board = newBoard;
+		} else if (error) {
+			console.error("❌ Error fetching kanban board:", error);
+			return null;
+		} else {
+			console.log("✅ Found existing board:", board?.id);
+		}
+
+		const boardData = await this.getKanbanBoardWithDataOptimized(board!.id);
+
+		// Cache the result
+		if (boardData) {
+			boardCache.set(cacheKey, { data: boardData, timestamp: Date.now() });
+		}
+
+		return boardData;
+	}
+
+	// NEW: Optimized single-query version that fetches everything at once
+	static async getKanbanBoardWithDataOptimized(
 		boardId: string
 	): Promise<KanbanBoardWithData | null> {
 		const {
@@ -322,6 +452,78 @@ export class DatabaseService {
 			console.error("No authenticated user found");
 			return null;
 		}
+
+		console.log("🔍 Loading board with optimized query:", boardId);
+
+		// Single optimized query - removed !inner to allow boards without columns
+		const { data: result, error } = await supabase
+			.from("kanban_boards")
+			.select(
+				`
+				*,
+				kanban_columns (
+					*,
+					kanban_cards (*)
+				)
+			`
+			)
+			.eq("id", boardId)
+			.eq("user_id", user.id)
+			.single();
+
+		if (error) {
+			console.error("❌ Error with optimized query:", error);
+			// Fall back to the original method
+			return this.getKanbanBoardWithDataFallback(boardId);
+		}
+
+		if (!result) {
+			console.log("❌ No board found with optimized query");
+			return null;
+		}
+
+		// Transform the nested data to match our expected format
+		const board = {
+			id: result.id,
+			user_id: result.user_id,
+			workspace_id: result.workspace_id,
+			name: result.name,
+			description: result.description,
+			is_active: result.is_active,
+			created_at: result.created_at,
+			updated_at: result.updated_at,
+			columns: (result.kanban_columns || [])
+				.sort((a: any, b: any) => a.position - b.position)
+				.map((column: any) => ({
+					...column,
+					cards: (column.kanban_cards || []).sort(
+						(a: any, b: any) => a.position - b.position
+					),
+				})),
+		};
+
+		console.log(
+			"✅ Optimized query successful! Found",
+			board.columns.length,
+			"columns"
+		);
+		return board;
+	}
+
+	// Fallback method using original separate queries
+	static async getKanbanBoardWithDataFallback(
+		boardId: string
+	): Promise<KanbanBoardWithData | null> {
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			console.error("No authenticated user found");
+			return null;
+		}
+
+		console.log("🔄 Using fallback queries for board:", boardId);
 
 		// Fetch board
 		const { data: board, error: boardError } = await supabase
@@ -365,6 +567,12 @@ export class DatabaseService {
 			...column,
 			cards: cards.filter((card) => card.column_id === column.id),
 		}));
+
+		console.log(
+			"✅ Fallback query successful! Found",
+			columnsWithCards.length,
+			"columns"
+		);
 
 		return {
 			...board,
@@ -421,6 +629,17 @@ export class DatabaseService {
 			return null;
 		}
 
+		// Invalidate cache for the board's workspace
+		const { data: board } = await supabase
+			.from("kanban_boards")
+			.select("workspace_id")
+			.eq("id", data.board_id)
+			.single();
+
+		if (board?.workspace_id) {
+			this.invalidateWorkspaceCache(board.workspace_id);
+		}
+
 		return column;
 	}
 
@@ -438,6 +657,17 @@ export class DatabaseService {
 		if (error) {
 			console.error("Error updating kanban column:", error);
 			return null;
+		}
+
+		// Invalidate cache
+		const { data: board } = await supabase
+			.from("kanban_boards")
+			.select("workspace_id")
+			.eq("id", column.board_id)
+			.single();
+
+		if (board?.workspace_id) {
+			this.invalidateWorkspaceCache(board.workspace_id);
 		}
 
 		return column;
@@ -503,6 +733,17 @@ export class DatabaseService {
 			return null;
 		}
 
+		// Invalidate cache
+		const { data: board } = await supabase
+			.from("kanban_boards")
+			.select("workspace_id")
+			.eq("id", data.board_id)
+			.single();
+
+		if (board?.workspace_id) {
+			this.invalidateWorkspaceCache(board.workspace_id);
+		}
+
 		return card;
 	}
 
@@ -520,6 +761,17 @@ export class DatabaseService {
 		if (error) {
 			console.error("Error updating kanban card:", error);
 			return null;
+		}
+
+		// Invalidate cache
+		const { data: board } = await supabase
+			.from("kanban_boards")
+			.select("workspace_id")
+			.eq("id", card.board_id)
+			.single();
+
+		if (board?.workspace_id) {
+			this.invalidateWorkspaceCache(board.workspace_id);
 		}
 
 		return card;
@@ -579,5 +831,25 @@ export class DatabaseService {
 		}
 
 		return true;
+	}
+
+	// Cache invalidation methods
+	static invalidateWorkspaceCache(workspaceId: string) {
+		const cacheKey = `workspace-${workspaceId}`;
+		boardCache.delete(cacheKey);
+		console.log("🗑️ Invalidated cache for workspace:", workspaceId);
+	}
+
+	// Clear all cache (useful for development)
+	static clearAllCache() {
+		boardCache.clear();
+		console.log("🗑️ Cleared all board cache");
+	}
+
+	// Fallback method for backward compatibility
+	static async getKanbanBoardWithData(
+		boardId: string
+	): Promise<KanbanBoardWithData | null> {
+		return this.getKanbanBoardWithDataOptimized(boardId);
 	}
 }

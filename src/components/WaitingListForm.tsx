@@ -60,6 +60,8 @@ export default function WaitingListForm() {
 	};
 	return (
 		<form
+			name="wait_list"
+			id="wait_list"
 			className="flex flex-col gap-2 mt-8 w-full border-r-0 md:w-fit md:flex-row md:gap-0"
 			onSubmit={handleJoinWaitlist}
 		>

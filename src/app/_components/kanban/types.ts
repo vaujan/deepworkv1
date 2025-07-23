@@ -10,7 +10,7 @@ export type { KanbanBoard, KanbanColumn, KanbanCard, KanbanBoardWithData };
 
 // Component-specific interfaces
 export interface KanbanBoardProps {
-	boardId: string;
+	boardId?: string; // Optional - will use user's default board
 	className?: string;
 }
 

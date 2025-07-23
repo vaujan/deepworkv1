@@ -11,47 +11,31 @@ import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/ad
 import { reorder } from "@atlaskit/pragmatic-drag-and-drop/reorder";
 import { toast } from "sonner";
 import { useSyncOperation } from "@/hooks/use-sync-status";
-
-const BOARD_ID = "default-board"; // For now, using a default board
+import { useWorkspaceBoard } from "@/hooks/use-workspace-board";
 
 export default function KanbanBoard({
-	boardId = BOARD_ID,
 	className,
-}: KanbanBoardProps) {
+	workspaceId,
+}: {
+	className?: string;
+	workspaceId: string;
+}) {
+	const {
+		board: hookBoard,
+		loading,
+		error,
+		refetch,
+	} = useWorkspaceBoard(workspaceId);
 	const [board, setBoard] = useState<KanbanBoardWithData | null>(null);
-	const [loading, setLoading] = useState(true);
 	const [, setDraggedColumnId] = useState<string | null>(null);
 	const { withSync } = useSyncOperation();
 
-	// Load board data
+	// Sync local state with hook state for optimistic updates
 	useEffect(() => {
-		loadBoard();
-	}, [boardId]);
-
-	const loadBoard = async () => {
-		try {
-			const boardData = await DatabaseService.getKanbanBoardWithData(boardId);
-			if (boardData) {
-				setBoard(boardData);
-			} else {
-				// Create default board if it doesn't exist
-				const newBoard = await DatabaseService.createKanbanBoard({
-					name: "My Kanban Board",
-				});
-				if (newBoard) {
-					setBoard({
-						...newBoard,
-						columns: [],
-					});
-				}
-			}
-		} catch (error) {
-			console.error("Failed to load board:", error);
-			toast.error("Failed to load board");
-		} finally {
-			setLoading(false);
+		if (hookBoard) {
+			setBoard(hookBoard);
 		}
-	};
+	}, [hookBoard]);
 
 	// Drag and drop handlers
 	useEffect(() => {
@@ -578,7 +562,7 @@ export default function KanbanBoard({
 			<div className="flex items-center justify-center h-64">
 				<div className="text-center">
 					<p className="text-muted-foreground mb-2">No board found</p>
-					<Button onClick={loadBoard} variant="outline" size="sm">
+					<Button onClick={refetch} variant="outline" size="sm">
 						Retry
 					</Button>
 				</div>
