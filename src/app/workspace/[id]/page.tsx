@@ -3,7 +3,7 @@
 import Header from "@/app/_components/Header";
 import PomodoroCard from "@/app/_components/PomodoroCard";
 import TodoList from "@/app/_components/TodoList";
-import AnalyticsWidget from "@/app/_components/AnalyticsWidget";
+import Heatmap from "@/app/_components/Heatmap";
 import useDynamicTitle from "@/hooks/use-dynamic-title";
 import React from "react";
 import KanbanBoard from "../../_components/kanban/Board";
@@ -92,7 +92,7 @@ export default function WorkspacePage() {
 			<section className="flex flex-col gap-8 px-8">
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
 					<PomodoroCard />
-					<AnalyticsWidget />
+					<Heatmap />
 				</div>
 
 				<div className="w-full">
