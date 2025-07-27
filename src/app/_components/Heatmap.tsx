@@ -3,8 +3,11 @@
 import React from "react";
 import { ResponsiveCalendar } from "@nivo/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Heatmap = () => {
+	const isMobile = useIsMobile();
+
 	const data = [
 		// Generate daily data for 2025 with value representing minutes of deep work (randomized between 20 and 120)
 		...Array.from({ length: 62 }, (_, i) => {
@@ -18,10 +21,10 @@ const Heatmap = () => {
 	];
 
 	const chartColors = [
-		"var(--chart-1)",
-		"var(--chart-2)",
-		"var(--chart-3)",
 		"var(--chart-4)",
+		"var(--chart-3)",
+		"var(--chart-2)",
+		"var(--chart-1)",
 	];
 
 	const values = data.map((d) => d.value);
@@ -47,14 +50,16 @@ const Heatmap = () => {
 				<CardTitle>Focus Activity</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<div className="h-52 w-full">
+				<div className="md:h-32 min-w-md h-full">
 					<ResponsiveCalendar
+						direction={isMobile === true ? "vertical" : "horizontal"}
 						data={data}
 						from="2025-01-01"
 						to="2025-12-31"
 						emptyColor="var(--card)"
 						colors={chartColors}
 						margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+						daySpacing={2}
 						yearSpacing={40}
 						dayBorderWidth={2}
 						dayBorderColor="var(--background)"
@@ -62,7 +67,7 @@ const Heatmap = () => {
 						theme={{
 							text: {
 								fill: "var(--foreground)",
-								fontSize: 11,
+								fontSize: 12,
 							},
 							tooltip: {
 								container: {
@@ -86,9 +91,9 @@ const Heatmap = () => {
 							const { value } = dayData;
 							const color = getColorForValue(value);
 							return (
-								<div className="bg-popover flex	 text-popover-foreground  align-middle  gap-3 min-w-[200px] w-fit p-2 rounded-md border shadow-md">
+								<div className="bg-popover flex items-center	 text-popover-foreground  align-middle  gap-3 min-w-[200px] w-fit p-2 rounded-md border shadow-md">
 									<div
-										className="w-4 h-4 mt-1 rounded-xs"
+										className="w-2 h-10 my-1 rounded-xs"
 										style={{ backgroundColor: color }}
 									/>
 									<div className="flex flex-col">
@@ -108,11 +113,11 @@ const Heatmap = () => {
 				</div>
 				<div className="flex text-xs items-center justify-center text-muted-foreground gap-2 mt-4">
 					<span>Less</span>
-					<div className="flex gap-0 overflow-clip rounded-sm">
+					<div className="flex gap-1 overflow-clip">
 						{chartColors.map((color) => (
 							<div
 								key={color}
-								className="w-8 h-2"
+								className="w-3 h-3 rounded-xs"
 								style={{ backgroundColor: color }}
 							/>
 						))}
