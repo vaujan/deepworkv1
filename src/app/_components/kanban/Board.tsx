@@ -5,7 +5,6 @@ import { Plus, Loader2 } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { DatabaseService } from "@/lib/database";
 import { KanbanBoardWithData } from "@/lib/types";
-import { KanbanBoardProps } from "./types";
 import KanbanColumn from "./Column";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { reorder } from "@atlaskit/pragmatic-drag-and-drop/reorder";
@@ -20,12 +19,7 @@ export default function KanbanBoard({
 	className?: string;
 	workspaceId: string;
 }) {
-	const {
-		board: hookBoard,
-		loading,
-		error,
-		refetch,
-	} = useWorkspaceBoard(workspaceId);
+	const { board: hookBoard, loading, refetch } = useWorkspaceBoard(workspaceId);
 	const [board, setBoard] = useState<KanbanBoardWithData | null>(null);
 	const [, setDraggedColumnId] = useState<string | null>(null);
 	const { withSync } = useSyncOperation();

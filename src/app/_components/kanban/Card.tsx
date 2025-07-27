@@ -163,7 +163,7 @@ export default function KanbanCard({
 			ref={cardRef}
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
-			className={`p-3 mb-2 rounded-lg border cursor-grab active:cursor-grabbing transition-all duration-200 ${
+			className={`p-3 mb-2 w-full rounded-lg border cursor-grab active:cursor-grabbing transition-all duration-200 ${
 				isDraggedOver
 					? "border-accent border-2 bg-accent/10 shadow-lg scale-[1.02]"
 					: "border-border hover:border-accent/50 bg-card hover:bg-card/80"
@@ -179,7 +179,7 @@ export default function KanbanCard({
 						onChange={(e) => handleTitleChange(e.target.value)}
 						onKeyDown={handleKeyPress}
 						placeholder="Card title..."
-						className="font-medium"
+						className="font-medium w-full bg-red-500"
 						autoFocus
 					/>
 					<div className="flex gap-2">
@@ -195,10 +195,10 @@ export default function KanbanCard({
 				</div>
 			) : (
 				<>
-					<div className="flex justify-between items-center gap-2">
-						<h4 className="flex-1 font-medium text-sm text-foreground leading-snug break-words">
+					<div className="flex justify-between w-full ">
+						<span className="w-full font-medium text-sm text-foreground leading-snug break-words">
 							{card.title}
-						</h4>
+						</span>
 
 						{/* Action buttons */}
 						{(isHovered || isEditing) && (

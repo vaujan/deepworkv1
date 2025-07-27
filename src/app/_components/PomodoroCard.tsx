@@ -38,11 +38,7 @@ export default function PomodoroCard() {
 	];
 
 	return (
-		<Tabs
-			className="w-full max-w-[750px]"
-			value={activeTimer}
-			defaultValue="focus"
-		>
+		<Tabs className="w-full" value={activeTimer} defaultValue="focus">
 			<div className="flex justify-between w-full">
 				<TabsList className="w-full">
 					{tabs.map((tab) => (

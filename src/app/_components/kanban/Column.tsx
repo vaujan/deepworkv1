@@ -1,13 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
-import { EllipsisVertical, KanbanIcon, Plus, Trash } from "lucide-react";
+	DropdownMenu,
+	DropdownMenuTrigger,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { EllipsisVertical, Plus, Trash } from "lucide-react";
 import { KanbanColumnProps } from "./types";
 import KanbanCard from "./Card";
 import {
@@ -17,6 +20,7 @@ import {
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import { pointerOutsideOfPreview } from "@atlaskit/pragmatic-drag-and-drop/element/pointer-outside-of-preview";
+import { toast } from "sonner";
 
 const ColumnContainer = React.memo(function ColumnContainer({
 	column,
@@ -32,9 +36,18 @@ const ColumnContainer = React.memo(function ColumnContainer({
 	const [newCardTitle, setNewCardTitle] = useState("");
 	const [showAddCard, setShowAddCard] = useState(false);
 	const [isDraggedOver, setIsDraggedOver] = useState(false);
+
 	const columnRef = useRef<HTMLDivElement>(null);
 	const dragHandleRef = useRef<HTMLDivElement>(null);
 	const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		if (editMode && inputRef.current) {
+			inputRef.current.focus();
+			inputRef.current.select();
+		}
+	}, [editMode]);
 
 	useEffect(() => {
 		const element = columnRef.current;
@@ -145,10 +158,16 @@ const ColumnContainer = React.memo(function ColumnContainer({
 	};
 
 	const handleAddCard = async () => {
-		if (newCardTitle.trim()) {
-			await onCreateCard(column.id, newCardTitle.trim());
+		const trimmedTitle = newCardTitle.trim();
+		if (trimmedTitle) {
 			setNewCardTitle("");
-			setShowAddCard(false);
+			try {
+				await onCreateCard(column.id, trimmedTitle);
+			} catch (error) {
+				toast.error("Failed to create card. Please try again.");
+				setNewCardTitle(trimmedTitle); // Restore the input on failure
+				console.error("Failed to create card:", error);
+			}
 		}
 	};
 
@@ -173,10 +192,11 @@ const ColumnContainer = React.memo(function ColumnContainer({
 			{/* Column Header */}
 			<div
 				ref={dragHandleRef}
-				className="flex justify-between items-center rounded-xl p-3 bg-card cursor-grab active:cursor-grabbing hover:bg-card/80 transition-colors"
+				className="flex justify-between items-center p-3 cursor-grab active:cursor-grabbing hover:bg-card/80 transition-colors"
 			>
 				{editMode ? (
 					<Input
+						ref={inputRef}
 						value={editValue}
 						onChange={(e) => handleColumnNameChange(e.target.value)}
 						onBlur={handleColumnNameSave}
@@ -190,47 +210,49 @@ const ColumnContainer = React.memo(function ColumnContainer({
 								handleColumnNameCancel();
 							}
 						}}
-						autoFocus
 						className="text-base font-medium"
 					/>
 				) : (
 					<h3
 						onClick={() => setEditMode(true)}
-						className="flex-1 text-base w-fit cursor-grab font-medium p-1 rounded hover:bg-muted/20 transition-colors"
+						className="flex-1 text-base w-fit cursor-grab font-medium p-1 transition-colors"
 					>
 						{column.name}
 					</h3>
 				)}
 
 				<div className="flex items-center gap-1">
-					<Popover>
-						<PopoverTrigger asChild>
-							<Button
-								size="sm"
-								variant="ghost"
-								className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-							>
-								<EllipsisVertical className="h-4 w-4" />
+					<DropdownMenu>
+						<DropdownMenuTrigger>
+							<Button variant={"ghost"} className="size-6">
+								<EllipsisVertical />
 							</Button>
-						</PopoverTrigger>
-						<PopoverContent className="w-fit border-full p-2">
-							<Button
-								variant="ghostDestructive"
-								size="sm"
+						</DropdownMenuTrigger>
+						<DropdownMenuContent className="w-[250px]">
+							<DropdownMenuLabel>Action list</DropdownMenuLabel>
+							<DropdownMenuSeparator />
+							{/* <DropdownMenuItem
+								onClick={() => {
+									setEditMode(true);
+								}}
+							>
+								<Pencil /> Rename
+							</DropdownMenuItem> */}
+							<DropdownMenuItem
 								onClick={handleColumnDelete}
-								className="w-full justify-start"
+								variant="destructive"
 							>
-								<Trash className="mr-2 h-4 w-4" />
-								Delete Column
-							</Button>
-						</PopoverContent>
-					</Popover>
+								<Trash />
+								Delete
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 			</div>
 
 			{/* Cards Area */}
-			<ScrollArea className="flex-1 p-2 max-h-[480px]">
-				<div className="space-y-2">
+			<ScrollArea className="w-full max-h-[480px]">
+				<div className="p-2">
 					{column.cards.map((card, cardIndex) => (
 						<KanbanCard
 							key={card.id}
@@ -241,19 +263,11 @@ const ColumnContainer = React.memo(function ColumnContainer({
 							columnId={column.id}
 						/>
 					))}
-
-					{/* Drop zone when column is empty */}
-					{column.cards.length === 0 && (
-						<div className="flex items-center justify-center p-8 text-muted-foreground border-2 border-dashed border-muted rounded-lg">
-							<KanbanIcon className="mr-2 h-4 w-4" />
-							No card available
-						</div>
-					)}
 				</div>
 			</ScrollArea>
 
 			{/* Add Card Section */}
-			<div className="p-2 border-t border-border/20">
+			<div className={`p-2 bg-card -mt-2`}>
 				{showAddCard ? (
 					<div className="space-y-2">
 						<Input
@@ -262,7 +276,12 @@ const ColumnContainer = React.memo(function ColumnContainer({
 							onKeyDown={handleKeyPress}
 							placeholder="Enter card title..."
 							autoFocus
-							className="text-sm"
+							className="text-sm mt-2"
+							onBlur={() => {
+								if (!newCardTitle.trim()) {
+									setShowAddCard(false);
+								}
+							}}
 						/>
 						<div className="flex gap-2">
 							<Button
@@ -289,7 +308,7 @@ const ColumnContainer = React.memo(function ColumnContainer({
 						size="sm"
 						variant="ghost"
 						onClick={() => setShowAddCard(true)}
-						className="w-full justify-start text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+						className="w-full justify-start text-muted-foreground transition-opacity"
 					>
 						<Plus className="mr-2 h-4 w-4" />
 						Add a card

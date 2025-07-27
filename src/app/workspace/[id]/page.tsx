@@ -90,7 +90,7 @@ export default function WorkspacePage() {
 			</div>
 
 			<section className="flex flex-col gap-8 px-8">
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+				<div className="flex flex-col md:flex-row gap-12">
 					<PomodoroCard />
 					<Heatmap />
 				</div>

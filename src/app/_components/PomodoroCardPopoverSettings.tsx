@@ -74,10 +74,10 @@ export default function PomodoroCardPopoverSettings() {
 					<span className="text-center text-muted-foreground">
 						Focus minutes
 					</span>
-					<div className="flex overflow-hidden justify-between items-center h-16 rounded-lg transition-all ease-out hover:bg-input/10 border-1 border-border">
+					<div className="flex overflow-hidden justify-between items-center h-16 rounded-lg transition-all ease-out border-1 border-border">
 						<Button
-							className="h-full rounded-none border-0 shadow-none"
-							variant={"secondary"}
+							className="h-full "
+							variant={"outline"}
 							onClick={() => handleFocusTimeChange(false)}
 						>
 							<Minus />
@@ -91,8 +91,8 @@ export default function PomodoroCardPopoverSettings() {
 							onChange={focusInputOnChange}
 						/>
 						<Button
-							className="h-full rounded-none border-0 shadow-none"
-							variant={"secondary"}
+							className="h-full "
+							variant={"outline"}
 							onClick={() => handleFocusTimeChange(true)}
 						>
 							<Plus />
@@ -103,10 +103,10 @@ export default function PomodoroCardPopoverSettings() {
 					<span className="text-center text-muted-foreground">
 						Rest minutes
 					</span>
-					<div className="flex overflow-hidden justify-between items-center h-16 rounded-lg transition-all ease-out hover:bg-input/10 border-1 border-border">
+					<div className="flex overflow-hidden justify-between items-center h-16 rounded-lg transition-all ease-out border-1 border-border">
 						<Button
-							className="h-full rounded-none border-0 shadow-none"
-							variant={"secondary"}
+							className="h-full"
+							variant={"outline"}
 							onClick={() => handleRestTimeChange(false)}
 							disabled={focusMode !== "idle" || restMode !== "idle"}
 						>
@@ -121,8 +121,8 @@ export default function PomodoroCardPopoverSettings() {
 							onChange={restInputOnChange}
 						/>
 						<Button
-							className="h-full rounded-none border-0 shadow-none"
-							variant={"secondary"}
+							className="h-full "
+							variant={"outline"}
 							onClick={() => handleRestTimeChange(true)}
 							disabled={focusMode !== "idle" || restMode !== "idle"}
 						>
