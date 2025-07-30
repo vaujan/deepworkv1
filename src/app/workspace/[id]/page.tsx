@@ -2,7 +2,6 @@
 
 import Header from "@/app/_components/Header";
 import PomodoroCard from "@/app/_components/PomodoroCard";
-import TodoList from "@/app/_components/TodoList";
 import Heatmap from "@/app/_components/Heatmap";
 import useDynamicTitle from "@/hooks/use-dynamic-title";
 import React from "react";
