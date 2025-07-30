@@ -5,7 +5,7 @@ import { ResponsiveCalendar } from "@nivo/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const Heatmap = () => {
+export default function Heatmap() {
 	const isMobile = useIsMobile();
 
 	const data = [
@@ -127,6 +127,4 @@ const Heatmap = () => {
 			</CardContent>
 		</Card>
 	);
-};
-
-export default Heatmap;
+}
