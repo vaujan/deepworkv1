@@ -329,7 +329,7 @@ export default function AppSidebar() {
 				<SidebarFooter>
 					{/* User profile & avatar */}
 					<DropdownMenu>
-						<DropdownMenuTrigger>
+						<DropdownMenuTrigger asChild>
 							<SidebarMenu>
 								<SidebarMenuItem>
 									<SidebarMenuButton
