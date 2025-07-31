@@ -30,15 +30,13 @@ export async function testWorkspaceBoard(workspaceId: string) {
 
 		// Test 2: Test caching
 		console.log("\n2️⃣ Testing cache...");
-		const cachedBoard =
-			await DatabaseService.getOrCreateWorkspaceBoard(workspaceId);
+		await DatabaseService.getOrCreateWorkspaceBoard(workspaceId);
 		console.log('Should see "Using cached board data" message above');
 
 		// Test 3: Clear cache and reload
 		console.log("\n3️⃣ Testing cache invalidation...");
 		DatabaseService.clearAllCache();
-		const freshBoard =
-			await DatabaseService.getOrCreateWorkspaceBoard(workspaceId);
+		await DatabaseService.getOrCreateWorkspaceBoard(workspaceId);
 		console.log('Should see "Loading fresh board data" message above');
 
 		console.log("\n✅ All tests completed successfully!");
@@ -52,7 +50,7 @@ export async function testWorkspaceBoard(workspaceId: string) {
 // Convenience function to test with current URL
 export function testCurrentWorkspace() {
 	const path = window.location.pathname;
-	const match = path.match(/\/workspace\/([^\/]+)/);
+	const match = path.match(/\/workspace\/([^/]+)/);
 
 	if (match) {
 		const workspaceId = match[1];
@@ -68,8 +66,18 @@ export function testCurrentWorkspace() {
 // Run automatically if in development
 if (process.env.NODE_ENV === "development") {
 	// Make functions available globally for console testing
-	(window as any).testWorkspaceBoard = testWorkspaceBoard;
-	(window as any).testCurrentWorkspace = testCurrentWorkspace;
+	(
+		window as unknown as {
+			testWorkspaceBoard: typeof testWorkspaceBoard;
+			testCurrentWorkspace: typeof testCurrentWorkspace;
+		}
+	).testWorkspaceBoard = testWorkspaceBoard;
+	(
+		window as unknown as {
+			testWorkspaceBoard: typeof testWorkspaceBoard;
+			testCurrentWorkspace: typeof testCurrentWorkspace;
+		}
+	).testCurrentWorkspace = testCurrentWorkspace;
 
 	console.log("🧪 Database test functions available:");
 	console.log("- testCurrentWorkspace() - Test current workspace");

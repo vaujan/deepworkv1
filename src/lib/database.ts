@@ -396,7 +396,7 @@ export class DatabaseService {
 		console.log("🔄 Loading fresh board data for workspace:", workspaceId);
 
 		// Try to get workspace's existing board
-		let { data: board, error } = await supabase
+		const { data: fetchedBoard, error } = await supabase
 			.from("kanban_boards")
 			.select("*")
 			.eq("user_id", user.id)
@@ -405,6 +405,8 @@ export class DatabaseService {
 			.order("created_at", { ascending: true })
 			.limit(1)
 			.single();
+
+		let board = fetchedBoard;
 
 		// If no board exists, create one
 		if (error?.code === "PGRST116") {
@@ -455,20 +457,18 @@ export class DatabaseService {
 
 		console.log("🔍 Loading board with optimized query:", boardId);
 
-		// Single optimized query - removed !inner to allow boards without columns
+		// Try simple embedded query first - just boards and columns
 		const { data: result, error } = await supabase
 			.from("kanban_boards")
 			.select(
 				`
 				*,
-				kanban_columns (
-					*,
-					kanban_cards (*)
-				)
+				kanban_columns (*)
 			`
 			)
 			.eq("id", boardId)
 			.eq("user_id", user.id)
+			.order("position", { referencedTable: "kanban_columns", ascending: true })
 			.single();
 
 		if (error) {
@@ -482,6 +482,19 @@ export class DatabaseService {
 			return null;
 		}
 
+		// Now fetch cards separately since embedded query had issues
+		const { data: cards, error: cardsError } = await supabase
+			.from("kanban_cards")
+			.select("*")
+			.eq("board_id", boardId)
+			.order("position", { ascending: true });
+
+		if (cardsError) {
+			console.error("❌ Error fetching cards:", cardsError);
+			// Fall back to the original method if cards query fails
+			return this.getKanbanBoardWithDataFallback(boardId);
+		}
+
 		// Transform the nested data to match our expected format
 		const board = {
 			id: result.id,
@@ -493,11 +506,14 @@ export class DatabaseService {
 			created_at: result.created_at,
 			updated_at: result.updated_at,
 			columns: (result.kanban_columns || [])
-				.sort((a: any, b: any) => a.position - b.position)
-				.map((column: any) => ({
+				.sort(
+					(a: { position: number }, b: { position: number }) =>
+						a.position - b.position
+				)
+				.map((column: { id: string; [key: string]: unknown }) => ({
 					...column,
-					cards: (column.kanban_cards || []).sort(
-						(a: any, b: any) => a.position - b.position
+					cards: (cards || []).filter(
+						(card: { column_id: string }) => card.column_id === column.id
 					),
 				})),
 		};
