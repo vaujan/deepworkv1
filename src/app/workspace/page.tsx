@@ -17,7 +17,6 @@ import Link from "next/link";
 
 export default function WorkspacePage() {
 	const [workspaces, setWorkspaces] = React.useState<Workspace[] | null>();
-	const [isLoading, setIsLoading] = React.useState(false);
 
 	React.useEffect(() => {
 		fetchWorkspaces();
@@ -26,7 +25,6 @@ export default function WorkspacePage() {
 
 	const fetchWorkspaces = async () => {
 		try {
-			setIsLoading(true);
 			const workspaceData = await DatabaseService.getWorkspaces();
 			if (workspaceData && workspaceData.length > 0) {
 				setWorkspaces(workspaceData);
@@ -34,8 +32,6 @@ export default function WorkspacePage() {
 		} catch (error) {
 			console.error("Error fetching workspaces", error);
 			toast.error("Failed to load workspaces");
-		} finally {
-			setIsLoading(false);
 		}
 	};
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
 	DropdownMenu,
 	DropdownMenuTrigger,
@@ -10,7 +10,7 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { EllipsisVertical, Plus, Trash } from "lucide-react";
+import { EllipsisVertical, Plus, Trash, GripVertical } from "lucide-react";
 import { KanbanColumnProps } from "./types";
 import KanbanCard from "./Card";
 import {
@@ -190,36 +190,46 @@ const ColumnContainer = React.memo(function ColumnContainer({
 			} bg-card/60 group transition-colors`}
 		>
 			{/* Column Header */}
-			<div
-				ref={dragHandleRef}
-				className="flex justify-between items-center p-3 cursor-grab active:cursor-grabbing hover:bg-card/80 transition-colors"
-			>
-				{editMode ? (
-					<Input
-						ref={inputRef}
-						value={editValue}
-						onChange={(e) => handleColumnNameChange(e.target.value)}
-						onBlur={handleColumnNameSave}
-						onKeyDown={(e) => {
-							if (e.key === "Enter") {
-								e.preventDefault();
-								handleColumnNameSave();
-							}
-							if (e.key === "Escape") {
-								e.preventDefault();
-								handleColumnNameCancel();
-							}
-						}}
-						className="text-base font-medium"
-					/>
-				) : (
-					<h3
-						onClick={() => setEditMode(true)}
-						className="flex-1 text-base w-fit cursor-grab font-medium p-1 transition-colors"
+			<div className="flex justify-between items-center p-3 hover:bg-card/80 transition-colors">
+				<div className="flex items-center gap-2 flex-1">
+					{/* Dedicated Drag Handle */}
+					<div
+						ref={dragHandleRef}
+						className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted/50 rounded opacity-50 hover:opacity-100 transition-all"
+						title="Drag to reorder column"
 					>
-						{column.name}
-					</h3>
-				)}
+						<GripVertical className="h-4 w-4" />
+					</div>
+
+					{/* Column Name */}
+					{editMode ? (
+						<Input
+							ref={inputRef}
+							value={editValue}
+							onChange={(e) => handleColumnNameChange(e.target.value)}
+							onBlur={handleColumnNameSave}
+							onKeyDown={(e) => {
+								if (e.key === "Enter") {
+									e.preventDefault();
+									handleColumnNameSave();
+								}
+								if (e.key === "Escape") {
+									e.preventDefault();
+									handleColumnNameCancel();
+								}
+							}}
+							className="text-base font-medium flex-1"
+						/>
+					) : (
+						<h3
+							onClick={() => setEditMode(true)}
+							className="flex-1 text-base font-medium p-1 cursor-pointer hover:bg-muted/30 rounded transition-colors"
+							title="Click to edit column name"
+						>
+							{column.name}
+						</h3>
+					)}
+				</div>
 
 				<div className="flex items-center gap-1">
 					<DropdownMenu>
