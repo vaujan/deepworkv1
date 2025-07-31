@@ -1,7 +1,7 @@
 // import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import React from "react";
-import { Lock, LockOpen, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import SyncIndicator from "./SyncIndicator";
 
 export default function Header({ children }: { children: React.ReactNode }) {

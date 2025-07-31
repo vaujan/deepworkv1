@@ -28,7 +28,6 @@ export default function PomodoroCardFocus() {
 		resumeFocusTimer,
 		resetFocusTimer,
 		decrementFocusTimer,
-		initialFocusTime,
 	} = useTimerStore();
 
 	const intervalRef = React.useRef<NodeJS.Timeout | null>(null);

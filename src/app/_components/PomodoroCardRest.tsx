@@ -6,12 +6,7 @@ import React from "react";
 import { useTimerStore } from "@/lib/store";
 import { Pause, Play, TimerReset } from "lucide-react";
 import { formatTime } from "@/lib/utils";
-import {
-	ChartContainer,
-	ChartTooltip,
-	ChartTooltipContent,
-	type ChartConfig,
-} from "@/components/ui/chart";
+import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { PolarGrid, RadialBar, RadialBarChart } from "recharts";
 
 const chartConfig = {
@@ -33,7 +28,6 @@ export default function PomodoroCardRest() {
 		resumeRestTimer,
 		resetRestTimer,
 		decrementRestTimer,
-		initialRestTime,
 	} = useTimerStore();
 
 	const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
