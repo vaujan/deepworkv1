@@ -38,15 +38,20 @@ export default function PomodoroCard() {
 	];
 
 	return (
-		<Tabs className="w-full" value={activeTimer} defaultValue="focus">
+		<Tabs
+			className="w-full border-border border p-3 rounded-xl"
+			value={activeTimer}
+			defaultValue="focus"
+		>
 			<div className="flex justify-between w-full">
-				<TabsList className="w-full md:w-fit">
+				<TabsList className="w-full h-12">
 					{tabs.map((tab) => (
 						<TabsTrigger
 							disabled={restMode !== "idle" || focusMode !== "idle"}
 							key={tab.id}
 							value={tab.value}
 							onClick={() => setActiveTimer(tab.value)}
+							className="border-0"
 						>
 							{tab.title}
 						</TabsTrigger>
@@ -54,6 +59,7 @@ export default function PomodoroCard() {
 				</TabsList>
 				<Popover>
 					<PopoverTrigger
+						asChild
 						disabled={restMode !== "idle" || focusMode !== "idle"}
 						className="ml-2"
 					>
@@ -69,7 +75,7 @@ export default function PomodoroCard() {
 					<PomodoroCardPopoverSettings />
 				</Popover>
 			</div>
-			<Card className="overflow-hidden p-0">
+			<Card className="overflow-hidden bg-transparent border-0 shadow-none p-0">
 				{tabs.map((tab) => (
 					<TabsContent value={tab.value} key={tab.id}>
 						{tab.component}

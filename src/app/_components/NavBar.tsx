@@ -1,4 +1,5 @@
-// import { ThemeToggle } from "@/components/ThemeToggle";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -65,7 +66,7 @@ export default function NavBar() {
 				<div className="flex items-center space-x-4">
 					{/* <ThemeToggle /> */}
 					{user ? (
-						<Link href={"/start"}>
+						<Link href={"/workspace"}>
 							<Button
 								className="inline-flex py-5 px-2 pl-0 "
 								variant={"ghost"}

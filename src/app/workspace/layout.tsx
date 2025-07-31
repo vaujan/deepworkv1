@@ -1,15 +1,14 @@
 "use client";
 
-// import type { Metadata } from "next";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/app/_components/AppSidebar";
 import React from "react";
 import useUser from "@/hooks/use-user";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import AppSidebar from "../_components/AppSidebar";
 
-export default function Layout({
+export default function WorkspaceLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
@@ -19,7 +18,7 @@ export default function Layout({
 
 	React.useEffect(() => {
 		if (theme) setTheme("dark");
-	}, []);
+	}, [theme, setTheme]);
 
 	if (!user || loading) {
 		return (
@@ -47,9 +46,7 @@ export default function Layout({
 		<SidebarProvider>
 			<div className="flex w-full md:py-2">
 				<AppSidebar />
-				<div
-					className={`flex overflow-hidden w-full antialiased md:shadow-xs bg-background md:rounded-2xl`}
-				>
+				<div className="flex overflow-hidden w-full antialiased md:shadow-xs bg-background md:rounded-2xl">
 					{children}
 				</div>
 			</div>

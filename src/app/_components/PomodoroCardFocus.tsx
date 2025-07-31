@@ -6,6 +6,18 @@ import { Pause, Play, TimerReset } from "lucide-react";
 import React from "react";
 import { formatTime } from "@/lib/utils";
 import { useTimerStore } from "@/lib/store";
+import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
+import { PolarGrid, RadialBar, RadialBarChart } from "recharts";
+
+const chartConfig = {
+	minutes: {
+		label: "Minutes",
+	},
+	focus: {
+		label: "Focus",
+		color: "var(--chart-1)",
+	},
+} satisfies ChartConfig;
 
 export default function PomodoroCardFocus() {
 	const {
@@ -33,7 +45,7 @@ export default function PomodoroCardFocus() {
 		return () => {
 			if (intervalRef.current) clearInterval(intervalRef.current);
 		};
-	}, [focusTime, focusMode]);
+	}, [focusTime, focusMode, decrementFocusTimer]);
 
 	const handleClick = () => {
 		if (focusMode === "idle" && focusTime) {
@@ -67,20 +79,53 @@ export default function PomodoroCardFocus() {
 		}
 	};
 
+	const chartData = [
+		{ month: "focus", minutes: focusTime, fill: "var(--color-focus)" },
+	];
+
 	return (
 		<>
-			{" "}
-			<CardContent className="flex justify-center items-center">
-				<div className="flex flex-col justify-center items-center h-32 rounded-lg transition-all w-54">
-					<h3 className="text-5xl font-semibold">{formatTime(focusTime)}</h3>
-					<span className="mt-2 text-xs font-medium text-muted-foreground">
-						{focusMode === "paused" ? "PAUSED" : "REMAINING TIME"}
-					</span>
+			<CardContent className="flex-1 flex items-center justify-center py-8">
+				<div className="relative w-full max-w-[250px] aspect-square mx-auto">
+					<ChartContainer
+						config={chartConfig}
+						className="absolute w-full h-full"
+					>
+						<RadialBarChart
+							data={chartData}
+							startAngle={180}
+							endAngle={0}
+							innerRadius="70%"
+							outerRadius="100%"
+							barSize={10}
+						>
+							<PolarGrid
+								gridType="circle"
+								radialLines={false}
+								stroke="none"
+								className="first:fill-muted last:fill-background"
+							/>
+							<RadialBar dataKey="minutes" background cornerRadius={10} />
+						</RadialBarChart>
+					</ChartContainer>
+					<div
+						className="absolute inset-0 flex flex-col items-center justify-center"
+						aria-hidden="true"
+					>
+						<div className="text-center">
+							<div className="text-5xl font-bold tabular-nums tracking-tighter text-foreground">
+								{formatTime(focusTime)}
+							</div>
+							<div className="text-sm font-medium uppercase text-muted-foreground mt-1">
+								{focusMode === "paused" ? "Paused" : "Focus"}
+							</div>
+						</div>
+					</div>
 				</div>
 			</CardContent>
-			<CardFooter className="flex justify-center items-center p-0 shadow-none">
+			<CardFooter className="flex gap-3 justify-center items-center p-0 shadow-none">
 				<Button
-					className={`${focusMode === "paused" ? "" : "hidden"} border-x-0 border-b-0 rounded-none`}
+					className={`${focusMode === "paused" ? "" : "hidden"} `}
 					size={"lg"}
 					variant={"outlineDestructive"}
 					onClick={resetFocusTimer}
@@ -90,7 +135,7 @@ export default function PomodoroCardFocus() {
 
 				<Button
 					size={"lg"}
-					className={`rounded-none flex-1 border-r-0 border-b-0 shadow-none ${focusMode === "paused" ? "text-primary" : ""}`}
+					className={`${focusMode === "paused" ? "text-primary" : ""}`}
 					variant={
 						focusMode === "idle"
 							? "default"

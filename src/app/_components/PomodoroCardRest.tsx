@@ -6,6 +6,18 @@ import React from "react";
 import { useTimerStore } from "@/lib/store";
 import { Pause, Play, TimerReset } from "lucide-react";
 import { formatTime } from "@/lib/utils";
+import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
+import { PolarGrid, RadialBar, RadialBarChart } from "recharts";
+
+const chartConfig = {
+	minutes: {
+		label: "Minutes",
+	},
+	rest: {
+		label: "Rest",
+		color: "var(--chart-2)",
+	},
+} satisfies ChartConfig;
 
 export default function PomodoroCardRest() {
 	const {
@@ -35,7 +47,7 @@ export default function PomodoroCardRest() {
 		return () => {
 			if (intervalRef.current) clearInterval(intervalRef.current);
 		};
-	}, [restTime, restMode]);
+	}, [restTime, restMode, decrementRestTimer]);
 
 	const handleClick = () => {
 		if (restMode === "idle" && restTime > 0) {
@@ -69,27 +81,58 @@ export default function PomodoroCardRest() {
 		}
 	};
 
+	const chartData = [
+		{ month: "rest", minutes: restTime, fill: "var(--color-rest)" },
+	];
+
 	return (
 		<>
-			<CardContent className="flex justify-center items-center">
-				<div className="flex flex-col justify-center items-center h-32 rounded-lg transition-all w-54">
-					<h3 className="text-5xl font-semibold">{formatTime(restTime)}</h3>
-					<span className="mt-2 text-xs font-medium text-muted-foreground">
-						{restMode === "paused" ? "PAUSED" : "REMAINING TIME"}
-					</span>
+			<CardContent className="flex-1 flex items-center justify-center py-8">
+				<div className="relative w-full max-w-[250px] aspect-square mx-auto">
+					<ChartContainer config={chartConfig} className="absolute inset-0">
+						<RadialBarChart
+							data={chartData}
+							startAngle={90}
+							endAngle={-270}
+							innerRadius="70%"
+							outerRadius="100%"
+							barSize={20}
+						>
+							<PolarGrid
+								gridType="polygon"
+								radialLines={false}
+								stroke="none"
+								className="first:fill-muted last:fill-background"
+							/>
+							<RadialBar dataKey="minutes" background cornerRadius={10} />
+						</RadialBarChart>
+					</ChartContainer>
+					<div
+						className="absolute inset-0 flex flex-col items-center justify-center"
+						aria-hidden="true"
+					>
+						<div className="text-center">
+							<div className="text-2xl font-bold tabular-nums tracking-tighter text-foreground">
+								{formatTime(restTime)}
+							</div>
+							<div className="text-sm font-medium uppercase text-muted-foreground mt-1">
+								{restMode === "paused" ? "Paused" : "Rest"}
+							</div>
+						</div>
+					</div>
 				</div>
 			</CardContent>
-			<CardFooter className="flex justify-center items-center p-0">
+			<CardFooter className="flex gap-3 justify-center items-center p-0">
 				<Button
-					className={`${restMode === "paused" ? "" : "hidden"} border-x-0 border-b-0 rounded-none`}
+					className={`${restMode === "paused" ? "" : "hidden"} `}
 					size={"lg"}
-					variant={"outlineDestructive"}
+					variant={"ghostDestructive"}
 					onClick={resetRestTimer}
 				>
 					<TimerReset /> Reset
 				</Button>
 				<Button
-					className={`shadow-none flex-1 rounded-none border-r-0 border-b-0 ${restMode === "running" ? "text" : "text-primary"}`}
+					className={` ${restMode === "running" ? "text" : "text-primary"}`}
 					size={"lg"}
 					variant={
 						restMode === "idle"

@@ -57,6 +57,98 @@ export interface Task {
 	status: "todo" | "inprogress" | "done";
 }
 
+// Kanban Board interfaces for database integration
+export interface KanbanBoard {
+	id: string;
+	user_id: string;
+	workspace_id?: string;
+	name: string;
+	description?: string;
+	is_active: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface KanbanColumn {
+	id: string;
+	board_id: string;
+	name: string;
+	position: number;
+	color?: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface KanbanCard {
+	id: string;
+	column_id: string;
+	board_id: string;
+	title: string;
+	description?: string;
+	position: number;
+	tags?: string[];
+	priority?: "low" | "medium" | "high";
+	due_date?: string;
+	created_at: string;
+	updated_at: string;
+}
+
+// DTOs for API operations
+export interface CreateKanbanBoardData {
+	name: string;
+	description?: string;
+	workspace_id: string; // Required: All boards must belong to a workspace
+}
+
+export interface UpdateKanbanBoardData {
+	name?: string;
+	description?: string;
+	is_active?: boolean;
+}
+
+export interface CreateKanbanColumnData {
+	board_id: string;
+	name: string;
+	position: number;
+	color?: string;
+}
+
+export interface UpdateKanbanColumnData {
+	name?: string;
+	position?: number;
+	color?: string;
+}
+
+export interface CreateKanbanCardData {
+	column_id: string;
+	board_id: string;
+	title: string;
+	description?: string;
+	position: number;
+	tags?: string[];
+	priority?: "low" | "medium" | "high";
+	due_date?: string;
+}
+
+export interface UpdateKanbanCardData {
+	title?: string;
+	description?: string;
+	column_id?: string;
+	position?: number;
+	tags?: string[];
+	priority?: "low" | "medium" | "high";
+	due_date?: string;
+}
+
+// Complete Kanban Board with nested data
+export interface KanbanBoardWithData extends KanbanBoard {
+	columns: KanbanColumnWithCards[];
+}
+
+export interface KanbanColumnWithCards extends KanbanColumn {
+	cards: KanbanCard[];
+}
+
 // Widget interface for workspace components
 export interface Widget {
 	id: string;
