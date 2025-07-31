@@ -18,7 +18,7 @@ export default function TodoList() {
 							<Plus />
 						</Button>
 						<Popover>
-							<PopoverTrigger>
+							<PopoverTrigger asChild>
 								<Button variant={"ghost"} className="md:size-8" size={"icon"}>
 									<EllipsisVertical />
 								</Button>
