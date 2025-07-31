@@ -81,9 +81,13 @@ export default function KanbanBoard({
 					id: column.id,
 					position: index,
 				}));
-				await DatabaseService.reorderColumns(updates);
+				await DatabaseService.reorderColumns(updates, board.id);
 			}, "reorder-columns");
+
+			// Success - the optimistic update is now persisted
+			// Cache has been invalidated, so future loads will get fresh data
 		} catch (error) {
+			console.error("❌ Column reorder failed, reverting:", error);
 			// Revert on error
 			setBoard(board);
 			toast.error("Failed to reorder columns");
@@ -152,69 +156,122 @@ export default function KanbanBoard({
 		)
 			return;
 
-		// Optimistic update
+		// Optimistic update using reorder utility for same column, manual handling for cross-column
 		const updatedBoard = { ...board };
 
-		// Remove card from source
-		const updatedSourceColumn = {
-			...sourceColumn,
-			cards: sourceColumn.cards.filter((c) => c.id !== cardId),
-		};
+		if (sourceColumnId === destinationColumnId) {
+			// Same column - use reorder utility for proper index handling
+			const reorderedCards = reorder({
+				list: sourceColumn.cards,
+				startIndex: cardIndex,
+				finishIndex: destinationIndex,
+			});
 
-		// Add card to destination
-		const updatedDestColumn = {
-			...destColumn,
-			cards: [...destColumn.cards],
-		};
+			// Update positions for all cards
+			const updatedCards = reorderedCards.map((c, idx) => ({
+				...c,
+				position: idx,
+			}));
 
-		// If moving within same column, adjust index
-		const adjustedIndex =
-			sourceColumnId === destinationColumnId && cardIndex < destinationIndex
-				? destinationIndex - 1
-				: destinationIndex;
+			const updatedColumn = {
+				...sourceColumn,
+				cards: updatedCards,
+			};
 
-		updatedDestColumn.cards.splice(adjustedIndex, 0, {
-			...card,
-			column_id: destinationColumnId,
-			position: adjustedIndex,
-		});
+			updatedBoard.columns = updatedBoard.columns.map((col) =>
+				col.id === sourceColumnId ? updatedColumn : col
+			);
 
-		// Update positions for all cards in destination column
-		updatedDestColumn.cards = updatedDestColumn.cards.map((c, idx) => ({
-			...c,
-			position: idx,
-		}));
+			setBoard(updatedBoard);
 
-		// Update the board state
-		updatedBoard.columns = updatedBoard.columns.map((col) => {
-			if (col.id === sourceColumnId) return updatedSourceColumn;
-			if (col.id === destinationColumnId) return updatedDestColumn;
-			return col;
-		});
+			// Background database operation
+			try {
+				await withSync(async () => {
+					// Update all card positions in the reordered column
+					const cardUpdates = updatedCards.map((c, idx) => ({
+						id: c.id,
+						column_id: c.column_id,
+						position: idx,
+					}));
+					await DatabaseService.reorderCards(cardUpdates);
+				}, `reorder-cards-${sourceColumnId}`);
+			} catch (error) {
+				// Revert on error
+				setBoard(board);
+				toast.error("Failed to reorder cards");
+			}
+		} else {
+			// Cross-column move
+			// Remove card from source
+			const updatedSourceColumn = {
+				...sourceColumn,
+				cards: sourceColumn.cards
+					.filter((c) => c.id !== cardId)
+					.map((c, idx) => ({
+						...c,
+						position: idx,
+					})),
+			};
 
-		setBoard(updatedBoard);
+			// Add card to destination
+			const updatedDestColumn = {
+				...destColumn,
+				cards: [...destColumn.cards],
+			};
 
-		// Background database operation
-		try {
-			await withSync(async () => {
-				await DatabaseService.moveCard(
-					cardId,
-					destinationColumnId,
-					adjustedIndex
-				);
+			updatedDestColumn.cards.splice(destinationIndex, 0, {
+				...card,
+				column_id: destinationColumnId,
+				position: destinationIndex,
+			});
 
-				// Update all card positions in destination column
-				const cardUpdates = updatedDestColumn.cards.map((c, idx) => ({
-					id: c.id,
-					column_id: c.column_id,
-					position: idx,
-				}));
-				await DatabaseService.reorderCards(cardUpdates);
-			}, `move-card-${cardId}`);
-		} catch (error) {
-			// Revert on error
-			setBoard(board);
-			toast.error("Failed to move card");
+			// Update positions for all cards in destination column
+			updatedDestColumn.cards = updatedDestColumn.cards.map((c, idx) => ({
+				...c,
+				position: idx,
+			}));
+
+			// Update the board state
+			updatedBoard.columns = updatedBoard.columns.map((col) => {
+				if (col.id === sourceColumnId) return updatedSourceColumn;
+				if (col.id === destinationColumnId) return updatedDestColumn;
+				return col;
+			});
+
+			setBoard(updatedBoard);
+
+			// Background database operation
+			try {
+				await withSync(async () => {
+					await DatabaseService.moveCard(
+						cardId,
+						destinationColumnId,
+						destinationIndex
+					);
+
+					// Update all card positions in both columns
+					const sourceCardUpdates = updatedSourceColumn.cards.map((c, idx) => ({
+						id: c.id,
+						column_id: c.column_id,
+						position: idx,
+					}));
+
+					const destCardUpdates = updatedDestColumn.cards.map((c, idx) => ({
+						id: c.id,
+						column_id: c.column_id,
+						position: idx,
+					}));
+
+					await DatabaseService.reorderCards([
+						...sourceCardUpdates,
+						...destCardUpdates,
+					]);
+				}, `move-card-${cardId}`);
+			} catch (error) {
+				// Revert on error
+				setBoard(board);
+				toast.error("Failed to move card");
+			}
 		}
 	};
 
