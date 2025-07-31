@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { DatabaseService } from "@/lib/database";
 import { KanbanBoardWithData } from "@/lib/types";
 import { toast } from "sonner";
@@ -21,6 +21,7 @@ export function useWorkspaceBoard(
 	const [board, setBoard] = useState<KanbanBoardWithData | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const loadingRef = useRef<string | null>(null); // Track current loading workspace
 
 	const fetchBoard = useCallback(async (id: string) => {
 		if (!id) {
@@ -101,6 +102,13 @@ export function useWorkspaceBoard(
 			console.log("🚫 No workspaceId provided, clearing board");
 			setBoard(null);
 			setLoading(false);
+			loadingRef.current = null;
+			return;
+		}
+
+		// Prevent duplicate loading
+		if (loadingRef.current === workspaceId) {
+			console.log("🚫 Already loading workspace:", workspaceId);
 			return;
 		}
 
@@ -109,6 +117,7 @@ export function useWorkspaceBoard(
 				"🔄 useWorkspaceBoard effect triggered for workspace:",
 				workspaceId
 			);
+			loadingRef.current = workspaceId;
 			setLoading(true);
 			setError(null);
 
@@ -128,20 +137,30 @@ export function useWorkspaceBoard(
 					boardData = await fetchBoard(workspaceId);
 				}
 
-				if (boardData) {
-					console.log("✅ Setting board data in hook:", boardData.id);
-					setBoard(boardData);
-				} else {
-					console.log("❌ No board data returned, setting null");
-					setBoard(null);
+				// Only update state if we're still loading the same workspace
+				if (loadingRef.current === workspaceId) {
+					if (boardData) {
+						console.log("✅ Setting board data in hook:", boardData.id);
+						setBoard(boardData);
+					} else {
+						console.log("❌ No board data returned, setting null");
+						setBoard(null);
+					}
 				}
 			} catch (err) {
-				const errorMessage = "Failed to load board";
-				setError(errorMessage);
-				toast.error(errorMessage);
-				console.error("❌ Board load error:", err);
+				// Only update error state if we're still loading the same workspace
+				if (loadingRef.current === workspaceId) {
+					const errorMessage = "Failed to load board";
+					setError(errorMessage);
+					toast.error(errorMessage);
+					console.error("❌ Board load error:", err);
+				}
 			} finally {
-				setLoading(false);
+				// Only update loading state if we're still loading the same workspace
+				if (loadingRef.current === workspaceId) {
+					setLoading(false);
+					loadingRef.current = null;
+				}
 			}
 		};
 
