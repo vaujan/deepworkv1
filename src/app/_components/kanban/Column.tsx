@@ -24,6 +24,7 @@ import {
 	attachClosestEdge,
 	extractClosestEdge,
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
+import { autoScrollForElements } from "@atlaskit/pragmatic-drag-and-drop-auto-scroll/element";
 import { toast } from "sonner";
 
 const ColumnContainer = React.memo(function ColumnContainer({
@@ -70,7 +71,7 @@ const ColumnContainer = React.memo(function ColumnContainer({
 
 		if (!element || !header) return;
 
-		return combine(
+		const cleanupDragDrop = combine(
 			draggable({
 				element: header,
 				getInitialData: () => ({
@@ -126,6 +127,59 @@ const ColumnContainer = React.memo(function ColumnContainer({
 				},
 			})
 		);
+
+		// Set up auto-scroll for vertical scrolling within column
+		let cleanupAutoScroll: (() => void) | undefined;
+
+		const setupColumnAutoScroll = () => {
+			// Try multiple selectors to find the scrollable element within this column
+			const selectors = [
+				'[data-testid="column-scroll-area"] [data-radix-scroll-area-viewport]',
+				'[data-testid="column-scroll-area"]',
+			];
+
+			for (const selector of selectors) {
+				const scrollElement = element.querySelector(selector) as HTMLElement;
+				if (scrollElement) {
+					return autoScrollForElements({
+						element: scrollElement,
+						canScroll: ({ source }) => source.data.type === "card",
+						getConfiguration: () => ({
+							maxScrollSpeed: "fast",
+							startScrollingThreshold: 200,
+							maxScrollSpeedAt: 100,
+						}),
+					});
+				}
+			}
+			return undefined;
+		};
+
+		// Setup with retry logic
+		cleanupAutoScroll = setupColumnAutoScroll();
+		let retryCount = 0;
+		const maxRetries = 3;
+
+		const retrySetup = () => {
+			if (!cleanupAutoScroll && retryCount < maxRetries) {
+				retryCount++;
+				setTimeout(() => {
+					cleanupAutoScroll = setupColumnAutoScroll();
+					if (!cleanupAutoScroll) {
+						retrySetup();
+					}
+				}, 100 * retryCount);
+			}
+		};
+
+		if (!cleanupAutoScroll) {
+			retrySetup();
+		}
+
+		return () => {
+			cleanupDragDrop();
+			cleanupAutoScroll?.();
+		};
 	}, [column.id, column.board_id, index]);
 
 	// Update local state when column name changes from external sources
@@ -313,7 +367,7 @@ const ColumnContainer = React.memo(function ColumnContainer({
 			{/* Cards Area */}
 			{column.cards.length > 0 && (
 				<div className="flex-1 overflow-hidden">
-					<ScrollArea className="max-h-[60vh]">
+					<ScrollArea className="max-h-[60vh]" data-testid="column-scroll-area">
 						<div className="p-2 space-y-2">
 							{column.cards.map((card, cardIndex) => (
 								<KanbanCard

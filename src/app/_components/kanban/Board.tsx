@@ -9,6 +9,7 @@ import KanbanColumn from "./Column";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { reorder } from "@atlaskit/pragmatic-drag-and-drop/reorder";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
+import { autoScrollForElements } from "@atlaskit/pragmatic-drag-and-drop-auto-scroll/element";
 import { toast } from "sonner";
 import { useSyncOperation } from "@/hooks/use-sync-status";
 import { useWorkspaceBoard } from "@/hooks/use-workspace-board";
@@ -34,7 +35,7 @@ export default function KanbanBoard({
 
 	// Drag and drop handlers
 	useEffect(() => {
-		const cleanup = monitorForElements({
+		const cleanupMonitor = monitorForElements({
 			onDrop({ source, location }) {
 				if (!board) return;
 
@@ -51,7 +52,58 @@ export default function KanbanBoard({
 			},
 		});
 
-		return cleanup;
+		// Set up auto-scroll for horizontal scrolling
+		let cleanupAutoScroll: (() => void) | undefined;
+
+		const setupAutoScroll = () => {
+			// Try multiple selectors to find the scrollable element
+			const selectors = [
+				'[data-testid="board-scroll-container"] [data-radix-scroll-area-viewport]',
+				'[data-testid="board-scroll-container"]',
+			];
+
+			for (const selector of selectors) {
+				const element = document.querySelector(selector) as HTMLElement;
+				if (element) {
+					return autoScrollForElements({
+						element,
+						canScroll: ({ source }) => source.data.type === "column",
+						getConfiguration: () => ({
+							maxScrollSpeed: "fast",
+							startScrollingThreshold: 200,
+							maxScrollSpeedAt: 100,
+						}),
+					});
+				}
+			}
+			return undefined;
+		};
+
+		// Setup with retry logic
+		cleanupAutoScroll = setupAutoScroll();
+		let retryCount = 0;
+		const maxRetries = 3;
+
+		const retrySetup = () => {
+			if (!cleanupAutoScroll && retryCount < maxRetries) {
+				retryCount++;
+				setTimeout(() => {
+					cleanupAutoScroll = setupAutoScroll();
+					if (!cleanupAutoScroll) {
+						retrySetup();
+					}
+				}, 100 * retryCount);
+			}
+		};
+
+		if (!cleanupAutoScroll) {
+			retrySetup();
+		}
+
+		return () => {
+			cleanupMonitor();
+			cleanupAutoScroll?.();
+		};
 	}, [board]);
 
 	const handleColumnMove = async (
@@ -333,7 +385,7 @@ export default function KanbanBoard({
 			...board,
 			columns: [
 				...board.columns,
-				{ ...tempColumn, cards: [], isNewColumn: true },
+				{ ...tempColumn, cards: [], isNewColumn: true } as any,
 			],
 		});
 
@@ -354,7 +406,7 @@ export default function KanbanBoard({
 									...prev,
 									columns: prev.columns.map((col) =>
 										col.id === tempColumn.id
-											? { ...newColumn, cards: [], isNewColumn: true }
+											? ({ ...newColumn, cards: [], isNewColumn: true } as any)
 											: col
 									),
 								}
@@ -789,6 +841,9 @@ export default function KanbanBoard({
 					);
 
 					const duplicatedCards = await Promise.all(cardPromises);
+					const validCards = duplicatedCards.filter(
+						(card): card is NonNullable<typeof card> => card !== null
+					);
 
 					// Replace temp column with real one and add cards
 					setBoard((prev) =>
@@ -797,7 +852,7 @@ export default function KanbanBoard({
 									...prev,
 									columns: prev.columns.map((col) =>
 										col.id === tempColumn.id
-											? { ...newColumn, cards: duplicatedCards }
+											? { ...newColumn, cards: validCards }
 											: col
 									),
 								}
@@ -847,7 +902,7 @@ export default function KanbanBoard({
 
 	return (
 		<div className={className}>
-			<ScrollArea className="w-full" orientation="horizontal">
+			<ScrollArea className="w-full" data-testid="board-scroll-container">
 				<div className="flex gap-4 p-4 pb-6 items-start">
 					{board.columns.map((column, index) => (
 						<KanbanColumn
