@@ -10,7 +10,7 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { EllipsisVertical, Plus, Trash, GripVertical } from "lucide-react";
+import { EllipsisVertical, Plus, Trash, Files } from "lucide-react";
 import { KanbanColumnProps } from "./types";
 import KanbanCard from "./Card";
 import {
@@ -20,6 +20,10 @@ import {
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import { pointerOutsideOfPreview } from "@atlaskit/pragmatic-drag-and-drop/element/pointer-outside-of-preview";
+import {
+	attachClosestEdge,
+	extractClosestEdge,
+} from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { toast } from "sonner";
 
 const ColumnContainer = React.memo(function ColumnContainer({
@@ -27,18 +31,22 @@ const ColumnContainer = React.memo(function ColumnContainer({
 	index,
 	onUpdateColumn,
 	onDeleteColumn,
+	onDuplicateColumn,
 	onCreateCard,
 	onUpdateCard,
 	onDeleteCard,
+	onDuplicateCard,
 }: KanbanColumnProps) {
 	const [editMode, setEditMode] = useState(false);
 	const [editValue, setEditValue] = useState(column.name);
 	const [newCardTitle, setNewCardTitle] = useState("");
 	const [showAddCard, setShowAddCard] = useState(false);
 	const [isDraggedOver, setIsDraggedOver] = useState(false);
+	const [closestEdge, setClosestEdge] = useState<"left" | "right" | null>(null);
+	const [isDragging, setIsDragging] = useState(false);
 
 	const columnRef = useRef<HTMLDivElement>(null);
-	const dragHandleRef = useRef<HTMLDivElement>(null);
+	const headerRef = useRef<HTMLDivElement>(null);
 	const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 
@@ -49,21 +57,30 @@ const ColumnContainer = React.memo(function ColumnContainer({
 		}
 	}, [editMode]);
 
+	// Auto-edit mode for new columns
+	useEffect(() => {
+		if ((column as any).isNewColumn && !editMode) {
+			setEditMode(true);
+		}
+	}, [column]);
+
 	useEffect(() => {
 		const element = columnRef.current;
-		const dragHandle = dragHandleRef.current;
+		const header = headerRef.current;
 
-		if (!element || !dragHandle) return;
+		if (!element || !header) return;
 
 		return combine(
 			draggable({
-				element: dragHandle,
+				element: header,
 				getInitialData: () => ({
 					type: "column",
 					id: column.id,
 					boardId: column.board_id,
 					index,
 				}),
+				onDragStart: () => setIsDragging(true),
+				onDrop: () => setIsDragging(false),
 				onGenerateDragPreview: ({ nativeSetDragImage }) => {
 					setCustomNativeDragPreview({
 						nativeSetDragImage,
@@ -81,14 +98,32 @@ const ColumnContainer = React.memo(function ColumnContainer({
 			}),
 			dropTargetForElements({
 				element,
-				getData: () => ({
-					type: "column",
-					id: column.id,
-					index,
-				}),
-				onDragEnter: () => setIsDraggedOver(true),
-				onDragLeave: () => setIsDraggedOver(false),
-				onDrop: () => setIsDraggedOver(false),
+				getData: ({ input, element }) => {
+					const data = {
+						type: "column",
+						id: column.id,
+						index,
+					};
+
+					return attachClosestEdge(data, {
+						input,
+						element,
+						allowedEdges: ["left", "right"],
+					});
+				},
+				onDragEnter: ({ self }) => {
+					setIsDraggedOver(true);
+					const edge = extractClosestEdge(self.data);
+					setClosestEdge(edge === "left" || edge === "right" ? edge : null);
+				},
+				onDragLeave: () => {
+					setIsDraggedOver(false);
+					setClosestEdge(null);
+				},
+				onDrop: () => {
+					setIsDraggedOver(false);
+					setClosestEdge(null);
+				},
 			})
 		);
 	}, [column.id, column.board_id, index]);
@@ -157,6 +192,10 @@ const ColumnContainer = React.memo(function ColumnContainer({
 		onDeleteColumn(column.id);
 	};
 
+	const handleColumnDuplicate = () => {
+		onDuplicateColumn(column.id);
+	};
+
 	const handleAddCard = async () => {
 		const trimmedTitle = newCardTitle.trim();
 		if (trimmedTitle) {
@@ -180,27 +219,32 @@ const ColumnContainer = React.memo(function ColumnContainer({
 		}
 	};
 
+	// Show placeholder when dragging
+	if (isDragging) {
+		return (
+			<div className="flex flex-col min-w-[300px] w-[300px] h-[400px] rounded-xl border-2 border-dashed border-accent/50 bg-accent/10 opacity-50">
+				<div className="p-3">
+					<div className="h-6 bg-accent/20 rounded animate-pulse" />
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div
 			ref={columnRef}
-			className={`flex flex-col min-w-[300px] w-[300px] h-fit rounded-xl border ${
+			className={`relative overflow-hidden flex flex-col min-w-[300px] w-[300px] max-h-[80vh] rounded-xl border ${
 				isDraggedOver
-					? "border-accent border-2 bg-accent/5"
+					? "border-accent/50 bg-accent/5 shadow-sm"
 					: "border-border/50"
 			} bg-card/60 group transition-colors`}
 		>
 			{/* Column Header */}
-			<div className="flex justify-between items-center p-3 hover:bg-card/80 transition-colors">
+			<div
+				ref={headerRef}
+				className="flex justify-between items-center p-3 hover:bg-card/80 transition-colors cursor-grab active:cursor-grabbing"
+			>
 				<div className="flex items-center gap-2 flex-1">
-					{/* Dedicated Drag Handle */}
-					<div
-						ref={dragHandleRef}
-						className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted/50 rounded opacity-50 hover:opacity-100 transition-all"
-						title="Drag to reorder column"
-					>
-						<GripVertical className="h-4 w-4" />
-					</div>
-
 					{/* Column Name */}
 					{editMode ? (
 						<Input
@@ -218,12 +262,16 @@ const ColumnContainer = React.memo(function ColumnContainer({
 									handleColumnNameCancel();
 								}
 							}}
-							className="text-base font-medium flex-1"
+							className="text-base font-medium flex-1 border-0 bg-transparent p-1 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none cursor-text"
+							style={{ backgroundColor: "transparent" }}
 						/>
 					) : (
 						<h3
-							onClick={() => setEditMode(true)}
-							className="flex-1 text-base font-medium p-1 cursor-pointer hover:bg-muted/30 rounded transition-colors"
+							onClick={(e) => {
+								e.stopPropagation();
+								setEditMode(true);
+							}}
+							className="flex-1 text-base font-medium p-1 cursor-pointer hover:bg-muted/20 rounded transition-colors min-h-[1.5rem]"
 							title="Click to edit column name"
 						>
 							{column.name}
@@ -239,20 +287,22 @@ const ColumnContainer = React.memo(function ColumnContainer({
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent className="w-[250px]">
-							<DropdownMenuLabel>Action list</DropdownMenuLabel>
+							<DropdownMenuLabel>Column actions</DropdownMenuLabel>
 							<DropdownMenuSeparator />
-							{/* <DropdownMenuItem
-								onClick={() => {
-									setEditMode(true);
-								}}
+							<DropdownMenuItem
+								onClick={handleColumnDuplicate}
+								className="cursor-pointer"
 							>
-								<Pencil /> Rename
-							</DropdownMenuItem> */}
+								<Files className="mr-2 h-4 w-4" />
+								Duplicate column
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
 							<DropdownMenuItem
 								onClick={handleColumnDelete}
 								variant="destructive"
+								className="cursor-pointer"
 							>
-								<Trash />
+								<Trash className="mr-2 h-4 w-4" />
 								Delete
 							</DropdownMenuItem>
 						</DropdownMenuContent>
@@ -261,23 +311,30 @@ const ColumnContainer = React.memo(function ColumnContainer({
 			</div>
 
 			{/* Cards Area */}
-			<ScrollArea className="w-full max-h-[480px]">
-				<div className="p-2">
-					{column.cards.map((card, cardIndex) => (
-						<KanbanCard
-							key={card.id}
-							card={card}
-							onUpdate={onUpdateCard}
-							onDelete={onDeleteCard}
-							index={cardIndex}
-							columnId={column.id}
-						/>
-					))}
+			{column.cards.length > 0 && (
+				<div className="flex-1 overflow-hidden">
+					<ScrollArea className="max-h-[60vh]">
+						<div className="p-2 space-y-2">
+							{column.cards.map((card, cardIndex) => (
+								<KanbanCard
+									key={card.id}
+									card={card}
+									onUpdate={onUpdateCard}
+									onDelete={onDeleteCard}
+									onDuplicate={onDuplicateCard}
+									index={cardIndex}
+									columnId={column.id}
+								/>
+							))}
+						</div>
+					</ScrollArea>
 				</div>
-			</ScrollArea>
+			)}
 
 			{/* Add Card Section */}
-			<div className={`p-2 bg-card -mt-2`}>
+			<div
+				className={`flex-shrink-0 p-2 bg-card ${column.cards.length > 0 ? "border-t border-border/20" : ""}`}
+			>
 				{showAddCard ? (
 					<div className="space-y-2">
 						<Input
@@ -325,6 +382,20 @@ const ColumnContainer = React.memo(function ColumnContainer({
 					</Button>
 				)}
 			</div>
+
+			{/* Drop indicators for column reordering */}
+			{closestEdge === "left" && (
+				<div className="absolute -left-[2px] top-0 bottom-0 w-[2px] bg-accent pointer-events-none z-10">
+					<div className="absolute -left-1 -top-1 w-2 h-2 bg-accent rounded-full" />
+					<div className="absolute -left-1 -bottom-1 w-2 h-2 bg-accent rounded-full" />
+				</div>
+			)}
+			{closestEdge === "right" && (
+				<div className="absolute -right-[2px] top-0 bottom-0 w-[2px] bg-accent pointer-events-none z-10">
+					<div className="absolute -right-1 -top-1 w-2 h-2 bg-accent rounded-full" />
+					<div className="absolute -right-1 -bottom-1 w-2 h-2 bg-accent rounded-full" />
+				</div>
+			)}
 		</div>
 	);
 });

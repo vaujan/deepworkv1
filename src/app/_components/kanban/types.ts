@@ -22,15 +22,18 @@ export interface KanbanColumnProps {
 		data: { name?: string; color?: string }
 	) => void;
 	onDeleteColumn: (columnId: string) => void;
+	onDuplicateColumn: (columnId: string) => void;
 	onCreateCard: (columnId: string, title: string) => void;
 	onUpdateCard: (cardId: string, data: { title?: string }) => void;
 	onDeleteCard: (cardId: string) => void;
+	onDuplicateCard: (cardId: string) => void;
 }
 
 export interface KanbanCardProps {
 	card: KanbanCard;
 	onUpdate: (cardId: string, data: { title?: string }) => void;
 	onDelete: (cardId: string) => void;
+	onDuplicate: (cardId: string) => void;
 }
 
 // Drag and Drop interfaces
