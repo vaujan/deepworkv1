@@ -316,6 +316,34 @@ export class DatabaseService {
 		return { ...newEmail, isExisting: false };
 	}
 
+	static async getTables(): Promise<{ name: string; lastAccessed: string }[]> {
+		// DEBUG: Directly querying a table with RLS to test the policy.
+		console.log(
+			"DEBUG: Attempting to directly query 'workspaces' table to test RLS."
+		);
+		const { data, error } = await supabase.from("workspaces").select("name");
+
+		if (error) {
+			console.error("DEBUG: Error directly querying 'workspaces':", error);
+			return [];
+		}
+
+		console.log("DEBUG: Successfully queried 'workspaces'. Data:", data);
+
+		if (!data || data.length === 0) {
+			console.log(
+				"DEBUG: Querying 'workspaces' returned no data. This strongly suggests RLS is enabled but the policy is not allowing access, or the table is empty."
+			);
+		}
+
+		return (
+			data?.map((item) => ({
+				name: item.name,
+				lastAccessed: "Just now",
+			})) || []
+		);
+	}
+
 	// Kanban Board methods
 	static async createKanbanBoard(
 		data: CreateKanbanBoardData
