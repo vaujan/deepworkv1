@@ -316,6 +316,34 @@ export class DatabaseService {
 		return { ...newEmail, isExisting: false };
 	}
 
+	static async getTables(): Promise<{ name: string; lastAccessed: string }[]> {
+		// DEBUG: Directly querying a table with RLS to test the policy.
+		console.log(
+			"DEBUG: Attempting to directly query 'workspaces' table to test RLS."
+		);
+		const { data, error } = await supabase.from("workspaces").select("name");
+
+		if (error) {
+			console.error("DEBUG: Error directly querying 'workspaces':", error);
+			return [];
+		}
+
+		console.log("DEBUG: Successfully queried 'workspaces'. Data:", data);
+
+		if (!data || data.length === 0) {
+			console.log(
+				"DEBUG: Querying 'workspaces' returned no data. This strongly suggests RLS is enabled but the policy is not allowing access, or the table is empty."
+			);
+		}
+
+		return (
+			data?.map((item) => ({
+				name: item.name,
+				lastAccessed: "Just now",
+			})) || []
+		);
+	}
+
 	// Kanban Board methods
 	static async createKanbanBoard(
 		data: CreateKanbanBoardData
@@ -716,22 +744,44 @@ export class DatabaseService {
 	}
 
 	static async reorderColumns(
-		columns: { id: string; position: number }[]
+		columns: { id: string; position: number }[],
+		boardId?: string
 	): Promise<boolean> {
-		const updates = columns.map((col) => ({
-			id: col.id,
-			position: col.position,
-			updated_at: new Date().toISOString(),
-		}));
+		// Use individual updates instead of upsert to avoid RLS issues
+		try {
+			for (const col of columns) {
+				const { error } = await supabase
+					.from("kanban_columns")
+					.update({
+						position: col.position,
+						updated_at: new Date().toISOString(),
+					})
+					.eq("id", col.id);
 
-		const { error } = await supabase.from("kanban_columns").upsert(updates);
+				if (error) {
+					console.error("❌ Error updating column:", col.id, error);
+					return false;
+				}
+			}
 
-		if (error) {
-			console.error("Error reordering columns:", error);
+			// Invalidate cache for the board's workspace
+			if (boardId) {
+				const { data: board } = await supabase
+					.from("kanban_boards")
+					.select("workspace_id")
+					.eq("id", boardId)
+					.single();
+
+				if (board?.workspace_id) {
+					this.invalidateWorkspaceCache(board.workspace_id);
+				}
+			}
+
+			return true;
+		} catch (error) {
+			console.error("❌ Error in reorderColumns:", error);
 			return false;
 		}
-
-		return true;
 	}
 
 	// Kanban Card methods
@@ -810,21 +860,29 @@ export class DatabaseService {
 	static async reorderCards(
 		cards: { id: string; column_id: string; position: number }[]
 	): Promise<boolean> {
-		const updates = cards.map((card) => ({
-			id: card.id,
-			column_id: card.column_id,
-			position: card.position,
-			updated_at: new Date().toISOString(),
-		}));
+		try {
+			// Update each card individually to avoid RLS policy violations with upsert
+			const updatePromises = cards.map(async (card) => {
+				const { error } = await supabase
+					.from("kanban_cards")
+					.update({
+						column_id: card.column_id,
+						position: card.position,
+						updated_at: new Date().toISOString(),
+					})
+					.eq("id", card.id);
 
-		const { error } = await supabase.from("kanban_cards").upsert(updates);
+				if (error) {
+					throw new Error(`Failed to update card ${card.id}: ${error.message}`);
+				}
+			});
 
-		if (error) {
+			await Promise.all(updatePromises);
+			return true;
+		} catch (error) {
 			console.error("Error reordering cards:", error);
 			return false;
 		}
-
-		return true;
 	}
 
 	static async moveCard(

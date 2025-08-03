@@ -8,6 +8,8 @@ import { KanbanBoardWithData } from "@/lib/types";
 import KanbanColumn from "./Column";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { reorder } from "@atlaskit/pragmatic-drag-and-drop/reorder";
+import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
+import { autoScrollForElements } from "@atlaskit/pragmatic-drag-and-drop-auto-scroll/element";
 import { toast } from "sonner";
 import { useSyncOperation } from "@/hooks/use-sync-status";
 import { useWorkspaceBoard } from "@/hooks/use-workspace-board";
@@ -33,7 +35,7 @@ export default function KanbanBoard({
 
 	// Drag and drop handlers
 	useEffect(() => {
-		const cleanup = monitorForElements({
+		const cleanupMonitor = monitorForElements({
 			onDrop({ source, location }) {
 				if (!board) return;
 
@@ -50,7 +52,58 @@ export default function KanbanBoard({
 			},
 		});
 
-		return cleanup;
+		// Set up auto-scroll for horizontal scrolling
+		let cleanupAutoScroll: (() => void) | undefined;
+
+		const setupAutoScroll = () => {
+			// Try multiple selectors to find the scrollable element
+			const selectors = [
+				'[data-testid="board-scroll-container"] [data-radix-scroll-area-viewport]',
+				'[data-testid="board-scroll-container"]',
+			];
+
+			for (const selector of selectors) {
+				const element = document.querySelector(selector) as HTMLElement;
+				if (element) {
+					return autoScrollForElements({
+						element,
+						canScroll: ({ source }) => source.data.type === "column",
+						getConfiguration: () => ({
+							maxScrollSpeed: "fast",
+							startScrollingThreshold: 200,
+							maxScrollSpeedAt: 100,
+						}),
+					});
+				}
+			}
+			return undefined;
+		};
+
+		// Setup with retry logic
+		cleanupAutoScroll = setupAutoScroll();
+		let retryCount = 0;
+		const maxRetries = 3;
+
+		const retrySetup = () => {
+			if (!cleanupAutoScroll && retryCount < maxRetries) {
+				retryCount++;
+				setTimeout(() => {
+					cleanupAutoScroll = setupAutoScroll();
+					if (!cleanupAutoScroll) {
+						retrySetup();
+					}
+				}, 100 * retryCount);
+			}
+		};
+
+		if (!cleanupAutoScroll) {
+			retrySetup();
+		}
+
+		return () => {
+			cleanupMonitor();
+			cleanupAutoScroll?.();
+		};
 	}, [board]);
 
 	const handleColumnMove = async (
@@ -61,7 +114,13 @@ export default function KanbanBoard({
 		if (!board) return;
 
 		const sourceIndex = sourceData.index as number;
-		const destinationIndex = destination.data.index as number;
+		let destinationIndex = destination.data.index as number;
+
+		// Handle closest edge for more precise positioning
+		const closestEdge = extractClosestEdge(destination.data);
+		if (closestEdge === "right") {
+			destinationIndex = destinationIndex + 1;
+		}
 
 		if (sourceIndex === destinationIndex) return;
 
@@ -81,9 +140,13 @@ export default function KanbanBoard({
 					id: column.id,
 					position: index,
 				}));
-				await DatabaseService.reorderColumns(updates);
+				await DatabaseService.reorderColumns(updates, board.id);
 			}, "reorder-columns");
+
+			// Success - the optimistic update is now persisted
+			// Cache has been invalidated, so future loads will get fresh data
 		} catch (error) {
+			console.error("❌ Column reorder failed, reverting:", error);
 			// Revert on error
 			setBoard(board);
 			toast.error("Failed to reorder columns");
@@ -107,12 +170,15 @@ export default function KanbanBoard({
 		if (destination.data.type === "card") {
 			// Dropping on another card - get its column and position
 			const targetCardId = destination.data.id as string;
+			const closestEdge = extractClosestEdge(destination.data);
+
 			let found = false;
 			for (const col of board.columns) {
 				const cardIdx = col.cards.findIndex((c) => c.id === targetCardId);
 				if (cardIdx !== -1) {
 					destinationColumnId = col.id;
-					destinationIndex = cardIdx; // Insert before target card
+					// Insert based on closest edge
+					destinationIndex = closestEdge === "bottom" ? cardIdx + 1 : cardIdx;
 					found = true;
 					break;
 				}
@@ -152,80 +218,162 @@ export default function KanbanBoard({
 		)
 			return;
 
-		// Optimistic update
+		// Optimistic update using reorder utility for same column, manual handling for cross-column
 		const updatedBoard = { ...board };
 
-		// Remove card from source
-		const updatedSourceColumn = {
-			...sourceColumn,
-			cards: sourceColumn.cards.filter((c) => c.id !== cardId),
-		};
+		if (sourceColumnId === destinationColumnId) {
+			// Same column - use reorder utility for proper index handling
+			const reorderedCards = reorder({
+				list: sourceColumn.cards,
+				startIndex: cardIndex,
+				finishIndex: destinationIndex,
+			});
 
-		// Add card to destination
-		const updatedDestColumn = {
-			...destColumn,
-			cards: [...destColumn.cards],
-		};
+			// Update positions for all cards
+			const updatedCards = reorderedCards.map((c, idx) => ({
+				...c,
+				position: idx,
+			}));
 
-		// If moving within same column, adjust index
-		const adjustedIndex =
-			sourceColumnId === destinationColumnId && cardIndex < destinationIndex
-				? destinationIndex - 1
-				: destinationIndex;
+			const updatedColumn = {
+				...sourceColumn,
+				cards: updatedCards,
+			};
 
-		updatedDestColumn.cards.splice(adjustedIndex, 0, {
-			...card,
-			column_id: destinationColumnId,
-			position: adjustedIndex,
-		});
+			updatedBoard.columns = updatedBoard.columns.map((col) =>
+				col.id === sourceColumnId ? updatedColumn : col
+			);
 
-		// Update positions for all cards in destination column
-		updatedDestColumn.cards = updatedDestColumn.cards.map((c, idx) => ({
-			...c,
-			position: idx,
-		}));
+			setBoard(updatedBoard);
 
-		// Update the board state
-		updatedBoard.columns = updatedBoard.columns.map((col) => {
-			if (col.id === sourceColumnId) return updatedSourceColumn;
-			if (col.id === destinationColumnId) return updatedDestColumn;
-			return col;
-		});
+			// Background database operation
+			try {
+				await withSync(async () => {
+					// Update all card positions in the reordered column
+					const cardUpdates = updatedCards.map((c, idx) => ({
+						id: c.id,
+						column_id: c.column_id,
+						position: idx,
+					}));
+					await DatabaseService.reorderCards(cardUpdates);
+				}, `reorder-cards-${sourceColumnId}`);
+			} catch (error) {
+				// Revert on error
+				setBoard(board);
+				toast.error("Failed to reorder cards");
+			}
+		} else {
+			// Cross-column move
+			// Remove card from source
+			const updatedSourceColumn = {
+				...sourceColumn,
+				cards: sourceColumn.cards
+					.filter((c) => c.id !== cardId)
+					.map((c, idx) => ({
+						...c,
+						position: idx,
+					})),
+			};
 
-		setBoard(updatedBoard);
+			// Add card to destination
+			const updatedDestColumn = {
+				...destColumn,
+				cards: [...destColumn.cards],
+			};
 
-		// Background database operation
-		try {
-			await withSync(async () => {
-				await DatabaseService.moveCard(
-					cardId,
-					destinationColumnId,
-					adjustedIndex
-				);
+			updatedDestColumn.cards.splice(destinationIndex, 0, {
+				...card,
+				column_id: destinationColumnId,
+				position: destinationIndex,
+			});
 
-				// Update all card positions in destination column
-				const cardUpdates = updatedDestColumn.cards.map((c, idx) => ({
-					id: c.id,
-					column_id: c.column_id,
-					position: idx,
-				}));
-				await DatabaseService.reorderCards(cardUpdates);
-			}, `move-card-${cardId}`);
-		} catch (error) {
-			// Revert on error
-			setBoard(board);
-			toast.error("Failed to move card");
+			// Update positions for all cards in destination column
+			updatedDestColumn.cards = updatedDestColumn.cards.map((c, idx) => ({
+				...c,
+				position: idx,
+			}));
+
+			// Update the board state
+			updatedBoard.columns = updatedBoard.columns.map((col) => {
+				if (col.id === sourceColumnId) return updatedSourceColumn;
+				if (col.id === destinationColumnId) return updatedDestColumn;
+				return col;
+			});
+
+			setBoard(updatedBoard);
+
+			// Background database operation
+			try {
+				await withSync(async () => {
+					await DatabaseService.moveCard(
+						cardId,
+						destinationColumnId,
+						destinationIndex
+					);
+
+					// Update all card positions in both columns
+					const sourceCardUpdates = updatedSourceColumn.cards.map((c, idx) => ({
+						id: c.id,
+						column_id: c.column_id,
+						position: idx,
+					}));
+
+					const destCardUpdates = updatedDestColumn.cards.map((c, idx) => ({
+						id: c.id,
+						column_id: c.column_id,
+						position: idx,
+					}));
+
+					await DatabaseService.reorderCards([
+						...sourceCardUpdates,
+						...destCardUpdates,
+					]);
+				}, `move-card-${cardId}`);
+			} catch (error) {
+				// Revert on error
+				setBoard(board);
+				toast.error("Failed to move card");
+			}
 		}
 	};
 
 	const handleCreateColumn = async () => {
 		if (!board) return;
 
+		// Generate helpful default names
+		const getDefaultColumnName = () => {
+			const existingNames = board.columns.map((col) => col.name.toLowerCase());
+			const suggestions = [
+				"To Do",
+				"In Progress",
+				"Done",
+				"Backlog",
+				"Review",
+				"Testing",
+				"Ideas",
+				"Blocked",
+				"Archive",
+				"Next Up",
+			];
+
+			// Find first unused suggestion
+			const unusedSuggestion = suggestions.find(
+				(name) => !existingNames.includes(name.toLowerCase())
+			);
+
+			if (unusedSuggestion) {
+				return unusedSuggestion;
+			}
+
+			// If all suggestions are used, use "New Column"
+			return "New Column";
+		};
+
 		// Optimistic update - create temporary column immediately
 		const tempColumn = {
 			id: `temp-${Date.now()}`,
 			board_id: board.id,
-			name: `Column ${board.columns.length + 1}`,
+			name: getDefaultColumnName(),
 			position: board.columns.length,
 			color: undefined,
 			created_at: new Date().toISOString(),
@@ -235,7 +383,10 @@ export default function KanbanBoard({
 		// Update UI immediately
 		setBoard({
 			...board,
-			columns: [...board.columns, { ...tempColumn, cards: [] }],
+			columns: [
+				...board.columns,
+				{ ...tempColumn, cards: [], isNewColumn: true } as any,
+			],
 		});
 
 		// Background database operation
@@ -248,13 +399,15 @@ export default function KanbanBoard({
 				});
 
 				if (newColumn) {
-					// Replace temp column with real one
+					// Replace temp column with real one and maintain edit mode
 					setBoard((prev) =>
 						prev
 							? {
 									...prev,
 									columns: prev.columns.map((col) =>
-										col.id === tempColumn.id ? { ...newColumn, cards: [] } : col
+										col.id === tempColumn.id
+											? ({ ...newColumn, cards: [], isNewColumn: true } as any)
+											: col
 									),
 								}
 							: null
@@ -540,6 +693,189 @@ export default function KanbanBoard({
 		}
 	};
 
+	const handleDuplicateCard = async (cardId: string) => {
+		if (!board) return;
+
+		// Find the card to duplicate
+		let cardToDuplicate = null;
+		let sourceColumnId = null;
+		for (const col of board.columns) {
+			const card = col.cards.find((c) => c.id === cardId);
+			if (card) {
+				cardToDuplicate = card;
+				sourceColumnId = col.id;
+				break;
+			}
+		}
+
+		if (!cardToDuplicate || !sourceColumnId) return;
+
+		const sourceColumn = board.columns.find((col) => col.id === sourceColumnId);
+		if (!sourceColumn) return;
+
+		// Create temporary duplicate card
+		const tempCard = {
+			id: `temp-${Date.now()}`,
+			column_id: sourceColumnId,
+			board_id: board.id,
+			title: `${cardToDuplicate.title} (Copy)`,
+			description: cardToDuplicate.description,
+			position: sourceColumn.cards.length,
+			tags: cardToDuplicate.tags,
+			priority: cardToDuplicate.priority,
+			due_date: cardToDuplicate.due_date,
+			created_at: new Date().toISOString(),
+			updated_at: new Date().toISOString(),
+		};
+
+		// Optimistic update - add duplicate immediately
+		setBoard({
+			...board,
+			columns: board.columns.map((col) =>
+				col.id === sourceColumnId
+					? { ...col, cards: [...col.cards, tempCard] }
+					: col
+			),
+		});
+
+		// Background database operation
+		try {
+			await withSync(async () => {
+				const newCard = await DatabaseService.createKanbanCard({
+					column_id: sourceColumnId,
+					board_id: board.id,
+					title: tempCard.title,
+					description: tempCard.description,
+					position: tempCard.position,
+				});
+
+				if (newCard) {
+					// Replace temp card with real one
+					setBoard((prev) =>
+						prev
+							? {
+									...prev,
+									columns: prev.columns.map((col) =>
+										col.id === sourceColumnId
+											? {
+													...col,
+													cards: col.cards.map((card) =>
+														card.id === tempCard.id ? newCard : card
+													),
+												}
+											: col
+									),
+								}
+							: null
+					);
+				} else {
+					throw new Error("Failed to duplicate card");
+				}
+			}, `duplicate-card-${tempCard.id}`);
+		} catch (error) {
+			// Revert on error
+			setBoard((prev) =>
+				prev
+					? {
+							...prev,
+							columns: prev.columns.map((col) =>
+								col.id === sourceColumnId
+									? {
+											...col,
+											cards: col.cards.filter(
+												(card) => card.id !== tempCard.id
+											),
+										}
+									: col
+							),
+						}
+					: null
+			);
+			toast.error("Failed to duplicate card");
+		}
+	};
+
+	const handleDuplicateColumn = async (columnId: string) => {
+		if (!board) return;
+
+		const columnToDuplicate = board.columns.find((col) => col.id === columnId);
+		if (!columnToDuplicate) return;
+
+		// Create temporary duplicate column
+		const tempColumn = {
+			id: `temp-${Date.now()}`,
+			board_id: board.id,
+			name: `${columnToDuplicate.name} (Copy)`,
+			position: board.columns.length,
+			color: columnToDuplicate.color,
+			created_at: new Date().toISOString(),
+			updated_at: new Date().toISOString(),
+		};
+
+		// Optimistic update - add duplicate column immediately
+		setBoard({
+			...board,
+			columns: [...board.columns, { ...tempColumn, cards: [] }],
+		});
+
+		// Background database operation
+		try {
+			await withSync(async () => {
+				// Create the new column
+				const newColumn = await DatabaseService.createKanbanColumn({
+					board_id: board.id,
+					name: tempColumn.name,
+					position: tempColumn.position,
+				});
+
+				if (newColumn) {
+					// Duplicate all cards from the original column
+					const cardPromises = columnToDuplicate.cards.map((card, index) =>
+						DatabaseService.createKanbanCard({
+							column_id: newColumn.id,
+							board_id: board.id,
+							title: card.title,
+							description: card.description,
+							position: index,
+						})
+					);
+
+					const duplicatedCards = await Promise.all(cardPromises);
+					const validCards = duplicatedCards.filter(
+						(card): card is NonNullable<typeof card> => card !== null
+					);
+
+					// Replace temp column with real one and add cards
+					setBoard((prev) =>
+						prev
+							? {
+									...prev,
+									columns: prev.columns.map((col) =>
+										col.id === tempColumn.id
+											? { ...newColumn, cards: validCards }
+											: col
+									),
+								}
+							: null
+					);
+				} else {
+					throw new Error("Failed to duplicate column");
+				}
+			}, `duplicate-column-${tempColumn.id}`);
+		} catch (error) {
+			// Revert on error
+			setBoard((prev) =>
+				prev
+					? {
+							...prev,
+							columns: prev.columns.filter((col) => col.id !== tempColumn.id),
+						}
+					: null
+			);
+			toast.error("Failed to duplicate column");
+		}
+	};
+
 	if (loading) {
 		return (
 			<div className="flex items-center justify-center h-64">
@@ -566,8 +902,8 @@ export default function KanbanBoard({
 
 	return (
 		<div className={className}>
-			<ScrollArea className="w-full">
-				<div className="flex gap-4 p-4 pb-6">
+			<ScrollArea className="w-full" data-testid="board-scroll-container">
+				<div className="flex gap-4 p-4 pb-6 items-start">
 					{board.columns.map((column, index) => (
 						<KanbanColumn
 							key={column.id}
@@ -575,9 +911,11 @@ export default function KanbanBoard({
 							index={index}
 							onUpdateColumn={handleUpdateColumn}
 							onDeleteColumn={handleDeleteColumn}
+							onDuplicateColumn={handleDuplicateColumn}
 							onCreateCard={handleCreateCard}
 							onUpdateCard={handleUpdateCard}
 							onDeleteCard={handleDeleteCard}
+							onDuplicateCard={handleDuplicateCard}
 						/>
 					))}
 
@@ -586,7 +924,7 @@ export default function KanbanBoard({
 						<Button
 							variant="ghost"
 							onClick={handleCreateColumn}
-							className="h-auto min-h-[200px] w-[280px] border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 flex-col gap-2 text-muted-foreground hover:text-foreground bg-muted/5 hover:bg-muted/10"
+							className="h-auto min-h-[80px] w-[280px] border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 flex-col gap-2 text-muted-foreground hover:text-foreground bg-muted/5 hover:bg-muted/10"
 						>
 							<Plus className="h-5 w-5" />
 							<span className="text-sm font-medium">Add Column</span>

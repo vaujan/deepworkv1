@@ -1,0 +1,87 @@
+# Cursor Rules for Web Animations
+
+These rules provide a framework for crafting web animations that feel intuitive, performant, and delightful, drawing from animation theory and practical insights.
+
+## Timing Guidelines
+- **Keep Animations Fast**: Most UI animations should last 0.2s to 0.3s. Never exceed 1s unless the animation is illustrative (e.g., a decorative hero animation). Fast animations feel responsive and respect user time.
+- **Micro-Animations**: For subtle feedback (e.g., button hovers), aim for 0.1s to 0.15s to ensure immediacy without feeling rushed.
+- **Orchestration Timing**: When staggering multiple animations (e.g., list items), use delays of 0.05s to 0.1s between elements to create a natural flow without overwhelming the user.
+
+## Easing Rules
+- **Avoid Default CSS Easings**: Built-in easings like `ease-in` or `ease-in-out` often feel robotic. Use `ease-out` or `linear` for most cases, or custom cubic-bezier curves for nuanced motion.
+- **Custom Easing Functions**: Use these tailored easings for specific use cases:
+  - **Breeze**: `cubic-bezier(.55, .085, .68, .53)` – Smooth, natural exits for UI elements like modals.
+  - **Silk**: `cubic-bezier(.52, .062, .64, .21)` – Soft, elegant transitions for hover states.
+  - **Swift**: `cubic-bezier(.86, .04, .67, .24)` – Quick, snappy animations for button clicks.
+  - **Nova**: `cubic-bezier(.73, .065, .82, .08)` – Dynamic, energetic motion for popovers.
+  - **Crisp**: `cubic-bezier(.92, .06, .77, .045)` – Precise, sharp transitions for toggles.
+  - **Glide**: `cubic-bezier(.58, .06, .95, .32)` – Fluid, flowing animations for scrolling effects.
+- **Spring Animations**: For organic motion (e.g., Apple’s Dynamic Island), use spring-based animations with Framer Motion. Set `stiffness: 100-200` and `damping: 10-20` for a balanced, natural bounce.
+
+## Performance Optimization
+- **Animate Performant Properties**: Stick to `transform` (e.g., `translate`, `scale`, `rotate`) and `opacity` to leverage GPU acceleration and avoid reflows/repaints.
+- **Avoid Animating Layout Properties**: Properties like `width`, `height`, `top`, or `left` trigger costly layout recalculations. Use `transform` instead (e.g., `transform: scale(1.1)` instead of `width: 110%`).
+- **Test on Low-End Devices**: Ensure animations remain smooth on devices with limited processing power by keeping keyframes simple and avoiding heavy DOM manipulations.
+
+## User Experience and Accessibility
+- **Purposeful Animations**: Every animation should serve a purpose—guide attention, provide feedback, or clarify state changes. Avoid decorative animations that distract or delay interaction.
+- **Respect User Preferences**: Implement `prefers-reduced-motion` to disable or simplify animations for users with motion sensitivity. Example in CSS:
+  ```css
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+  ```
+- **Orchestration for Clarity**: Coordinate animations to avoid visual overload. For example, stagger list item animations to emphasize hierarchy rather than animating everything simultaneously.
+- **Feedback-Driven Animations**: Use animations to confirm user actions (e.g., a button scales down slightly on click with `transform: scale(0.95)` for 0.1s).
+
+## Tool-Specific Guidelines
+- **CSS Animations**:
+  - Use `@keyframes` for complex sequences and `transition` for simple state changes.
+  - Example: Smooth hover effect for a button:
+    ```css
+    .button {
+      transition: transform 0.2s cubic-bezier(.58, .06, .95, .32);
+    }
+    .button:hover {
+      transform: scale(1.05);
+    }
+    ```
+  - Combine transforms for richer effects (e.g., `transform: translateY(-2px) scale(1.05)`).
+- **Framer Motion (React)**:
+  - Leverage `motion` components for declarative animations. Example: Fade-in animation:
+    ```jsx
+    import { motion } from 'framer-motion';
+
+    const Component = () => (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: [0.55, 0.085, 0.68, 0.53] }}
+      >
+        Content
+      </motion.div>
+    );
+    ```
+  - Use `useMeasure` for dynamic resizing (e.g., auto-height animations for accordions).
+  - For spring animations, configure `type: 'spring'` with appropriate `stiffness` and `damping`.
+- **Prototyping for Designers**: If using Figma or similar tools, replicate these easings and timings to ensure prototypes align with coded animations.
+
+## Developing Taste
+- **Study High-Quality Examples**: Analyze animations from top-tier UI designs (e.g., Apple, Vercel, Linear). Notice how they use subtle easing and timing to create a polished feel.
+- **Iterate and Reflect**: When crafting an animation, ask: Does the easing match the context? Is the duration intuitive? Record your reasoning to refine your decision-making.
+- **Seek Feedback**: Share animations in communities (e.g., Discord groups) to gain insights on what feels "off" and how to improve.
+
+## Additional Insights from reactiive.io
+- **Anticipation and Follow-Through**: Borrow from traditional animation principles (e.g., Disney’s 12 principles). Add slight anticipation (e.g., a button dipping slightly before popping up) to make movements feel alive.
+- **Contextual Animations**: Tailor animations to the component’s purpose. A modal might slide in with a gentle `ease-out`, while a notification toast might use a quicker `ease-in-out` to grab attention briefly.
+- **Avoid Over-Animation**: As noted in "Why Your Animations Feel Wrong," excessive motion or mismatched easings (e.g., using `ease-in` for exits) can make animations feel jarring. Test animations in context to ensure they enhance, not hinder, UX.
+
+## Resources
+- **Curated Examples**: Study animations from open-source libraries like Sonner or Vaul for practical inspiration.
+- **Community**: Join animation-focused communities (e.g., Discord) to share work and learn from others.
+- **Tools**: Use Framer Motion’s dev tools or Chrome’s animation inspector to debug and fine-tune animations.
+
+By following these rules, you’ll create animations that are fast, purposeful, and delightful, transforming static interfaces into engaging experiences.

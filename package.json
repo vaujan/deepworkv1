@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"@atlaskit/pragmatic-drag-and-drop": "^1.7.4",
+		"@atlaskit/pragmatic-drag-and-drop-auto-scroll": "^2.1.1",
 		"@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.1.0",
 		"@atlaskit/pragmatic-drag-and-drop-react-drop-indicator": "^3.2.1",
 		"@nivo/calendar": "^0.99.0",
@@ -32,6 +33,7 @@
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"cobe": "^0.6.4",
+		"framer-motion": "^12.23.12",
 		"lucide-react": "^0.511.0",
 		"motion": "^12.16.0",
 		"next": "15.3.3",
