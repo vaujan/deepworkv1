@@ -12,10 +12,7 @@ import {
 	MoreHorizontal,
 	Edit3,
 	Trash,
-	Check,
-	X,
 	Copy,
-	Archive,
 	Files,
 } from "lucide-react";
 import { KanbanCardProps } from "./types";
@@ -48,7 +45,7 @@ export default function KanbanCard({
 	const [isHovered, setIsHovered] = useState(false);
 	const [isDraggedOver, setIsDraggedOver] = useState(false);
 	const [isDragging, setIsDragging] = useState(false);
-	const [closestEdge, setClosestEdge] = useState<"top" | "bottom" | null>(null);
+	const [, setClosestEdge] = useState<"top" | "bottom" | null>(null);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 
 	const cardRef = useRef<HTMLDivElement>(null);

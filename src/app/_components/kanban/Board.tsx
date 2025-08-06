@@ -385,7 +385,7 @@ export default function KanbanBoard({
 			...board,
 			columns: [
 				...board.columns,
-				{ ...tempColumn, cards: [], isNewColumn: true } as any,
+				{ ...tempColumn, cards: [], isNewColumn: true } as KanbanBoardWithData["columns"][0] & { isNewColumn: boolean },
 			],
 		});
 
@@ -406,7 +406,7 @@ export default function KanbanBoard({
 									...prev,
 									columns: prev.columns.map((col) =>
 										col.id === tempColumn.id
-											? ({ ...newColumn, cards: [], isNewColumn: true } as any)
+											? ({ ...newColumn, cards: [], isNewColumn: true } as KanbanBoardWithData["columns"][0] & { isNewColumn: boolean })
 											: col
 									),
 								}

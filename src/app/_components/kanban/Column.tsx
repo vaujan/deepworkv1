@@ -60,7 +60,7 @@ const ColumnContainer = React.memo(function ColumnContainer({
 
 	// Auto-edit mode for new columns
 	useEffect(() => {
-		if ((column as any).isNewColumn && !editMode) {
+		if ((column as { isNewColumn?: boolean }).isNewColumn && !editMode) {
 			setEditMode(true);
 		}
 	}, [column]);
