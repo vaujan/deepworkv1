@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
 	DropdownMenu,
 	DropdownMenuTrigger,
@@ -57,13 +56,6 @@ const ColumnContainer = React.memo(function ColumnContainer({
 			inputRef.current.select();
 		}
 	}, [editMode]);
-
-	// Auto-edit mode for new columns
-	useEffect(() => {
-		if ((column as { isNewColumn?: boolean }).isNewColumn && !editMode) {
-			setEditMode(true);
-		}
-	}, [column]);
 
 	useEffect(() => {
 		const element = columnRef.current;
@@ -132,25 +124,20 @@ const ColumnContainer = React.memo(function ColumnContainer({
 		let cleanupAutoScroll: (() => void) | undefined;
 
 		const setupColumnAutoScroll = () => {
-			// Try multiple selectors to find the scrollable element within this column
-			const selectors = [
-				'[data-testid="column-scroll-area"] [data-radix-scroll-area-viewport]',
-				'[data-testid="column-scroll-area"]',
-			];
-
-			for (const selector of selectors) {
-				const scrollElement = element.querySelector(selector) as HTMLElement;
-				if (scrollElement) {
-					return autoScrollForElements({
-						element: scrollElement,
-						canScroll: ({ source }) => source.data.type === "card",
-						getConfiguration: () => ({
-							maxScrollSpeed: "fast",
-							startScrollingThreshold: 200,
-							maxScrollSpeedAt: 100,
-						}),
-					});
-				}
+			// Find the scrollable element within this column
+			const scrollElement = element.querySelector(
+				'[data-testid="column-scroll-area"]'
+			) as HTMLElement;
+			if (scrollElement) {
+				return autoScrollForElements({
+					element: scrollElement,
+					canScroll: ({ source }) => source.data.type === "card",
+					getConfiguration: () => ({
+						maxScrollSpeed: "fast",
+						startScrollingThreshold: 200,
+						maxScrollSpeedAt: 100,
+					}),
+				});
 			}
 			return undefined;
 		};
@@ -287,7 +274,7 @@ const ColumnContainer = React.memo(function ColumnContainer({
 	return (
 		<div
 			ref={columnRef}
-			className={`relative overflow-hidden flex flex-col min-w-[300px] w-[300px] max-h-[80vh] rounded-xl border ${
+			className={`relative overflow-hidden flex  flex-col min-w-[300px] w-[300px] max-h-[80vh] rounded-xl ${
 				isDraggedOver
 					? "border-accent/50 bg-accent/5 shadow-sm"
 					: "border-border/50"
@@ -296,7 +283,7 @@ const ColumnContainer = React.memo(function ColumnContainer({
 			{/* Column Header */}
 			<div
 				ref={headerRef}
-				className="flex justify-between items-center p-3 hover:bg-card/80 transition-colors cursor-grab active:cursor-grabbing"
+				className="flex justify-between items-center p-3 hover:bg-card/80 transition-colors cursor-grab active:cursor-grabbing flex-shrink-0"
 			>
 				<div className="flex items-center gap-2 flex-1">
 					{/* Column Name */}
@@ -364,31 +351,29 @@ const ColumnContainer = React.memo(function ColumnContainer({
 				</div>
 			</div>
 
-			{/* Cards Area */}
-			{column.cards.length > 0 && (
-				<div className="flex-1 overflow-hidden">
-					<ScrollArea className="max-h-[60vh]" data-testid="column-scroll-area">
-						<div className="p-2 space-y-2">
-							{column.cards.map((card, cardIndex) => (
-								<KanbanCard
-									key={card.id}
-									card={card}
-									onUpdate={onUpdateCard}
-									onDelete={onDeleteCard}
-									onDuplicate={onDuplicateCard}
-									index={cardIndex}
-									columnId={column.id}
-								/>
-							))}
-						</div>
-					</ScrollArea>
+			<div className="min-h-0 overflow-hidden">
+				<div
+					className="h-fit max-h-[750px] overflow-y-auto kanban-scrollbar"
+					data-testid="column-scroll-area"
+				>
+					<div className="p-2 space-y-2">
+						{column.cards.map((card, cardIndex) => (
+							<KanbanCard
+								key={card.id}
+								card={card}
+								onUpdate={onUpdateCard}
+								onDelete={onDeleteCard}
+								onDuplicate={onDuplicateCard}
+								index={cardIndex}
+								columnId={column.id}
+							/>
+						))}
+					</div>
 				</div>
-			)}
+			</div>
 
 			{/* Add Card Section */}
-			<div
-				className={`flex-shrink-0 p-2 bg-card ${column.cards.length > 0 ? "border-t border-border/20" : ""}`}
-			>
+			<div className="flex-shrink-0 p-2 ">
 				{showAddCard ? (
 					<div className="space-y-2">
 						<Input
@@ -397,7 +382,7 @@ const ColumnContainer = React.memo(function ColumnContainer({
 							onKeyDown={handleKeyPress}
 							placeholder="Enter card title..."
 							autoFocus
-							className="text-sm mt-2"
+							className="text-sm"
 							onBlur={() => {
 								if (!newCardTitle.trim()) {
 									setShowAddCard(false);

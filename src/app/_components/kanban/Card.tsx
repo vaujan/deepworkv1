@@ -8,13 +8,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import {
-	MoreHorizontal,
-	Edit3,
-	Trash,
-	Copy,
-	Files,
-} from "lucide-react";
+import { MoreHorizontal, Edit3, Trash, Copy, Files } from "lucide-react";
 import { KanbanCardProps } from "./types";
 import {
 	draggable,
