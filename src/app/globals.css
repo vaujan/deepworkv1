@@ -279,4 +279,28 @@
 	input[type="number"] {
 		-moz-appearance: textfield;
 	}
+
+	/* Custom scrollbar styles to match ScrollArea component */
+	.kanban-scrollbar::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	.kanban-scrollbar::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	.kanban-scrollbar::-webkit-scrollbar-thumb {
+		background: hsl(var(--border));
+		border-radius: 4px;
+	}
+
+	.kanban-scrollbar::-webkit-scrollbar-thumb:hover {
+		background: hsl(var(--muted-foreground));
+	}
+
+	/* Firefox scrollbar styles */
+	.kanban-scrollbar {
+		scrollbar-width: thin;
+		scrollbar-color: hsl(var(--border)) transparent;
+	}
 }
