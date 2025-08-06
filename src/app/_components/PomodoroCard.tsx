@@ -39,7 +39,7 @@ export default function PomodoroCard() {
 
 	return (
 		<Tabs
-			className="w-full max-w-[372px] p-3 border-border border rounded-xl"
+			className="w-full md:max-w-[372px] p-3 border-border border rounded-xl"
 			value={activeTimer}
 			defaultValue="focus"
 		>
@@ -75,7 +75,7 @@ export default function PomodoroCard() {
 					<PomodoroCardPopoverSettings />
 				</Popover>
 			</div>
-			<Card className="rounded-none  bg-transparent border-0 shadow-none p-0">
+			<Card className="rounded-none bg-transparent border-0 shadow-none p-0">
 				{tabs.map((tab) => (
 					<TabsContent value={tab.value} key={tab.id}>
 						{tab.component}

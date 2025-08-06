@@ -10,18 +10,18 @@ import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { PolarGrid, RadialBar, RadialBarChart } from "recharts";
 
 const chartConfig = {
-	minutes: {
-		label: "Minutes",
-	},
-	rest: {
-		label: "Rest",
+	progress: {
+		label: "Progress",
 		color: "var(--chart-2)",
 	},
 } satisfies ChartConfig;
 
 export default function PomodoroCardRest() {
+	const [timerProgress, setTimerProgress] = React.useState(0);
+
 	const {
 		restTime,
+		initialRestTime,
 		restMode,
 		startRestTimer,
 		pauseRestTimer,
@@ -63,88 +63,108 @@ export default function PomodoroCardRest() {
 		if (restMode === "idle" && restTime > 0) {
 			return (
 				<>
-					<Play /> Start rest
+					<Play className="size-4" /> Start Rest
 				</>
 			);
 		} else if (restMode === "running" && restTime > 0) {
 			return (
 				<>
-					<Pause /> Pause
+					<Pause className="size-4" /> Pause
 				</>
 			);
 		} else {
 			return (
 				<>
-					<Play /> Resume rest
+					<Play className="size-4" /> Resume Rest
 				</>
 			);
 		}
 	};
 
+	// Calculate progress percentage (0% to 100%)
+	// Progress increases as time passes (starts at 0%, ends at 100%)
+	const progress = ((initialRestTime - restTime) / initialRestTime) * 100;
+
+	// Chart data for RadialBar - shows progress from 0 to 100
 	const chartData = [
-		{ month: "rest", minutes: restTime, fill: "var(--color-rest)" },
+		{
+			name: "progress",
+			value: progress, // Use actual progress value
+			fill: "var(--chart-2)", // Rest color for progress
+		},
 	];
+
+	// Format time display
+	const minutes = Math.floor(restTime / 60);
+	const seconds = restTime % 60;
+	const timeDisplay = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+
+	React.useEffect(() => {});
 
 	return (
 		<>
-			<CardContent className="flex-1 flex items-center justify-center py-8">
-				<div className="relative w-full max-w-[250px] aspect-square mx-auto">
-					<ChartContainer config={chartConfig} className="absolute inset-0">
+			<CardContent className="flex-1 py-4 flex items-center justify-center min-h-[300px]">
+				<div className="relative w-full min-w-[250px] flex flex-col items-center justify-center aspect-square">
+					{/* Shadcn RadialBar Chart */}
+					<ChartContainer
+						config={chartConfig}
+						className="absolute w-full h-full"
+					>
 						<RadialBarChart
 							data={chartData}
+							innerRadius="80%"
+							outerRadius="100%"
 							startAngle={90}
 							endAngle={-270}
-							innerRadius="70%"
-							outerRadius="100%"
-							barSize={20}
+							barSize={6}
 						>
-							<PolarGrid
-								gridType="polygon"
-								radialLines={false}
-								stroke="none"
-								className="first:fill-muted last:fill-background"
+							<PolarGrid stroke="hsl(var(--border))" strokeWidth={1} />
+							<RadialBar
+								dataKey="value"
+								cornerRadius={6}
+								background
+								fill="hsl(var(--primary))"
 							/>
-							<RadialBar dataKey="minutes" background cornerRadius={10} />
 						</RadialBarChart>
 					</ChartContainer>
-					<div
-						className="absolute inset-0 flex flex-col items-center justify-center"
-						aria-hidden="true"
-					>
+
+					{/* Center content overlay */}
+					<div className="flex flex-col  items-center justify-center pointer-events-none">
 						<div className="text-center">
-							<div className="text-2xl font-bold tabular-nums tracking-tighter text-foreground">
-								{formatTime(restTime)}
+							<div className="text-4xl font-semibold tabular-nums tracking-tighter text-white mb-2">
+								{timeDisplay}
 							</div>
-							<div className="text-sm font-medium uppercase text-muted-foreground mt-1">
-								{restMode === "paused" ? "Paused" : "Rest"}
+							<div className="text-sm font-semibold uppercase text-gray-400 tracking-wide">
+								MINUTES
 							</div>
 						</div>
 					</div>
 				</div>
 			</CardContent>
-			<CardFooter className="flex gap-3 justify-center items-center p-0">
-				<Button
-					className={`${restMode === "paused" ? "" : "hidden"} `}
-					size={"lg"}
-					variant={"ghostDestructive"}
-					onClick={resetRestTimer}
-				>
-					<TimerReset /> Reset
-				</Button>
-				<Button
-					className={` ${restMode === "running" ? "text" : "text-primary"}`}
-					size={"lg"}
-					variant={
-						restMode === "idle"
-							? "secondary"
-							: restMode === "running"
-								? "secondary"
-								: "outline"
-					}
-					onClick={handleClick}
-				>
-					{buttonLabel()}
-				</Button>
+
+			{/* Mobile Action Button */}
+			<CardFooter className="flex p-0 gap-3 justify-center items-center">
+				<div className="flex w-full gap-3">
+					{restMode === "paused" && (
+						<Button
+							variant={"ghostDestructive"}
+							onClick={resetRestTimer}
+							className="w-fit"
+							size={"xl"}
+						>
+							<TimerReset className="size-4" /> Reset
+						</Button>
+					)}
+
+					<Button
+						size={"xl"}
+						className={`flex flex-1 ${restMode === "running" ? "bg-transparent" : ""}`}
+						variant="secondary"
+						onClick={handleClick}
+					>
+						{buttonLabel()}
+					</Button>
+				</div>
 			</CardFooter>
 		</>
 	);

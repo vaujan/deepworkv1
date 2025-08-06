@@ -74,7 +74,7 @@ export default function PomodoroCardPopoverSettings() {
 					<span className="text-center text-muted-foreground">
 						Focus minutes
 					</span>
-					<div className="flex overflow-hidden justify-between items-center h-16 rounded-lg transition-all ease-out border-1 border-border">
+					<div className="flex overflow-hidden justify-between items-center h-16 rounded-lg transition-all ease-out">
 						<Button
 							className="h-full "
 							variant={"outline"}
@@ -103,7 +103,7 @@ export default function PomodoroCardPopoverSettings() {
 					<span className="text-center text-muted-foreground">
 						Rest minutes
 					</span>
-					<div className="flex overflow-hidden justify-between items-center h-16 rounded-lg transition-all ease-out border-1 border-border">
+					<div className="flex overflow-hidden justify-between items-center h-16 rounded-lg transition-all ease-out">
 						<Button
 							className="h-full"
 							variant={"outline"}

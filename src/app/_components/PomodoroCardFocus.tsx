@@ -17,6 +17,8 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function PomodoroCardFocus() {
+	const [timerProgress, setTimerProgress] = React.useState(0);
+
 	const {
 		focusTime,
 		initialFocusTime,
@@ -86,37 +88,33 @@ export default function PomodoroCardFocus() {
 		{
 			name: "progress",
 			value: progress, // Use actual progress value
-			fill: "hsl(var(--primary))",
+			fill: "var(--chart-1)", // Blue color for progress
 		},
 	];
-
-	// Debug logging
-	console.log("Timer Debug:", {
-		initialFocusTime,
-		focusTime,
-		progress,
-		chartValue: chartData[0].value,
-		focusMode,
-	});
 
 	// Format time display
 	const minutes = Math.floor(focusTime / 60);
 	const seconds = focusTime % 60;
 	const timeDisplay = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
+	React.useEffect(() => {});
+
 	return (
 		<>
-			<CardContent className="flex-1 flex items-center justify-center py-12 px-4">
-				<div className="relative w-full max-w-[280px] aspect-square mx-auto">
+			<CardContent className="flex-1 py-4 flex items-center justify-center min-h-[300px]">
+				<div className="relative w-full min-w-[250px] flex flex-col items-center justify-center aspect-square">
 					{/* Shadcn RadialBar Chart */}
-					<ChartContainer config={chartConfig} className="w-full h-full">
+					<ChartContainer
+						config={chartConfig}
+						className="absolute w-full h-full"
+					>
 						<RadialBarChart
 							data={chartData}
-							innerRadius="60%"
-							outerRadius="90%"
-							startAngle={180}
-							endAngle={-180}
-							barSize={16}
+							innerRadius="80%"
+							outerRadius="100%"
+							startAngle={90}
+							endAngle={-270}
+							barSize={6}
 						>
 							<PolarGrid stroke="hsl(var(--border))" strokeWidth={1} />
 							<RadialBar
@@ -129,13 +127,13 @@ export default function PomodoroCardFocus() {
 					</ChartContainer>
 
 					{/* Center content overlay */}
-					<div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+					<div className="flex flex-col  items-center justify-center pointer-events-none">
 						<div className="text-center">
 							<div className="text-4xl font-semibold tabular-nums tracking-tighter text-white mb-2">
 								{timeDisplay}
 							</div>
-							<div className="text-sm font-medium uppercase text-gray-400 tracking-wide">
-								{Math.round(progress)}% Complete
+							<div className="text-sm font-semibold uppercase text-gray-400 tracking-wide">
+								MINUTES
 							</div>
 						</div>
 					</div>
@@ -158,7 +156,7 @@ export default function PomodoroCardFocus() {
 
 					<Button
 						size={"xl"}
-						className="flex rounded- flex-1"
+						className={`flex flex-1 ${focusMode === "running" ? "bg-transparent" : ""}`}
 						variant="secondary"
 						onClick={handleClick}
 					>
