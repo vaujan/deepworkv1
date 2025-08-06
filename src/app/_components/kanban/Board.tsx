@@ -1007,7 +1007,7 @@ export default function KanbanBoard({
 				</div>
 
 				{/* Board Content */}
-				<div className="px-4 pb-4">
+				<div className="px-4 pb-4 min-h-[350px]">
 					<ScrollArea
 						ref={(element) => {
 							boardScrollRef.current = element;
