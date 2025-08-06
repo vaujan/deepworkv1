@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { Pause, Play, TimerReset } from "lucide-react";
 import React from "react";
-import { formatTime } from "@/lib/utils";
+
 import { useTimerStore } from "@/lib/store";
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { PolarGrid, RadialBar, RadialBarChart } from "recharts";
@@ -17,8 +17,6 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function PomodoroCardFocus() {
-	const [timerProgress, setTimerProgress] = React.useState(0);
-
 	const {
 		focusTime,
 		initialFocusTime,
@@ -96,8 +94,6 @@ export default function PomodoroCardFocus() {
 	const minutes = Math.floor(focusTime / 60);
 	const seconds = focusTime % 60;
 	const timeDisplay = `${minutes}:${seconds.toString().padStart(2, "0")}`;
-
-	React.useEffect(() => {});
 
 	return (
 		<>

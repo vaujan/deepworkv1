@@ -10,7 +10,7 @@ import {
 	AlertTriangle,
 } from "lucide-react";
 import { DatabaseService } from "@/lib/database";
-import { KanbanBoardWithData } from "@/lib/types";
+import { KanbanBoardWithData, KanbanColumnWithCards } from "@/lib/types";
 import KanbanColumn from "./Column";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { reorder } from "@atlaskit/pragmatic-drag-and-drop/reorder";
@@ -377,7 +377,7 @@ export default function KanbanBoard({
 		// Update UI immediately
 		setBoard({
 			...board,
-			columns: [...board.columns, { ...tempColumn, cards: [] } as any],
+			columns: [...board.columns, { ...tempColumn, cards: [] } as KanbanColumnWithCards],
 		});
 
 		// Background database operation
@@ -397,7 +397,7 @@ export default function KanbanBoard({
 									...prev,
 									columns: prev.columns.map((col) =>
 										col.id === tempColumn.id
-											? ({ ...newColumn, cards: [] } as any)
+											? ({ ...newColumn, cards: [] } as KanbanColumnWithCards)
 											: col
 									),
 								}
