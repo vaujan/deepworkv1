@@ -75,7 +75,7 @@ export default function PomodoroCard() {
 					<PomodoroCardPopoverSettings />
 				</Popover>
 			</div>
-			<Card className="overflow-hidden rounded-none  bg-transparent border-0 shadow-none p-0">
+			<Card className="rounded-none  bg-transparent border-0 shadow-none p-0">
 				{tabs.map((tab) => (
 					<TabsContent value={tab.value} key={tab.id}>
 						{tab.component}

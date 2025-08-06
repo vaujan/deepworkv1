@@ -10,18 +10,16 @@ import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { PolarGrid, RadialBar, RadialBarChart } from "recharts";
 
 const chartConfig = {
-	minutes: {
-		label: "Minutes",
-	},
-	focus: {
-		label: "Focus",
-		color: "var(--chart-1)",
+	progress: {
+		label: "Progress",
+		color: "hsl(var(--primary))",
 	},
 } satisfies ChartConfig;
 
 export default function PomodoroCardFocus() {
 	const {
 		focusTime,
+		initialFocusTime,
 		focusMode,
 		startFocusTimer,
 		pauseFocusTimer,
@@ -61,92 +59,112 @@ export default function PomodoroCardFocus() {
 		if (focusMode === "idle" && focusTime > 0) {
 			return (
 				<>
-					<Play /> Start session
+					<Play className="size-4" /> Start Session
 				</>
 			);
 		} else if (focusMode === "running" && focusTime > 0) {
 			return (
 				<>
-					<Pause /> Pause
+					<Pause className="size-4" /> Pause
 				</>
 			);
 		} else {
 			return (
 				<>
-					<Play /> Resume session
+					<Play className="size-4" /> Resume Session
 				</>
 			);
 		}
 	};
 
+	// Calculate progress percentage (0% to 100%)
+	// Progress increases as time passes (starts at 0%, ends at 100%)
+	const progress = ((initialFocusTime - focusTime) / initialFocusTime) * 100;
+
+	// Chart data for RadialBar - shows progress from 0 to 100
 	const chartData = [
-		{ month: "focus", minutes: focusTime, fill: "var(--color-focus)" },
+		{
+			name: "progress",
+			value: progress, // Use actual progress value
+			fill: "hsl(var(--primary))",
+		},
 	];
+
+	// Debug logging
+	console.log("Timer Debug:", {
+		initialFocusTime,
+		focusTime,
+		progress,
+		chartValue: chartData[0].value,
+		focusMode,
+	});
+
+	// Format time display
+	const minutes = Math.floor(focusTime / 60);
+	const seconds = focusTime % 60;
+	const timeDisplay = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
 	return (
 		<>
-			<CardContent className="flex-1 flex items-center justify-center py-8">
-				<div className="relative w-full max-w-[250px] aspect-square mx-auto">
-					<ChartContainer
-						config={chartConfig}
-						className="absolute w-full h-full"
-					>
+			<CardContent className="flex-1 flex items-center justify-center py-12 px-4">
+				<div className="relative w-full max-w-[280px] aspect-square mx-auto">
+					{/* Shadcn RadialBar Chart */}
+					<ChartContainer config={chartConfig} className="w-full h-full">
 						<RadialBarChart
 							data={chartData}
+							innerRadius="60%"
+							outerRadius="90%"
 							startAngle={180}
-							endAngle={0}
-							innerRadius="70%"
-							outerRadius="100%"
-							barSize={10}
+							endAngle={-180}
+							barSize={16}
 						>
-							<PolarGrid
-								gridType="circle"
-								radialLines={false}
-								stroke="none"
-								className="first:fill-muted last:fill-background"
+							<PolarGrid stroke="hsl(var(--border))" strokeWidth={1} />
+							<RadialBar
+								dataKey="value"
+								cornerRadius={6}
+								background
+								fill="hsl(var(--primary))"
 							/>
-							<RadialBar dataKey="minutes" background cornerRadius={10} />
 						</RadialBarChart>
 					</ChartContainer>
-					<div
-						className="absolute inset-0 flex flex-col items-center justify-center"
-						aria-hidden="true"
-					>
+
+					{/* Center content overlay */}
+					<div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
 						<div className="text-center">
-							<div className="text-5xl font-bold tabular-nums tracking-tighter text-foreground">
-								{formatTime(focusTime)}
+							<div className="text-4xl font-semibold tabular-nums tracking-tighter text-white mb-2">
+								{timeDisplay}
 							</div>
-							<div className="text-sm font-medium uppercase text-muted-foreground mt-1">
-								{focusMode === "paused" ? "Paused" : "Focus"}
+							<div className="text-sm font-medium uppercase text-gray-400 tracking-wide">
+								{Math.round(progress)}% Complete
 							</div>
 						</div>
 					</div>
 				</div>
 			</CardContent>
-			<CardFooter className="flex gap-3 justify-center items-center p-0 shadow-none">
-				<Button
-					className={`${focusMode === "paused" ? "" : "hidden"} `}
-					size={"lg"}
-					variant={"outlineDestructive"}
-					onClick={resetFocusTimer}
-				>
-					<TimerReset /> Reset
-				</Button>
 
-				<Button
-					size={"lg"}
-					className={`${focusMode === "paused" ? "text-primary" : ""}`}
-					variant={
-						focusMode === "idle"
-							? "default"
-							: focusMode === "running"
-								? "secondary"
-								: "outline"
-					}
-					onClick={handleClick}
-				>
-					{buttonLabel()}
-				</Button>
+			{/* Mobile Action Button */}
+			<CardFooter className="flex p-0 gap-3 justify-center items-center">
+				<div className="flex w-full gap-3">
+					{focusMode === "paused" && (
+						<Button
+							variant={"ghostDestructive"}
+							onClick={resetFocusTimer}
+							className="w-fit"
+							size={"xl"}
+						>
+							<TimerReset className="size-4" /> Reset
+						</Button>
+					)}
+
+					<Button
+						size={"xl"}
+						className="flex rounded- flex-1"
+						variant="secondary"
+						onClick={handleClick}
+					>
+						{buttonLabel()}
+					</Button>
+				</div>
 			</CardFooter>
 		</>
 	);
