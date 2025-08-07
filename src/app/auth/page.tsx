@@ -33,7 +33,7 @@ export default function Login() {
 				email: userEmail,
 				options: {
 					// redirect user to dedicated on boarding page
-					emailRedirectTo: `${window.location.origin}/start`,
+					emailRedirectTo: `${window.location.origin}/workspace`,
 				},
 			});
 
@@ -57,7 +57,7 @@ export default function Login() {
 		const { error } = await supabase.auth.signInWithOAuth({
 			provider: "google",
 			options: {
-				redirectTo: `${window.location.origin}/start`,
+				redirectTo: `${window.location.origin}/workspace`,
 			},
 		});
 
