@@ -10,6 +10,7 @@ import { DatabaseService } from "@/lib/database";
 import { Workspace } from "@/lib/types";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import ActiveMinutesMonospaceChart from "@/app/_components/ActiveMinutesMonospaceChart";
 
 export default function WorkspacePage() {
 	const params = useParams();
@@ -89,8 +90,16 @@ export default function WorkspacePage() {
 			</div>
 
 			<section className="flex flex-col gap-8 px-8">
-				<div className="flex flex-col md:flex-row gap-12">
-					<PomodoroCard />
+				<div className="flex gap-8 items-start">
+					<div className="shrink-0">
+						<PomodoroCard />
+					</div>
+					<div className="min-w-0 flex-1">
+						<ActiveMinutesMonospaceChart />
+					</div>
+				</div>
+
+				<div className="flex flex-col gap-12">
 					<Heatmap />
 				</div>
 

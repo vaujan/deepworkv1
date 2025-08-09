@@ -13,14 +13,8 @@ import PomodoroCardPopoverSettings from "./PomodoroCardPopoverSettings";
 import { TimerType } from "@/lib/store";
 
 export default function PomodoroCard() {
-	const {
-		focusMode,
-		restMode,
-		activeTimer,
-		setActiveTimer,
-		switchToFocus,
-		switchToRest,
-	} = useTimerStore();
+	const { focusMode, restMode, activeTimer, switchToFocus, switchToRest } =
+		useTimerStore();
 
 	interface TabState {
 		title: string;
