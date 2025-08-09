@@ -30,7 +30,7 @@ import {
 	DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-export default function KanbanBoard({
+function InnerKanbanBoard({
 	className,
 	workspaceId,
 }: {
@@ -377,7 +377,10 @@ export default function KanbanBoard({
 		// Update UI immediately
 		setBoard({
 			...board,
-			columns: [...board.columns, { ...tempColumn, cards: [] } as KanbanColumnWithCards],
+			columns: [
+				...board.columns,
+				{ ...tempColumn, cards: [] } as KanbanColumnWithCards,
+			],
 		});
 
 		// Background database operation
@@ -1116,4 +1119,11 @@ export default function KanbanBoard({
 			</div>
 		</div>
 	);
+}
+
+export default function KanbanBoard(props: {
+	className?: string;
+	workspaceId: string;
+}) {
+	return <InnerKanbanBoard {...props} />;
 }

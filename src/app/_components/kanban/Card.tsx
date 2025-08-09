@@ -39,7 +39,7 @@ export default function KanbanCard({
 	const [isHovered, setIsHovered] = useState(false);
 	const [isDraggedOver, setIsDraggedOver] = useState(false);
 	const [isDragging, setIsDragging] = useState(false);
-	const [, setClosestEdge] = useState<"top" | "bottom" | null>(null);
+	const [closestEdge, setClosestEdge] = useState<"top" | "bottom" | null>(null);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 
 	const cardRef = useRef<HTMLDivElement>(null);
@@ -262,15 +262,28 @@ export default function KanbanCard({
 			ref={cardRef}
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
-			className={`relative p-2 w-full rounded-lg border cursor-grab active:cursor-grabbing transition-all duration-200 ${
+			className={`relative p-2 w-full rounded-lg border cursor-grab active:cursor-grabbing ${
 				isDraggedOver
 					? "border-accent/50 bg-accent/5 shadow-sm"
 					: "border-border hover:border-accent/50 bg-card hover:bg-card/80 hover:shadow-sm"
-			} ${isEditing ? "ring-2 ring-primary/50 cursor-default" : ""} group`}
+			} ${isEditing ? "ring-2 ring-primary/50 cursor-default" : "select-none"} group`}
 			role="button"
 			tabIndex={0}
 			aria-label={`Card: ${card.title}`}
 		>
+			{/* Drop indicators for card reordering */}
+			{isDraggedOver && closestEdge === "top" && (
+				<div className="absolute left-2 right-2 -top-[2px] h-[2px] bg-accent pointer-events-none">
+					<div className="absolute -left-1 -top-1 w-2 h-2 bg-accent rounded-full" />
+					<div className="absolute -right-1 -top-1 w-2 h-2 bg-accent rounded-full" />
+				</div>
+			)}
+			{isDraggedOver && closestEdge === "bottom" && (
+				<div className="absolute left-2 right-2 -bottom-[2px] h-[2px] bg-accent pointer-events-none">
+					<div className="absolute -left-1 -bottom-1 w-2 h-2 bg-accent rounded-full" />
+					<div className="absolute -right-1 -bottom-1 w-2 h-2 bg-accent rounded-full" />
+				</div>
+			)}
 			{isEditing ? (
 				<div ref={editingContainerRef} className="space-y-3">
 					<Textarea
@@ -295,13 +308,13 @@ export default function KanbanCard({
 				<>
 					<div className="flex justify-between w-full">
 						<div
-							className="flex-1 cursor-text"
+							className="flex-1 cursor-pointer"
 							onClick={(e) => {
 								e.stopPropagation();
 								setIsEditing(true);
 							}}
 						>
-							<span className="font-medium text-sm text-foreground leading-snug break-words whitespace-pre-wrap">
+							<span className="text-sm text-foreground leading-snug break-words whitespace-pre-wrap">
 								{card.title}
 							</span>
 						</div>

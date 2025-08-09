@@ -356,7 +356,7 @@ const ColumnContainer = React.memo(function ColumnContainer({
 					className="h-fit max-h-[750px] overflow-y-auto kanban-scrollbar"
 					data-testid="column-scroll-area"
 				>
-					<div className="p-2 space-y-2">
+					<div className="p-2 min-h-1rem space-y-2">
 						{column.cards.map((card, cardIndex) => (
 							<KanbanCard
 								key={card.id}

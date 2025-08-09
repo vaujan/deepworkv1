@@ -13,7 +13,8 @@ import PomodoroCardPopoverSettings from "./PomodoroCardPopoverSettings";
 import { TimerType } from "@/lib/store";
 
 export default function PomodoroCard() {
-	const { focusMode, restMode, activeTimer, setActiveTimer } = useTimerStore();
+	const { focusMode, restMode, activeTimer, switchToFocus, switchToRest } =
+		useTimerStore();
 
 	interface TabState {
 		title: string;
@@ -50,7 +51,13 @@ export default function PomodoroCard() {
 							disabled={restMode !== "idle" || focusMode !== "idle"}
 							key={tab.id}
 							value={tab.value}
-							onClick={() => setActiveTimer(tab.value)}
+							onClick={() => {
+								if (tab.value === "focus") {
+									switchToFocus();
+								} else {
+									switchToRest();
+								}
+							}}
 							className="border-0 h-10"
 						>
 							{tab.title}
