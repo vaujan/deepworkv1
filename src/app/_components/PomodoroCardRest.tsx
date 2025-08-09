@@ -7,7 +7,7 @@ import { useTimerStore } from "@/lib/store";
 import { Pause, Play, TimerReset } from "lucide-react";
 
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
-import { PolarGrid, RadialBar, RadialBarChart } from "recharts";
+import { PolarAngleAxis, PolarGrid, RadialBar, RadialBarChart } from "recharts";
 
 const chartConfig = {
 	progress: {
@@ -17,7 +17,6 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function PomodoroCardRest() {
-
 	const {
 		restTime,
 		initialRestTime,
@@ -80,9 +79,12 @@ export default function PomodoroCardRest() {
 		}
 	};
 
-	// Calculate progress percentage (0% to 100%)
-	// Progress increases as time passes (starts at 0%, ends at 100%)
-	const progress = ((initialRestTime - restTime) / initialRestTime) * 100;
+	// Calculate progress percentage and clamp to [0, 100]
+	const progressRaw =
+		initialRestTime > 0
+			? ((initialRestTime - restTime) / initialRestTime) * 100
+			: 0;
+	const progress = Math.max(0, Math.min(100, progressRaw));
 
 	// Chart data for RadialBar - shows progress from 0 to 100
 	const chartData = [
@@ -98,7 +100,8 @@ export default function PomodoroCardRest() {
 	const seconds = restTime % 60;
 	const timeDisplay = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
-
+	const isRunning = restMode === "running";
+	const isUnderMinute = restTime < 60;
 
 	return (
 		<>
@@ -117,6 +120,12 @@ export default function PomodoroCardRest() {
 							endAngle={-270}
 							barSize={6}
 						>
+							<PolarAngleAxis
+								type="number"
+								domain={[0, 100]}
+								tick={false}
+								dataKey="value"
+							/>
 							<PolarGrid stroke="hsl(var(--border))" strokeWidth={1} />
 							<RadialBar
 								dataKey="value"
@@ -131,11 +140,13 @@ export default function PomodoroCardRest() {
 					<div className="flex flex-col  items-center justify-center pointer-events-none">
 						<div className="text-center">
 							<div className="text-4xl font-semibold tabular-nums tracking-tighter text-white mb-2">
-								{timeDisplay}
+								{isRunning ? timeDisplay : isUnderMinute ? seconds : minutes}
 							</div>
-							<div className="text-sm font-semibold uppercase text-gray-400 tracking-wide">
-								MINUTES
-							</div>
+							{!isRunning && (
+								<div className="text-sm font-semibold uppercase text-gray-400 tracking-wide">
+									{isUnderMinute ? "SECONDS" : "MINUTES"}
+								</div>
+							)}
 						</div>
 					</div>
 				</div>
