@@ -99,9 +99,9 @@ export default function WorkspacePage() {
 					</div>
 				</div>
 
-				<div className="flex flex-col gap-12">
+				{/* <div className="flex flex-col gap-12">
 					<Heatmap />
-				</div>
+				</div> */}
 
 				<div className="w-full">
 					<KanbanBoard workspaceId={workspaceId} />
