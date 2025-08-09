@@ -280,27 +280,45 @@
 		-moz-appearance: textfield;
 	}
 
-	/* Custom scrollbar styles to match ScrollArea component */
+	/* Minimalist scrollbar inspired by shadcn/ui ScrollArea */
+	/* Hidden by default; appears on hover */
 	.kanban-scrollbar::-webkit-scrollbar {
-		width: 8px;
+		width: 0;
+		height: 0;
+	}
+
+	.kanban-scrollbar:hover::-webkit-scrollbar {
+		width: 8px; /* thin */
+		height: 8px;
 	}
 
 	.kanban-scrollbar::-webkit-scrollbar-track {
-		background: transparent;
+		background: transparent; /* no visual track */
 	}
 
 	.kanban-scrollbar::-webkit-scrollbar-thumb {
-		background: hsl(var(--border));
-		border-radius: 4px;
+		background-color: hsl(var(--border)); /* subtle */
+		border-radius: 9999px; /* pill */
+		border: 2px solid transparent; /* inner padding */
+		background-clip: content-box; /* keep padding visible */
 	}
 
-	.kanban-scrollbar::-webkit-scrollbar-thumb:hover {
-		background: hsl(var(--muted-foreground));
+	.kanban-scrollbar:hover::-webkit-scrollbar-thumb {
+		background-color: hsl(
+			var(--muted-foreground)
+		); /* slightly stronger on hover */
 	}
 
-	/* Firefox scrollbar styles */
+	.kanban-scrollbar::-webkit-scrollbar-corner {
+		background: transparent;
+	}
+
+	/* Firefox: hide by default, show thin on hover */
 	.kanban-scrollbar {
-		scrollbar-width: thin;
+		scrollbar-width: none; /* hidden */
 		scrollbar-color: hsl(var(--border)) transparent;
+	}
+	.kanban-scrollbar:hover {
+		scrollbar-width: thin; /* minimalist */
 	}
 }

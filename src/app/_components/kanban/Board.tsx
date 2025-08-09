@@ -12,6 +12,10 @@ import {
 import { DatabaseService } from "@/lib/database";
 import { KanbanBoardWithData, KanbanColumnWithCards } from "@/lib/types";
 import KanbanColumn from "./Column";
+import {
+	DragAnimationProvider,
+	useDragAnimation,
+} from "./DragAnimationProvider";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { reorder } from "@atlaskit/pragmatic-drag-and-drop/reorder";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
@@ -30,13 +34,14 @@ import {
 	DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-export default function KanbanBoard({
+function InnerKanbanBoard({
 	className,
 	workspaceId,
 }: {
 	className?: string;
 	workspaceId: string;
 }) {
+	const { setEnabled: setDragAnimationEnabled } = useDragAnimation();
 	const { board: hookBoard, loading, refetch } = useWorkspaceBoard(workspaceId);
 	const [board, setBoard] = useState<KanbanBoardWithData | null>(null);
 	const [, setDraggedColumnId] = useState<string | null>(null);
@@ -72,6 +77,12 @@ export default function KanbanBoard({
 				}
 
 				setDraggedColumnId(null);
+				// disable animation after drop completes
+				setDragAnimationEnabled(false);
+			},
+			onDragStart() {
+				// enable animation only during DnD
+				setDragAnimationEnabled(true);
 			},
 		});
 
@@ -377,7 +388,10 @@ export default function KanbanBoard({
 		// Update UI immediately
 		setBoard({
 			...board,
-			columns: [...board.columns, { ...tempColumn, cards: [] } as KanbanColumnWithCards],
+			columns: [
+				...board.columns,
+				{ ...tempColumn, cards: [] } as KanbanColumnWithCards,
+			],
 		});
 
 		// Background database operation
@@ -1115,5 +1129,16 @@ export default function KanbanBoard({
 				</div>
 			</div>
 		</div>
+	);
+}
+
+export default function KanbanBoard(props: {
+	className?: string;
+	workspaceId: string;
+}) {
+	return (
+		<DragAnimationProvider>
+			<InnerKanbanBoard {...props} />
+		</DragAnimationProvider>
 	);
 }
