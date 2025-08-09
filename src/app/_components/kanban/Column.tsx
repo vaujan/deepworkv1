@@ -25,8 +25,6 @@ import {
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { autoScrollForElements } from "@atlaskit/pragmatic-drag-and-drop-auto-scroll/element";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
-import { useDragAnimation } from "./DragAnimationProvider";
 
 const ColumnContainer = React.memo(function ColumnContainer({
 	column,
@@ -39,7 +37,6 @@ const ColumnContainer = React.memo(function ColumnContainer({
 	onDeleteCard,
 	onDuplicateCard,
 }: KanbanColumnProps) {
-	const { enabled: dragAnimationEnabled } = useDragAnimation();
 	const [editMode, setEditMode] = useState(false);
 	const [editValue, setEditValue] = useState(column.name);
 	const [newCardTitle, setNewCardTitle] = useState("");
@@ -275,19 +272,13 @@ const ColumnContainer = React.memo(function ColumnContainer({
 	}
 
 	return (
-		<motion.div
+		<div
 			ref={columnRef}
 			className={`relative overflow-hidden flex  flex-col min-w-[300px] w-[300px] max-h-[80vh] rounded-xl ${
 				isDraggedOver
 					? "border-accent/50 bg-accent/5 shadow-sm"
 					: "border-border/50"
 			} bg-card/60 group transition-colors`}
-			layout={dragAnimationEnabled}
-			transition={
-				dragAnimationEnabled
-					? { type: "spring", stiffness: 300, damping: 30, mass: 0.6 }
-					: undefined
-			}
 		>
 			{/* Column Header */}
 			<div
@@ -365,7 +356,7 @@ const ColumnContainer = React.memo(function ColumnContainer({
 					className="h-fit max-h-[750px] overflow-y-auto kanban-scrollbar"
 					data-testid="column-scroll-area"
 				>
-					<div className="p-2 min-h-15 space-y-2">
+					<div className="p-2 min-h-1rem space-y-2">
 						{column.cards.map((card, cardIndex) => (
 							<KanbanCard
 								key={card.id}
@@ -444,7 +435,7 @@ const ColumnContainer = React.memo(function ColumnContainer({
 					<div className="absolute -right-1 -bottom-1 w-2 h-2 bg-accent rounded-full" />
 				</div>
 			)}
-		</motion.div>
+		</div>
 	);
 });
 

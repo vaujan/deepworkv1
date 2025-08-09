@@ -12,10 +12,6 @@ import {
 import { DatabaseService } from "@/lib/database";
 import { KanbanBoardWithData, KanbanColumnWithCards } from "@/lib/types";
 import KanbanColumn from "./Column";
-import {
-	DragAnimationProvider,
-	useDragAnimation,
-} from "./DragAnimationProvider";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { reorder } from "@atlaskit/pragmatic-drag-and-drop/reorder";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
@@ -41,7 +37,6 @@ function InnerKanbanBoard({
 	className?: string;
 	workspaceId: string;
 }) {
-	const { setEnabled: setDragAnimationEnabled } = useDragAnimation();
 	const { board: hookBoard, loading, refetch } = useWorkspaceBoard(workspaceId);
 	const [board, setBoard] = useState<KanbanBoardWithData | null>(null);
 	const [, setDraggedColumnId] = useState<string | null>(null);
@@ -77,12 +72,6 @@ function InnerKanbanBoard({
 				}
 
 				setDraggedColumnId(null);
-				// disable animation after drop completes
-				setDragAnimationEnabled(false);
-			},
-			onDragStart() {
-				// enable animation only during DnD
-				setDragAnimationEnabled(true);
 			},
 		});
 
@@ -1136,9 +1125,5 @@ export default function KanbanBoard(props: {
 	className?: string;
 	workspaceId: string;
 }) {
-	return (
-		<DragAnimationProvider>
-			<InnerKanbanBoard {...props} />
-		</DragAnimationProvider>
-	);
+	return <InnerKanbanBoard {...props} />;
 }

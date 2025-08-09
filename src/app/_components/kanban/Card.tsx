@@ -21,8 +21,6 @@ import {
 	attachClosestEdge,
 	extractClosestEdge,
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
-import { motion } from "framer-motion";
-import { useDragAnimation } from "./DragAnimationProvider";
 
 interface KanbanCardComponentProps extends KanbanCardProps {
 	index: number;
@@ -36,7 +34,6 @@ export default function KanbanCard({
 	onDuplicate,
 	index,
 }: KanbanCardComponentProps) {
-	const { enabled: dragAnimationEnabled } = useDragAnimation();
 	const [isEditing, setIsEditing] = useState(false);
 	const [editTitle, setEditTitle] = useState(card.title);
 	const [isHovered, setIsHovered] = useState(false);
@@ -261,7 +258,7 @@ export default function KanbanCard({
 	}
 
 	return (
-		<motion.div
+		<div
 			ref={cardRef}
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
@@ -270,12 +267,6 @@ export default function KanbanCard({
 					? "border-accent/50 bg-accent/5 shadow-sm"
 					: "border-border hover:border-accent/50 bg-card hover:bg-card/80 hover:shadow-sm"
 			} ${isEditing ? "ring-2 ring-primary/50 cursor-default" : "select-none"} group`}
-			layout={dragAnimationEnabled}
-			transition={
-				dragAnimationEnabled
-					? { type: "spring", stiffness: 500, damping: 40, mass: 0.5 }
-					: undefined
-			}
 			role="button"
 			tabIndex={0}
 			aria-label={`Card: ${card.title}`}
@@ -378,6 +369,6 @@ export default function KanbanCard({
 					</div>
 				</>
 			)}
-		</motion.div>
+		</div>
 	);
 }
