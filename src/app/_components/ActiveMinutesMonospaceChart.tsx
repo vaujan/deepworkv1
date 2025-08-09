@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
+import { ChevronDown, EllipsisVertical, TrendingUp } from "lucide-react";
 import { Bar, BarChart, XAxis } from "recharts";
 import React, { SVGProps } from "react";
 import { AnimatePresence, motion } from "motion/react";
@@ -16,6 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { JetBrains_Mono } from "next/font/google";
+import { Button } from "@/components/ui/button";
 
 const jetBrainsMono = JetBrains_Mono({
 	subsets: ["latin"],
@@ -62,18 +63,34 @@ export default function ActiveMinutesMonospaceChart() {
 	}, [activeIndex]);
 
 	return (
-		<Card>
+		<Card className="bg-transparent">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
-					<span
-						className={cn(jetBrainsMono.className, "text-2xl tracking-tighter")}
-					>
-						{activeData ? activeData.minutes : 123} min
-					</span>
-					<Badge variant="secondary">
-						<TrendingUp className="h-4 w-4" />
-						<span>5.2%</span>
-					</Badge>
+					<div className="flex w-full justify-between items-center">
+						<div className="flex gap-3">
+							<span
+								className={cn(
+									jetBrainsMono.className,
+									"text-2xl tracking-tighter"
+								)}
+							>
+								{activeData ? activeData.minutes : 123} min
+							</span>
+							<Badge variant="secondary">
+								<TrendingUp className="h-4 w-4" />
+								<span>5.2%</span>
+							</Badge>
+						</div>
+						<div className="flex gap-3">
+							<Button variant={"secondary"} size={"sm"}>
+								12 Months
+								<ChevronDown />
+							</Button>
+							<Button size={"sm"} className="size-8" variant={"ghost"}>
+								<EllipsisVertical />
+							</Button>
+						</div>
+					</div>
 				</CardTitle>
 				<CardDescription>Deep work minutes per day</CardDescription>
 			</CardHeader>
@@ -87,7 +104,7 @@ export default function ActiveMinutesMonospaceChart() {
 							return (
 								<ChartContainer
 									config={chartConfig}
-									className="h-[240px] md:h-[300px] aspect-auto"
+									className="h-[240px] md:h-[300px] mb-3 aspect-auto"
 									style={{ minWidth: minWidthPx, maxWidth: "100%" }}
 								>
 									<BarChart
